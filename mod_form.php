@@ -35,11 +35,11 @@ require_once($CFG->dirroot.'/mod/accredible/locallib.php');
 class mod_accredible_mod_form extends moodleform_mod {
 
     function definition() {
-        global $DB, $OUTPUT, $CFG;
+        global $DB, $OUTPUT, $CFG, $COURSE;
         $updatingcert = false;
         $alreadyexists = false;
 
-        $description = Html2Text\Html2Text::convert($course->summary);
+        $description = Html2Text\Html2Text::convert($COURSE->summary);
         if(empty($description)){
             $description = "Recipient has compeleted the achievement.";
         }
@@ -151,6 +151,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         }
 
         // Unissued certificates header
+        $users_earned_certificate = [];
         if (count($users_earned_certificate) > 0) {
             $unissued_header = false;
             foreach ($users_earned_certificate as $user) {
