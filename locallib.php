@@ -750,7 +750,7 @@ function unserialize_completion_array($completion_object) {
 }
 
 function accredible_post_essay_answers($user_id, $course_id, $credential_id) {
-	global $DB;
+	global $DB, $CFG;
 
 	// grab the course quizes
 	if($quizes = $DB->get_records_select('quiz', 'course = :course_id', array('course_id' => $course_id)) ) {
