@@ -52,7 +52,7 @@ $string['id'] = 'ID';
 $string['indexheader'] = 'All certificates/badges for {$a}';
 $string['issued'] = 'Issued';
 $string['manualheader'] = 'Manually issue certificates/badges';
-$string['modulename'] = 'Accredible certificates & badges';
+$string['modulename'] = 'Accredible certificates and badges';
 $string['modulename_help'] = 'The Accredible certificate & badge activity module allows you to issue course certificates or badges to students on accredible.com.
 
 Add the activity wherever you want your students see their certificate or badge.';
@@ -61,7 +61,7 @@ $string['modulenameplural'] = 'Accredible certificates/badges';
 $string['nocertificates'] = 'There are no certificates/badges';
 $string['passinggrade'] = 'Percentage grade needed to pass course (%)';
 $string['pluginadministration'] = 'Accredible certificates/badges administration';
-$string['pluginname'] = 'Accredible certificates & badges';
+$string['pluginname'] = 'Accredible certificates and badges';
 $string['recipient'] = 'Recipient';
 $string['templatename'] = 'Cohort name (from dashboard)';
 $string['groupselect'] = 'Group';
