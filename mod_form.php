@@ -49,7 +49,7 @@ class mod_accredible_mod_form extends moodleform_mod {
      * @return void
      */
     public function definition() {
-        global $DB, $COURSE, $CFG;
+        global $DB, $COURSE, $CFG, $PAGE;
 
         $credentialsclient = new credentials();
         $groupsclient = new groups();
@@ -110,6 +110,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         $inputstyle = array('style' => 'width: 399px');
 
         // Form start.
+        $PAGE->requires->js_call_amd('mod_accredible/userlist_updater', 'init');
         $mform =& $this->_form;
         $mform->addElement('hidden', 'course', $id);
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -220,6 +221,7 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         // Manually issue certificates header.
         $mform->addElement('header', 'chooseusers', get_string('manualheader', 'accredible'));
+        $mform->addElement('html', '<div id="users-container">');
         $this->add_checkbox_controller(1, 'Select All/None');
 
         if ($updatingcert) {
@@ -259,6 +261,7 @@ class mod_accredible_mod_form extends moodleform_mod {
                     $user->firstname . ' ' . $user->lastname . '    ' . $user->email, null, array('group' => 1));
             }
         }
+        $mform->addElement('html', '</div>');
 
         $mform->addElement('header', 'gradeissue', get_string('gradeissueheader', 'accredible'));
         $mform->addElement('select', 'finalquiz', get_string('chooseexam', 'accredible'), $quizchoices);
