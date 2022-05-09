@@ -23,7 +23,7 @@ global $CFG;
 require_once($CFG->libdir  . '/externallib.php');
 require_once($CFG->dirroot . '/mod/accredible/locallib.php');
 
-use mod_accredible\local\credentials;
+use mod_accredible\helpers\user_helper;
 
 /**
  * Web service end point for the reload users filter.
@@ -73,38 +73,12 @@ class form_helper extends \external_api {
      */
     public static function reload_users($courseid, $groupid) {
         $params = self::validate_parameters(self::reload_users_parameters(), array('courseid' => $courseid, 'groupid' => $groupid));
-        $users = array();
         $context = \context_course::instance($courseid);
-        $enrolledusers = get_enrolled_users($context, "mod/accredible:view", null, 'u.*');
+        self::validate_context($context);
 
-        if ($enrolledusers) {
-            $credentialsclient = new credentials();
-            $certificates = $credentialsclient->get_credentials($groupid);
+        $userhelper = new user_helper();
+        $users = $userhelper->load_users_with_credentials_from_course_context($context, $groupid);
 
-            foreach ($enrolledusers as $user) {
-                $credentialurl = null;
-                $credentialid = null;
-                foreach ($certificates as $certificate) {
-                    if ($certificate->recipient->email == strtolower($user->email)) {
-                        $credentialid = $certificate->id;
-
-                        if (isset($certificate->url)) {
-                            $credentialurl = $certificate->url;
-                        } else {
-                            $credentialurl = 'https://www.credential.net/' . $certificate->id;
-                        }
-                        break;
-                    }
-                }
-                $users[] = array(
-                    'id'             => $user->id,
-                    'email'          => $user->email,
-                    'name'           => $user->firstname . ' ' . $user->lastname,
-                    'credential_url' => $credentialurl,
-                    'credential_id'  => $credentialid
-                );
-            }
-        }
         return $users;
     }
 }

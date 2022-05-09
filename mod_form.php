@@ -250,6 +250,10 @@ class mod_accredible_mod_form extends moodleform_mod {
                     $mform->addElement('static', 'certlink'.$user->id,
                         $user->firstname . ' ' . $user->lastname . '    ' . $user->email,
                         "Certificate $certid - <a href='$certlink' target='_blank'>link</a>");
+                    $mform->addElement('html', '<div class="hidden">');
+                    $mform->addElement('advcheckbox', 'users['.$user->id.']',
+                        $user->firstname . ' ' . $user->lastname . '    ' . $user->email, null, array('group' => 1));
+                    $mform->addElement('html', '</div>');
                 } else { // Show a checkbox if they don't.
                     $mform->addElement('advcheckbox', 'users['.$user->id.']',
                         $user->firstname . ' ' . $user->lastname . '    ' . $user->email, null, array('group' => 1));
