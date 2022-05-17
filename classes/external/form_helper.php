@@ -23,7 +23,7 @@ global $CFG;
 require_once($CFG->libdir  . '/externallib.php');
 require_once($CFG->dirroot . '/mod/accredible/locallib.php');
 
-use mod_accredible\helpers\user_helper;
+use mod_accredible\local\users;
 
 /**
  * Web service end point for the reload users filter.
@@ -76,8 +76,9 @@ class form_helper extends \external_api {
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
-        $userhelper = new user_helper();
-        $users = $userhelper->load_users_with_credentials_from_course_context($context, $groupid);
+        $enrolledusers = get_enrolled_users($context, "mod/accredible:view", null, 'u.*', 'id');
+        $userhelper = new users();
+        $users = $userhelper->fetch_credentials_for_users($enrolledusers, $groupid);
 
         return $users;
     }

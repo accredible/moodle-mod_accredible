@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace mod_accredible\helpers;
+namespace mod_accredible\local;
 
 use mod_accredible\apirest\apirest;
 use mod_accredible\local\credentials;
@@ -27,7 +27,7 @@ use mod_accredible\local\credentials;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class user_helper {
+class users {
     /**
      * HTTP request apirest.
      * @var apirest
@@ -49,17 +49,16 @@ class user_helper {
     }
 
     /**
-     * Load list of users from a course and fetch their credentials from
+     * Receive a list of users and fetch their credentials from
      * the accredible group provided.
      *
-     * @param context $context course context
+     * @param array $enrolledusers array of users
      * @param int $groupid accredible group id
      * @return array the list of users
      */
-    public function load_users_with_credentials_from_course_context($context, $groupid = null) {
+    public function fetch_credentials_for_users($enrolledusers, $groupid = null) {
         $users = array();
         $certificates = array();
-        $enrolledusers = get_enrolled_users($context, "mod/accredible:view", null, 'u.*', 'id');
 
         if ($enrolledusers) {
             if ($groupid) {

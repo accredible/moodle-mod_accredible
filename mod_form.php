@@ -221,6 +221,9 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         // Manually issue certificates header.
         $mform->addElement('header', 'chooseusers', get_string('manualheader', 'accredible'));
+        $mform->addElement('html', '<div id="users-warning" class="hidden">');
+        $mform->addElement('static', 'nouserswarning', '', get_string('nouserswarning', 'accredible'));
+        $mform->addElement('html', '</div>');
         $mform->addElement('html', '<div id="users-container">');
         $this->add_checkbox_controller(1, 'Select All/None');
 

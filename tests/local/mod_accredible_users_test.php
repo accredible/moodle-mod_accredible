@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace mod_accredible\helpers;
+namespace mod_accredible\local;
 
-use mod_accredible\helpers\user_helper;
+use mod_accredible\local\user;
 use mod_accredible\client\client;
 use mod_accredible\apirest\apirest;
 
@@ -29,7 +29,7 @@ use mod_accredible\apirest\apirest;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_user_helper_test extends \advanced_testcase {
+class mod_accredible_users_test extends \advanced_testcase {
     /**
      * Setup before every test.
      */
@@ -65,11 +65,11 @@ class mod_accredible_user_helper_test extends \advanced_testcase {
     /**
      * Generate list of users with their credentials from a course
      */
-    public function test_load_users_with_credentials_from_course_context() {
-        $userhelper = new user_helper();
+    public function test_fetch_credentials_for_users() {
+        $userhelper = new users();
 
         // When there are not users.
-        $result = $userhelper->load_users_with_credentials_from_course_context($this->context);
+        $result = $userhelper->fetch_credentials_for_users(array());
         $this->assertEquals($result, array());
 
         // When there are users but not groupid.
@@ -81,8 +81,8 @@ class mod_accredible_user_helper_test extends \advanced_testcase {
                              'credential_url' => null,
                              'credential_id'  => null);
         $expectedresponse = array('0' => $userrespone);
-
-        $result = $userhelper->load_users_with_credentials_from_course_context($this->context);
+        $enrolledusers = get_enrolled_users($this->context, "mod/accredible:view", null, 'u.*', 'id');
+        $result = $userhelper->fetch_credentials_for_users($enrolledusers);
         $this->assertEquals($result, $expectedresponse);
 
         // When there users and groupid.
@@ -112,8 +112,9 @@ class mod_accredible_user_helper_test extends \advanced_testcase {
             ->will($this->onConsecutiveCalls($resdatapage1, $resdatapage2));
 
         $api = new apirest($mockclient1);
-        $userhelper = new user_helper($api);
-        $result = $userhelper->load_users_with_credentials_from_course_context($this->context, 123);
+        $userhelper = new users($api);
+        $enrolledusers = get_enrolled_users($this->context, "mod/accredible:view", null, 'u.*', 'id');
+        $result = $userhelper->fetch_credentials_for_users($enrolledusers, 123);
         $this->assertEquals($result, $expectedresponse);
     }
 }

@@ -58,7 +58,6 @@ class apirest {
         if ($devapiendpoint) {
             $this->apiendpoint = $devapiendpoint;
         }
-
         // A mock client is passed when unit testing.
         if ($client) {
             $this->client = $client;

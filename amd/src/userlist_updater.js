@@ -28,8 +28,14 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
          */
         init: function() {
             $('select#id_groupid').on('change', t.groupChanged);
-            t.lastGroup = null;
+            t.lastGroup = $('select#id_groupid').val();
             t.courseid = $('input:hidden[name=course]').val();
+            t.userwarning = $('#users-warning');
+            t.userscontainer = $('#users-container');
+            if (t.lastGroup === '') {
+                t.userwarning.removeClass('hidden');
+                t.userscontainer.addClass('hidden');
+            }
         },
 
         /**
@@ -43,11 +49,15 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
 
             if (t.lastGroup === '') {
                 t.updateChoices([]);
+                t.userwarning.removeClass('hidden');
+                t.userscontainer.addClass('hidden');
             } else {
                 Ajax.call([{
                     methodname: 'mod_accredible_reload_users',
                     args: { courseid: t.courseid, groupid: $('select#id_groupid').val()}
                 }])[0].done(t.updateChoices);
+                t.userwarning.addClass('hidden');
+                t.userscontainer.removeClass('hidden');
             }
         },
 
@@ -59,7 +69,6 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
         updateChoices: function(response) {
             var output = "";
             var userselements = $('#users-container .form-group').not('.femptylabel');
-            var userscontainer = $('#users-container');
 
             userselements.remove();
 
@@ -84,7 +93,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                 }
             });
 
-            userscontainer.append(output);
+            t.userscontainer.append(output);
         }
     };
     return t;
