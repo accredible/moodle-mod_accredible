@@ -65,11 +65,11 @@ class mod_accredible_users_test extends \advanced_testcase {
     /**
      * Generate list of users with their credentials from a course
      */
-    public function test_fetch_credentials_for_users() {
+    public function test_get_users_with_credentials() {
         $userhelper = new users();
 
         // When there are not users.
-        $result = $userhelper->fetch_credentials_for_users(array());
+        $result = $userhelper->get_users_with_credentials(array());
         $this->assertEquals($result, array());
 
         // When there are users but not groupid.
@@ -82,7 +82,7 @@ class mod_accredible_users_test extends \advanced_testcase {
                              'credential_id'  => null);
         $expectedresponse = array('0' => $userrespone);
         $enrolledusers = get_enrolled_users($this->context, "mod/accredible:view", null, 'u.*', 'id');
-        $result = $userhelper->fetch_credentials_for_users($enrolledusers);
+        $result = $userhelper->get_users_with_credentials($enrolledusers);
         $this->assertEquals($result, $expectedresponse);
 
         // When there users and groupid.
@@ -91,8 +91,8 @@ class mod_accredible_users_test extends \advanced_testcase {
         $user2respone = array('id'             => $user2->id,
                               'email'          => $user2->email,
                               'name'           => $user2->firstname . ' ' . $user2->lastname,
-                              'credential_url' => 'https://www.credential.net/10250009',
-                              'credential_id'  => 10250009);
+                              'credential_url' => 'https://www.credential.net/10250012',
+                              'credential_id'  => 10250012);
         $expectedresponse = array('0' => $userrespone, '1' => $user2respone);
 
         $mockclient1 = $this->getMockBuilder('client')
@@ -114,7 +114,7 @@ class mod_accredible_users_test extends \advanced_testcase {
         $api = new apirest($mockclient1);
         $userhelper = new users($api);
         $enrolledusers = get_enrolled_users($this->context, "mod/accredible:view", null, 'u.*', 'id');
-        $result = $userhelper->fetch_credentials_for_users($enrolledusers, 123);
+        $result = $userhelper->get_users_with_credentials($enrolledusers, 123);
         $this->assertEquals($result, $expectedresponse);
     }
 }

@@ -78,7 +78,7 @@ class form_helper extends \external_api {
 
         $enrolledusers = get_enrolled_users($context, "mod/accredible:view", null, 'u.*', 'id');
         $userhelper = new users();
-        $users = $userhelper->fetch_credentials_for_users($enrolledusers, $groupid);
+        $users = $userhelper->get_users_with_credentials($enrolledusers, $groupid);
 
         return $users;
     }

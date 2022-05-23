@@ -56,40 +56,50 @@ class users {
      * @param int $groupid accredible group id
      * @return array the list of users
      */
-    public function fetch_credentials_for_users($enrolledusers, $groupid = null) {
+    public function get_users_with_credentials($enrolledusers, $groupid = null) {
         $users = array();
         $certificates = array();
 
-        if ($enrolledusers) {
-            if ($groupid) {
-                $credentialsclient = new credentials($this->apirest);
-                $certificates = $credentialsclient->get_credentials($groupid);
-            }
+        if (!$enrolledusers) {
+            return $users;
+        }
 
-            foreach ($enrolledusers as $user) {
-                $credentialurl = null;
-                $credentialid = null;
-                foreach ($certificates as $certificate) {
-                    if ($certificate->recipient->email == strtolower($user->email)) {
-                        $credentialid = $certificate->id;
+        $certificatesmemo = array();
+        if ($groupid) {
+            $credentialsclient = new credentials($this->apirest);
+            $certificates = $credentialsclient->get_credentials($groupid);
 
-                        if (isset($certificate->url)) {
-                            $credentialurl = $certificate->url;
-                        } else {
-                            $credentialurl = 'https://www.credential.net/' . $certificate->id;
-                        }
-                        break;
-                    }
+            foreach ($certificates as $certificate) {
+                if (isset($certificate->url)) {
+                    $credentialurl = $certificate->url;
+                } else {
+                    $credentialurl = 'https://www.credential.net/' . $certificate->id;
                 }
-                $user = array(
-                    'id'             => $user->id,
-                    'email'          => $user->email,
-                    'name'           => $user->firstname . ' ' . $user->lastname,
-                    'credential_url' => $credentialurl,
-                    'credential_id'  => $credentialid
+                $certificatesmemo[$certificate->recipient->email] = array(
+                    'credentialid' => $certificate->id,
+                    'credentialurl' => $credentialurl
                 );
-                array_push($users, $user);
             }
+
+        }
+
+        foreach ($enrolledusers as $user) {
+            if (isset($certificatesmemo[strtolower($user->email)])) {
+                $certificate = $certificatesmemo[strtolower($user->email)];
+            } else {
+                $certificate = null;
+            }
+
+            $credentialurl = isset($certificate) ? $certificate['credentialurl'] : null;
+            $credentialid = isset($certificate) ? $certificate['credentialid'] : null;
+            $user = array(
+                'id'             => $user->id,
+                'email'          => $user->email,
+                'name'           => $user->firstname . ' ' . $user->lastname,
+                'credential_url' => $credentialurl,
+                'credential_id'  => $credentialid
+            );
+            array_push($users, $user);
         }
         return $users;
     }
