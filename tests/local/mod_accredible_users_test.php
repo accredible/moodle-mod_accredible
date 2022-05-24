@@ -116,5 +116,27 @@ class mod_accredible_users_test extends \advanced_testcase {
         $enrolledusers = get_enrolled_users($this->context, "mod/accredible:view", null, 'u.*', 'id');
         $result = $userhelper->get_users_with_credentials($enrolledusers, 123);
         $this->assertEquals($result, $expectedresponse);
+
+        // When apirest returns an error response.
+        $mockclient2 = $this->getMockBuilder('client')
+            ->setMethods(['get'])
+            ->getMock();
+
+        // Mock API response data.
+        $mockclient2->error = 'The requested URL returned error: 401 Unauthorized';
+        $resdata = $this->mockapi->resdata('unauthorized_error.json');
+
+        // Expect to call the endpoint once with page and page_size.
+        $url = "https://api.accredible.com/v1/all_credentials?group_id=123&email=&page_size=50&page=1";
+        $mockclient2->expects($this->once())
+            ->method('get')
+            ->with($this->equalTo($url))
+            ->willReturn($resdata);
+
+        // Expect to return empty array.
+        $api = new apirest($mockclient2);
+        $userhelper = new users($api);
+        $result = $userhelper->get_users_with_credentials($enrolledusers, 123);
+        $this->assertEquals($result, array());
     }
 }

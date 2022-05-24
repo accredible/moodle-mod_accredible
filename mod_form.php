@@ -202,6 +202,7 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         // Manually issue certificates header.
         $mform->addElement('header', 'chooseusers', get_string('manualheader', 'accredible'));
+        // Hidden message to be displayed with Javascript when no users are available.
         $mform->addElement('html', '<div id="users-warning" class="hidden">');
         $mform->addElement('static', 'nouserswarning', '', get_string('nouserswarning', 'accredible'));
         $mform->addElement('html', '</div>');
