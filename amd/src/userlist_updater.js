@@ -67,33 +67,13 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
          * @param {Array} response - array of users.
          */
         updateChoices: function(response) {
-            var output = "";
+            var form = new DOMParser().parseFromString(response, "text/html");
+
             var userselements = $('#users-container .form-group').not('.femptylabel');
 
             userselements.remove();
 
-            $(response).each(function(index, option) {
-                if (option.credential_url) {
-                    output += "<div id='fitem_id_certlink" + option.id + "' class='form-group row fitem'>";
-                    output += "<div class='col-md-3 col-form-label d-flex pb-0 pr-md-0'>";
-                    output += "<span class='d-inline-block'>" + option.name + "   " + option.email + "</span></div>";
-                    output += "<div class='col-md-9 form-inline align-items-start felement' data-fieldtype='static'>";
-                    output += "<div class='form-control-static'>Certificate " + option.credential_id;
-                    output += " - <a href='" + option.credential_url + "' target='_blank'>link</a></div></div></div>";
-                } else {
-                    output += "<div class='form-group row fitem checkboxgroup1'>";
-                    output += "<div class='col-md-3'></div><div class='col-md-9 checkbox'>";
-                    output += "<div class='form-check d-flex'>";
-                    output += "<input type='hidden' name='users[" + option.id + "]' value='0'>";
-                    output += "<input type='checkbox' name='users[" + option.id + "]'"; 
-                    output += "class='form-check-input checkboxgroup1' value='1' id='id_users_" + option.id + "'>";
-                    output += "<label for='id_users_" + option.id + "'>";
-                    output += option.name + "   " + option.email;
-                    output += "</label></div></div></div>";
-                }
-            });
-
-            t.userscontainer.append(output);
+            t.userscontainer.append($(form).find('#users-list > div'));
         }
     };
     return t;

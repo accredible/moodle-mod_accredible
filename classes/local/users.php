@@ -20,7 +20,7 @@ use mod_accredible\apirest\apirest;
 use mod_accredible\local\credentials;
 
 /**
- * Local functions related to credentials.
+ * Local functions related to users.
  *
  * @package    mod_accredible
  * @subpackage accredible
