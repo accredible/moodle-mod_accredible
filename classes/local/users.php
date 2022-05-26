@@ -69,22 +69,21 @@ class users {
             try {
                 $credentialsclient = new credentials($this->apirest);
                 $certificates = $credentialsclient->get_credentials($groupid);
-
-                foreach ($certificates as $certificate) {
-                    if (isset($certificate->url)) {
-                        $credentialurl = $certificate->url;
-                    } else {
-                        $credentialurl = 'https://www.credential.net/' . $certificate->id;
-                    }
-                    $certificatesmemo[$certificate->recipient->email] = array(
-                        'credentialid' => $certificate->id,
-                        'credentialurl' => $credentialurl
-                    );
-                }
             } catch (\moodle_exception $e) {
                 return $users;
             }
 
+            foreach ($certificates as $certificate) {
+                if (isset($certificate->url)) {
+                    $credentialurl = $certificate->url;
+                } else {
+                    $credentialurl = 'https://www.credential.net/' . $certificate->id;
+                }
+                $certificatesmemo[$certificate->recipient->email] = array(
+                    'credentialid' => $certificate->id,
+                    'credentialurl' => $credentialurl
+                );
+            }
         }
 
         foreach ($enrolledusers as $user) {
