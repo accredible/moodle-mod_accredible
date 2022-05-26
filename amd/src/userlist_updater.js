@@ -21,7 +21,8 @@
  * @copyright Accredible <dev@accredible.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['jquery', 'core/ajax'], function($, Ajax) {
+
+define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
     var t = {
         /**
          * Initialise the handling.
@@ -56,6 +57,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                     methodname: 'mod_accredible_reload_users',
                     args: { courseid: t.courseid, groupid: $('select#id_groupid').val()}
                 }])[0].done(t.updateChoices);
+
                 t.userwarning.addClass('hidden');
                 t.userscontainer.removeClass('hidden');
             }
@@ -67,13 +69,47 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
          * @param {Array} response - array of users.
          */
         updateChoices: function(response) {
-            var form = new DOMParser().parseFromString(response, "text/html");
-
             var userselements = $('#users-container .form-group').not('.femptylabel');
-
             userselements.remove();
 
-            t.userscontainer.append($(form).find('#users-list > div'));
+            $(response).each(function(index, user) {
+                if (user.credential_url) {
+                  var context = {
+                    element: {
+                      html: 'Certificate ' + user.credential_id + ' - <a href='+ user.credential_url +' target="_blank">link</a>',
+                      staticlabel: true
+                    },
+                    label: user.name + '   ' + user.email
+                  };
+                } else {
+                  var context = {
+                    element: {
+                      id: user.id,
+                      name: 'users['+ user.id +']',
+                      extraclasses: 'checkboxgroup1'
+                    },
+                    label: user.name + '   ' + user.email
+                  };
+                }
+
+                t.renderUser(context, user.credential_url);
+            });
+        },
+
+        /**
+         * Render the template with the user context.
+         *
+         * @param stdObject context - data for template.
+         * @param string certificate - certificate url to select correct template.
+         */
+        renderUser: function(context, certificate) {
+          template = certificate ? 'core_form/element-static' : 'core_form/element-advcheckbox';
+          
+          Templates.renderForPromise(template, context).then(function (_ref) {
+            var html = _ref.html;
+            var js = _ref.js;
+            Templates.appendNodeContents('#users-container', html, js);
+          });
         }
     };
     return t;
