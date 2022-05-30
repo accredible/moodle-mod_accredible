@@ -124,6 +124,9 @@ class mod_accredible_mod_form extends moodleform_mod {
         $PAGE->requires->js_call_amd('mod_accredible/userlist_updater', 'init');
         $mform =& $this->_form;
         $mform->addElement('hidden', 'course', $id);
+        if ($updatingcert) {
+            $mform->addElement('hidden', 'instance-id', $cm->instance);
+        }
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         $mform->addElement('text', 'name', get_string('activityname', 'accredible'), $inputstyle);
@@ -182,32 +185,32 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         // Users who pass the requirements but not have credential.
         if (isset($userswithcredential) && count($userswithcredential) > 0) {
-            $unissuedheader = false;
+            $mform->addElement('header', 'chooseunissuedusers', get_string('unissuedheader', 'accredible'));
+            $mform->addElement('html', '<div class="manual-issue-warning hidden">');
+            $mform->addElement('static', 'nouserswarning', '', get_string('nouserswarning', 'accredible'));
+            $mform->addElement('html', '</div>');
+            $mform->addElement('static', 'unissueddescription', '', get_string('unissueddescription', 'accredible'));
+            $this->add_checkbox_controller(2, 'Select All/None');
+            $mform->addElement('html', '<div id="unissued-users-container">');
 
             foreach ($userswithcredential as $user) {
-                if (accredible_check_if_cert_earned($accrediblecertificate, $course, $user) && !$user['credential_id']) {
-                    if (!$unissuedheader) {
-                        $mform->addElement('header', 'chooseunissuedusers', get_string('unissuedheader', 'accredible'));
-                        $mform->addElement('static', 'unissueddescription', '', get_string('unissueddescription', 'accredible'));
-                        $this->add_checkbox_controller(2, 'Select All/None');
-                        $unissuedheader = true;
-                    }
-
+                if (!$user['credential_id'] && accredible_check_if_cert_earned($accrediblecertificate, $user)) {
                     // No existing certificate, add this user to the unissued users list.
                     $mform->addElement('advcheckbox', 'unissuedusers['.$user['id'].']',
                         $user['name'] . '    ' . $user['email'], null, array('group' => 2));
                 }
             }
+            $mform->addElement('html', '</div>');
         }
 
         // Manually issue certificates header.
         $mform->addElement('header', 'chooseusers', get_string('manualheader', 'accredible'));
         // Hidden message to be displayed with Javascript when no users are available.
-        $mform->addElement('html', '<div id="users-warning" class="hidden">');
+        $mform->addElement('html', '<div class="manual-issue-warning hidden">');
         $mform->addElement('static', 'nouserswarning', '', get_string('nouserswarning', 'accredible'));
         $mform->addElement('html', '</div>');
-        $mform->addElement('html', '<div id="users-container">');
         $this->add_checkbox_controller(1, 'Select All/None');
+        $mform->addElement('html', '<div id="manual-issue-users-container">');
 
         if ($updatingcert) {
             foreach ($userswithcredential as $user) {
