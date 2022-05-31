@@ -139,4 +139,103 @@ class mod_accredible_users_test extends \advanced_testcase {
         $result = $userhelper->get_users_with_credentials($enrolledusers, 123);
         $this->assertEquals($result, array());
     }
+
+    /**
+     * Generate list of users without credential but with requirements for the course pass.
+     */
+    public function test_get_unissued_users() {
+        $userhelper = new users();
+        $accredibleinstanceid = create_accredible_instance($this->course->id);
+
+        $generateduser2 = $this->getDataGenerator()->create_user(array('email' => 'person3@example.com'));
+        $this->getDataGenerator()->enrol_user($this->user->id, $this->course->id);
+        $this->getDataGenerator()->enrol_user($user2->id, $this->course->id);
+
+        $user1 = array('id'             => $this->user->id,
+                       'email'          => $this->user->email,
+                       'name'           => $this->user->firstname . ' ' . $this->user->lastname,
+                       'credential_url' => null,
+                       'credential_id'  => null);
+        $user2 = array('id'             => $generateduser2->id,
+                       'email'          => $generateduser2->email,
+                       'name'           => $generateduser2->firstname . ' ' . $generateduser2->lastname,
+                       'credential_url' => 'https://www.credential.net/10250012',
+                       'credential_id'  => 10250012);
+
+        $users = array($user1, $user2);
+
+        // When there are not users.
+        $result = $userhelper->get_unissued_users(array(), $accredibleinstanceid);
+        $this->assertEquals($result, array());
+
+        // When accredible instance id not provided.
+        $result = $userhelper->get_unissued_users($users);
+        $this->assertEquals($result, array());
+
+        // When the Accredible module don't have any requirement.
+        $result = $userhelper->get_unissued_users($users, $accredibleinstanceid);
+        $this->assertEquals($result, $expectedresponse);
+
+        // When there are not users who pass the requirements.
+        $quiz = $this->create_quiz_module($this->course->id);
+        $accredibleinstanceid = $this->create_accredible_instance($this->course->id, $quiz->id);
+
+        $result = $userhelper->get_unissued_users($users, $accredibleinstanceid);
+        $this->assertEquals($result, array());
+
+        // When there is a user who pass the requirements but have a credential.
+        $this->create_quiz_grades($quiz->id, $generateduser2->id, 8);
+        $result = $userhelper->get_unissued_users($users, $accredibleinstanceid);
+        $this->assertEquals($result, array());
+
+        // When there is a user who pass the requirements and not have a credential.
+        $this->create_quiz_grades($quiz->id, $this->user->id, 9);
+        $result = $userhelper->get_unissued_users($users, $accredibleinstanceid);
+        $expectedresponse = array($user1);
+        $this->assertEquals($result, $expectedresponse);
+    }
+
+    /**
+     * Create accredible activity.
+     *
+     * @param int $courseid
+     * @param int $finalquizid
+     */
+    private function create_accredible_instance($courseid, $finalquizid = 0) {
+        global $DB;
+        $dbrecord = array(
+            "name"                 => 'Accredible Test',
+            "course"               => $courseid,
+            "finalquiz"            => $finalquizid,
+            "passinggrade"         => 70,
+            "timecreated"          => time(),
+            "groupid"              => 1,
+            "completionactivities" => null
+        );
+
+        return $DB->insert_record('accredible', $dbrecord);
+    }
+
+    /**
+     * Create quiz module test
+     *
+     * @param int $courseid
+     */
+    private function create_quiz_module($courseid) {
+        $quiz = array("course" => $courseid, "grade" => 10);
+        return $this->getDataGenerator()->create_module('quiz', $quiz);
+    }
+
+    /**
+     * Create quiz grades test
+     *
+     * @param int $quizid
+     * @param int $userid
+     * @param int $grade
+     */
+    private function create_quiz_grades($quizid, $userid, $grade) {
+        global $DB;
+        $quizgrade = array("quiz" => $quizid, "userid" => $userid, "grade" => $grade);
+        $DB->insert_record('quiz_grades', $quizgrade);
+    }
 }

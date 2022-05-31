@@ -30,7 +30,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
         init: function() {
             $('select#id_groupid').on('change', t.groupChanged);
 
-            t.lastGroup = $('select#id_groupid').val();
+            t.lastSelectedGroup = $('select#id_groupid').val();
             t.courseid = $('input:hidden[name=course]').val();
             t.instanceid = $('input:hidden[name=instance-id]').val();
             t.userwarning = $('.manual-issue-warning');
@@ -39,7 +39,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             t.unissuedusersmessage = $('#fitem_id_unissueddescription');
             t.selectallbutton = $('#fitem_id_nosubmit_checkbox_controller1, #fitem_id_nosubmit_checkbox_controller2');
             
-            if (t.lastGroup === '') {
+            if (t.lastSelectedGroup === '') {
                 t.userwarning.removeClass('hidden');
                 t.manualuserscontainer.addClass('hidden');
             }
@@ -51,12 +51,12 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
         /**
          * Manage group changes from select dropdown.
          */
-        groupChanged: function() { 
-            if ($('select#id_groupid').val() === t.lastGroup) {
+        groupChanged: function() {
+            if ($('select#id_groupid').val() === t.lastSelectedGroup) {
                 return;
             }
-            t.lastGroup = $('select#id_groupid').val();
-            if (t.lastGroup === '') {
+            t.lastSelectedGroup = $('select#id_groupid').val();
+            if (t.lastSelectedGroup === '') {
                 t.displayNotUsersWarning();
             } else {
                 Ajax.call([{
@@ -90,27 +90,28 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
          * @param {Array} response - array of users.
          */
         updateUsers: function(response) {
+            var context;
             var userselements = $('#manual-issue-users-container .form-group, #unissued-users-container .form-group');
             userselements.remove();
 
-            $(response.manual_issue).each(function(index, user) {
+            $(response.users).each(function(index, user) {
                 if (user.credential_url) {
-                  var context = {
-                    element: {
-                        html: 'Certificate ' + user.credential_id + ' - <a href='+ user.credential_url +' target="_blank">link</a>',
-                        staticlabel: true
-                    },
-                    label: user.name + '   ' + user.email
-                  };
+                    context = {
+                        element: {
+                            html: 'Certificate ' + user.credential_id + ' - <a href='+ user.credential_url +' target="_blank">link</a>',
+                            staticlabel: true
+                        },
+                        label: user.name + '   ' + user.email
+                    };
                 } else {
-                  var context = {
-                    element: {
-                        id: user.id,
-                        name: 'users['+ user.id +']',
-                        extraclasses: 'checkboxgroup1'
-                    },
-                    label: user.name + '   ' + user.email
-                  };
+                    context = {
+                        element: {
+                            id: user.id,
+                            name: 'users['+ user.id +']',
+                            extraclasses: 'checkboxgroup1'
+                        },
+                        label: user.name + '   ' + user.email
+                    };
                 }
 
                 t.renderUser(context, '#manual-issue-users-container', user.credential_url);
@@ -119,7 +120,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             if (response.unissued_users.length > 0) {
                 t.unissuedusers.show();
                 $(response.unissued_users).each(function(index, user) {
-                    var context = {
+                    context = {
                         element: {
                             id: user.id,
                             name: 'users['+ user.id +']',
@@ -144,7 +145,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
          * @param string certificate - certificate url to select correct template.
          */
         renderUser: function(context, containerid, certificate) {
-          template = certificate ? 'core_form/element-static' : 'core_form/element-advcheckbox';
+          var template = certificate ? 'core_form/element-static' : 'core_form/element-advcheckbox';
           
           Templates.renderForPromise(template, context).then(function (_ref) {
             Templates.appendNodeContents(containerid, _ref.html, _ref.js);

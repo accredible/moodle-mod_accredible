@@ -182,7 +182,7 @@ class mod_accredible_locallib_test extends \advanced_testcase {
 
         // When user has attempted and pass the quiz.
         $quiz = $this->create_quiz_module(1, $this->user->id);
-        $this->create_quiz_grades($quiz->id, $this->user->id, 10);
+        $this->create_quiz_grades($quiz->id, $this->user->id, 7);
         $accredible = $this->create_accredible_instance($this->course->id, $quiz->id);
         $result = accredible_check_if_cert_earned($accredible, $user);
 

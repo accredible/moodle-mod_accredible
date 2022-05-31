@@ -21,7 +21,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->libdir  . '/externallib.php');
-require_once($CFG->dirroot . '/mod/accredible/locallib.php');
 
 use mod_accredible\local\users;
 
@@ -55,7 +54,7 @@ class form_helper extends \external_api {
      */
     public static function reload_users_returns() {
         return new \external_single_structure([
-            'manual_issue' => new \external_multiple_structure(
+            'users' => new \external_multiple_structure(
                 new \external_single_structure([
                     'id' => new \external_value(PARAM_RAW, 'User ID.'),
                     'email' => new \external_value(PARAM_RAW, 'User email'),
@@ -86,29 +85,20 @@ class form_helper extends \external_api {
      * @return array of users.
      */
     public static function reload_users($courseid, $groupid, $instanceid = null) {
-        global $DB;
         $params = self::validate_parameters(self::reload_users_parameters(),
             array('courseid' => $courseid, 'groupid' => $groupid, 'instanceid' => $instanceid));
         $context = \context_course::instance($courseid);
         self::validate_context($context);
+
+        $enrolledusers = get_enrolled_users($context, "mod/accredible:view", null, 'u.*', 'id');
         $users = array(
-            'manual_issue' => array(),
+            'users' => array(),
             'unissued_users' => array()
         );
 
-        $enrolledusers = get_enrolled_users($context, "mod/accredible:view", null, 'u.*', 'id');
         $userhelper = new users();
-        $users['manual_issue'] = $userhelper->get_users_with_credentials($enrolledusers, $groupid);
-
-        if ($instanceid) {
-            $accrediblecertificate = $DB->get_record('accredible', array('id' => $instanceid), '*', MUST_EXIST);
-
-            foreach ($users['manual_issue'] as $user) {
-                if (!$user['credential_id'] && accredible_check_if_cert_earned($accrediblecertificate, $user)) {
-                    array_push($users['unissued_users'], $user);
-                }
-            }
-        }
+        $users['users'] = $userhelper->get_users_with_credentials($enrolledusers, $groupid);
+        $users['unissued_users'] = $userhelper->get_unissued_users($users['users'], $instanceid);
 
         return $users;
     }
