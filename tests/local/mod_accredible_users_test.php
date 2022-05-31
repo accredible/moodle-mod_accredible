@@ -145,11 +145,11 @@ class mod_accredible_users_test extends \advanced_testcase {
      */
     public function test_get_unissued_users() {
         $userhelper = new users();
-        $accredibleinstanceid = create_accredible_instance($this->course->id);
+        $accredibleinstanceid = $this->create_accredible_instance($this->course->id);
 
         $generateduser2 = $this->getDataGenerator()->create_user(array('email' => 'person3@example.com'));
         $this->getDataGenerator()->enrol_user($this->user->id, $this->course->id);
-        $this->getDataGenerator()->enrol_user($user2->id, $this->course->id);
+        $this->getDataGenerator()->enrol_user($generateduser2->id, $this->course->id);
 
         $user1 = array('id'             => $this->user->id,
                        'email'          => $this->user->email,
@@ -174,7 +174,7 @@ class mod_accredible_users_test extends \advanced_testcase {
 
         // When the Accredible module don't have any requirement.
         $result = $userhelper->get_unissued_users($users, $accredibleinstanceid);
-        $this->assertEquals($result, $expectedresponse);
+        $this->assertEquals($result, array());
 
         // When there are not users who pass the requirements.
         $quiz = $this->create_quiz_module($this->course->id);

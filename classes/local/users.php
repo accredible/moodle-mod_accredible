@@ -16,6 +16,8 @@
 
 namespace mod_accredible\local;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/mod/accredible/locallib.php');
 
 use mod_accredible\apirest\apirest;
@@ -124,7 +126,7 @@ class users {
         if ($accredibleinstanceid) {
             $accrediblecertificate = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
 
-            foreach ($users['users'] as $user) {
+            foreach ($users as $user) {
                 if (!$user['credential_id'] && accredible_check_if_cert_earned($accrediblecertificate, $user)) {
                     array_push($unissuedusers, $user);
                 }

@@ -193,12 +193,12 @@ class mod_accredible_mod_form extends moodleform_mod {
             $this->add_checkbox_controller(2, 'Select All/None');
             $mform->addElement('html', '<div id="unissued-users-container">');
 
-            foreach ($userswithcredential as $user) {
-                if (!$user['credential_id'] && accredible_check_if_cert_earned($accrediblecertificate, $user)) {
-                    // No existing certificate, add this user to the unissued users list.
-                    $mform->addElement('advcheckbox', 'unissuedusers['.$user['id'].']',
-                        $user['name'] . '    ' . $user['email'], null, array('group' => 2));
-                }
+            $unissuedusers = $usersclient->get_unissued_users($userswithcredential, $cm->instance);
+
+            foreach ($unissuedusers as $user) {
+                // No existing certificate, add this user to the unissued users list.
+                $mform->addElement('advcheckbox', 'unissuedusers['.$user['id'].']',
+                    $user['name'] . '    ' . $user['email'], null, array('group' => 2));
             }
             $mform->addElement('html', '</div>');
         }

@@ -106,9 +106,10 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                 } else {
                     context = {
                         element: {
-                            id: user.id,
+                            id: 'id_users_' + user.id,
                             name: 'users['+ user.id +']',
-                            extraclasses: 'checkboxgroup1'
+                            extraclasses: 'checkboxgroup1',
+                            selectedvalue: 1
                         },
                         label: user.name + '   ' + user.email
                     };
@@ -122,9 +123,10 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                 $(response.unissued_users).each(function(index, user) {
                     context = {
                         element: {
-                            id: user.id,
-                            name: 'users['+ user.id +']',
-                            extraclasses: 'checkboxgroup2'
+                            id: 'id_unissuedusers_' + user.id,
+                            name: 'unissuedusers['+ user.id +']',
+                            extraclasses: 'checkboxgroup2',
+                            selectedvalue: 1
                         },
                         label: user.name + '   ' + user.email
                     };
