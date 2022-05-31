@@ -32,7 +32,7 @@ use mod_accredible\local\evidenceitems;
  * Checks if a user has earned a specific credential according to the activity settings
  * @param stdObject $record An Accredible activity record
  * @param stdObject $course
- * @param stdObject $user
+ * @param array $user
  * @return bool
  */
 function accredible_check_if_cert_earned($record, $course, $user) {
@@ -54,7 +54,7 @@ function accredible_check_if_cert_earned($record, $course, $user) {
             $quiz = $DB->get_record('quiz', array('id' => $record->finalquiz), '*', MUST_EXIST);
 
             // Create that credential if it doesn't exist.
-            $usersgrade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+            $usersgrade = min( ( quiz_get_best_grade($quiz, $user['id']) / $quiz->grade ) * 100, 100);
             $gradeishighenough = ($usersgrade >= $record->passinggrade);
 
             // Check for pass.
@@ -70,7 +70,7 @@ function accredible_check_if_cert_earned($record, $course, $user) {
             // If this quiz is in the completion activities.
             if ( isset($completionactivities[$quiz->id]) ) {
                 $completionactivities[$quiz->id] = true;
-                $quizattempts = $DB->get_records('quiz_attempts', array('userid' => $user->id, 'state' => 'finished'));
+                $quizattempts = $DB->get_records('quiz_attempts', array('userid' => $user['id'], 'state' => 'finished'));
                 foreach ($quizattempts as $quizattempt) {
                     // If this quiz was already attempted, then we shouldn't be issuing a certificate.
                     if ( $quizattempt->quiz == $quiz->id && $quizattempt->attempt > 1 ) {

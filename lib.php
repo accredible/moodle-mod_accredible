@@ -183,7 +183,7 @@ function accredible_update_instance($post) {
                     $credential = $localcredentials->create_credential_legacy($user, $post->achievementid,
                         $post->certificatename, $post->description, $courselink, $completeddate);
                 } else {
-                    $credential = $localcredentials->create_credential($user, $accrediblecertificate->groupid, $completeddate);
+                    $credential = $localcredentials->create_credential($user, $post->groupid, $completeddate);
                 }
 
                 // Evidence item posts.

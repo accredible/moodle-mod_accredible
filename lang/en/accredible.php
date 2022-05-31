@@ -83,3 +83,4 @@ $string['privacy:metadata:accredible'] = 'In order to integrate with Accredible,
 $string['privacy:metadata:accredible:email'] = 'Your email address is sent to Accredible to issue a credential.';
 $string['privacy:metadata:accredible:fullname'] = 'Your full name is sent to Accredible to issue a credential.';
 $string['privacy:metadata:accredible:quizgrade'] = 'Your quiz grade may be sent to Accredible to issue a credential.';
+$string['nouserswarning'] = 'You need to choose an Accredible group in order to see the list of users.';

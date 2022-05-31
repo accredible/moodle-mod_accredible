@@ -29,9 +29,10 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 require_once($CFG->dirroot.'/mod/accredible/lib.php');
 require_once($CFG->dirroot.'/mod/accredible/locallib.php');
 
-use mod_accredible\local\credentials;
 use mod_accredible\Html2Text\Html2Text;
+use mod_accredible\local\credentials;
 use mod_accredible\local\groups;
+use mod_accredible\local\users;
 
 /**
  * Accredible settings form.
@@ -49,10 +50,11 @@ class mod_accredible_mod_form extends moodleform_mod {
      * @return void
      */
     public function definition() {
-        global $DB, $COURSE, $CFG;
+        global $DB, $COURSE, $CFG, $PAGE;
 
         $credentialsclient = new credentials();
         $groupsclient = new groups();
+        $usersclient = new users();
 
         $updatingcert = false;
         $alreadyexists = false;
@@ -99,6 +101,15 @@ class mod_accredible_mod_form extends moodleform_mod {
         $context = context_course::instance($course->id);
         $users = get_enrolled_users($context, "mod/accredible:view", null, 'u.*');
 
+        if ($updatingcert) {
+            // Grab existing certificates and cross-reference emails.
+            if ($accrediblecertificate->achievementid) {
+                $userswithcredential = $usersclient->get_users_with_credentials($users, $accrediblecertificate->achievementid);
+            } else {
+                $userswithcredential = $usersclient->get_users_with_credentials($users, $accrediblecertificate->groupid);
+            }
+        }
+
         // Load final quiz choices.
         $quizchoices = array(0 => 'None');
         if ($quizes = $DB->get_records_select('quiz', 'course = :course_id', array('course_id' => $id) )) {
@@ -110,6 +121,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         $inputstyle = array('style' => 'width: 399px');
 
         // Form start.
+        $PAGE->requires->js_call_amd('mod_accredible/userlist_updater', 'init');
         $mform =& $this->_form;
         $mform->addElement('hidden', 'course', $id);
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -168,89 +180,49 @@ class mod_accredible_mod_form extends moodleform_mod {
             }
         }
 
-        // Get certificates if updating.
-        if ($updatingcert) {
-            // Grab existing certificates and cross-reference emails.
-            if ($accrediblecertificate->achievementid) {
-                $certificates = $credentialsclient->get_credentials($accrediblecertificate->achievementid);
-            } else if ($accrediblecertificate->groupid) {
-                $certificates = $credentialsclient->get_credentials($accrediblecertificate->groupid);
-            }
-        }
-
-        // Generate list of users who have earned a certificate, if updating.
-        if ($updatingcert) {
-            foreach ($users as $user) {
-                // If this user has completed the criteria to earn a certificate, add to $usersearnedcertificate.
-                if (accredible_check_if_cert_earned($accrediblecertificate, $course, $user)) {
-                    $usersearnedcertificate[$user->id] = $user;
-                }
-            }
-        }
-
-        // Unissued certificates header.
-        if (isset($usersearnedcertificate) && count($usersearnedcertificate) > 0) {
+        // Users who pass the requirements but not have credential.
+        if (isset($userswithcredential) && count($userswithcredential) > 0) {
             $unissuedheader = false;
-            foreach ($usersearnedcertificate as $user) {
-                $existingcertificate = false;
-                foreach ($certificates as $certificate) {
-                    // Search through the certificates to see if this user has one existing.
-                    if ($certificate->recipient->email == strtolower($user->email)) {
-                        // This user has an existing certificate, no need to continue searching.
-                        $existingcertificate = true;
-                        break;
-                    }
-                }
 
-                if (!$existingcertificate) {
+            foreach ($userswithcredential as $user) {
+                if (accredible_check_if_cert_earned($accrediblecertificate, $course, $user) && !$user['credential_id']) {
                     if (!$unissuedheader) {
-                        // The header has not been added to the form yet and is needed.
                         $mform->addElement('header', 'chooseunissuedusers', get_string('unissuedheader', 'accredible'));
                         $mform->addElement('static', 'unissueddescription', '', get_string('unissueddescription', 'accredible'));
                         $this->add_checkbox_controller(2, 'Select All/None');
                         $unissuedheader = true;
                     }
-                    // No existing certificate, add this user to the unissued users list.
-                    $mform->addElement('advcheckbox', 'unissuedusers['.$user->id.']',
-                        $user->firstname . ' ' . $user->lastname . '    ' . $user->email, null, array('group' => 2));
-                }
 
+                    // No existing certificate, add this user to the unissued users list.
+                    $mform->addElement('advcheckbox', 'unissuedusers['.$user['id'].']',
+                        $user['name'] . '    ' . $user['email'], null, array('group' => 2));
+                }
             }
         }
 
         // Manually issue certificates header.
         $mform->addElement('header', 'chooseusers', get_string('manualheader', 'accredible'));
+        // Hidden message to be displayed with Javascript when no users are available.
+        $mform->addElement('html', '<div id="users-warning" class="hidden">');
+        $mform->addElement('static', 'nouserswarning', '', get_string('nouserswarning', 'accredible'));
+        $mform->addElement('html', '</div>');
+        $mform->addElement('html', '<div id="users-container">');
         $this->add_checkbox_controller(1, 'Select All/None');
 
         if ($updatingcert) {
-            // Grab existing credentials and cross-reference emails.
-            if ($accrediblecertificate->achievementid) {
-                $certificates = $credentialsclient->get_credentials($accrediblecertificate->achievementid);
-            } else {
-                $certificates = $credentialsclient->get_credentials($accrediblecertificate->groupid);
-            }
-
-            foreach ($users as $user) {
-                $certid = null;
-                // Check cert emails for this user.
-                foreach ($certificates as $certificate) {
-                    if ($certificate->recipient->email == strtolower($user->email)) {
-                        $certid = $certificate->id;
-                        if (isset($certificate->url)) {
-                            $certlink = $certificate->url;
-                        } else {
-                            $certlink = 'https://www.credential.net/'.$certid;
-                        }
-                    }
-                }
+            foreach ($userswithcredential as $user) {
                 // Show the certificate if they have a certificate.
-                if ($certid) {
-                    $mform->addElement('static', 'certlink'.$user->id,
-                        $user->firstname . ' ' . $user->lastname . '    ' . $user->email,
-                        "Certificate $certid - <a href='$certlink' target='_blank'>link</a>");
+                if ($user['credential_id']) {
+                    $mform->addElement('static', 'certlink'.$user['id'],
+                        $user['name'] . '    ' . $user['email'],
+                        'Certificate '. $user['credential_id'].' - <a href='.$user['credential_url'].' target="_blank">link</a>');
+                    $mform->addElement('html', '<div class="hidden">');
+                    $mform->addElement('advcheckbox', 'users['.$user['id'].']',
+                        $user['name'] . '    ' . $user['email'], null, array('group' => 1));
+                    $mform->addElement('html', '</div>');
                 } else { // Show a checkbox if they don't.
-                    $mform->addElement('advcheckbox', 'users['.$user->id.']',
-                        $user->firstname . ' ' . $user->lastname . '    ' . $user->email, null, array('group' => 1));
+                    $mform->addElement('advcheckbox', 'users['.$user['id'].']',
+                        $user['name'] . '    ' . $user['email'], null, array('group' => 1));
                 }
             }
         } else { // For new modules, just list all the users.
@@ -259,6 +231,7 @@ class mod_accredible_mod_form extends moodleform_mod {
                     $user->firstname . ' ' . $user->lastname . '    ' . $user->email, null, array('group' => 1));
             }
         }
+        $mform->addElement('html', '</div>');
 
         $mform->addElement('header', 'gradeissue', get_string('gradeissueheader', 'accredible'));
         $mform->addElement('select', 'finalquiz', get_string('chooseexam', 'accredible'), $quizchoices);
