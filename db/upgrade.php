@@ -134,7 +134,7 @@ function xmldb_accredible_upgrade($oldversion=0) {
         $table = new xmldb_table('accredible');
 
         // Define field includegradeattribute to be added to accredible.
-        $field = new xmldb_field('includegradeattribute', XMLDB_TYPE_INTEGER, '1', null, null, null, '0',
+        $field = new xmldb_field('includegradeattribute', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0',
             'completionactivities');
 
         // Conditionally launch add field groupid.
