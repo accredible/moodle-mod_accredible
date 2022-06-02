@@ -19,7 +19,7 @@ namespace mod_accredible\local;
 use mod_accredible\apirest\apirest;
 
 /**
- * Local functions related to groups/courses.
+ * Local functions related to attribute keys.
  *
  * @package    mod_accredible
  * @subpackage accredible
@@ -48,8 +48,8 @@ class attribute_keys {
     }
 
     /**
-     * Get the groups for the issuer
-     * @return array[stdClass] $groups
+     * Get the attribute keys for the issuer
+     * @return array[stdClass] $attributekeys
      */
     public function get_attribute_keys() {
         $pagesize = 50;
