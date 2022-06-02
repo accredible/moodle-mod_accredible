@@ -16,6 +16,10 @@
 
 namespace mod_accredible\local;
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/mod/accredible/locallib.php');
+
 use mod_accredible\apirest\apirest;
 use mod_accredible\local\credentials;
 
@@ -105,5 +109,30 @@ class users {
             array_push($users, $user);
         }
         return $users;
+    }
+
+    /**
+     * Receive a list of users and return only those who don't have a credential
+     * and they have pass the requirements for the course.
+     *
+     * @param array $users array of users
+     * @param int $accredibleinstanceid accredible module id
+     * @return array list of users
+     */
+    public function get_unissued_users($users, $accredibleinstanceid = null) {
+        global $DB;
+        $unissuedusers = array();
+
+        if ($accredibleinstanceid) {
+            $accrediblecertificate = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+
+            foreach ($users as $user) {
+                if (!$user['credential_id'] && accredible_check_if_cert_earned($accrediblecertificate, $user)) {
+                    array_push($unissuedusers, $user);
+                }
+            }
+        }
+
+        return $unissuedusers;
     }
 }

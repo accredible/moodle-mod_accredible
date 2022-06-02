@@ -22,6 +22,9 @@
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 
 use mod_accredible\apirest\apirest;
 use mod_accredible\Html2Text\Html2Text;
@@ -31,11 +34,10 @@ use mod_accredible\local\evidenceitems;
 /**
  * Checks if a user has earned a specific credential according to the activity settings
  * @param stdObject $record An Accredible activity record
- * @param stdObject $course
  * @param array $user
  * @return bool
  */
-function accredible_check_if_cert_earned($record, $course, $user) {
+function accredible_check_if_cert_earned($record, $user) {
     global $DB;
 
     $earned = false;
@@ -43,16 +45,8 @@ function accredible_check_if_cert_earned($record, $course, $user) {
     // Check for the existence of an activity instance and an auto-issue rule.
     if ( $record and ($record->finalquiz or $record->completionactivities) ) {
 
-        // Check if we have a groupid or achievementid. Logic is same for both.
-        if ($record->groupid) {
-            $groupid = $record->groupid;
-        } else if ($record->achievementid) {
-            $groupid = $record->achievementid;
-        }
-
         if ($record->finalquiz) {
             $quiz = $DB->get_record('quiz', array('id' => $record->finalquiz), '*', MUST_EXIST);
-
             // Create that credential if it doesn't exist.
             $usersgrade = min( ( quiz_get_best_grade($quiz, $user['id']) / $quiz->grade ) * 100, 100);
             $gradeishighenough = ($usersgrade >= $record->passinggrade);

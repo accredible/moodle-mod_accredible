@@ -146,6 +146,74 @@ class mod_accredible_locallib_test extends \advanced_testcase {
     }
 
     /**
+     * Check if cert earned by user test.
+     */
+    public function test_accredible_check_if_cert_earned() {
+        global $DB;
+        $user = array(
+            'id'    => $this->user->id,
+            'email' => $this->user->email,
+            'name'  => $this->user->firstname . ' ' . $this->user->lastname
+        );
+
+        // When no quiz available.
+        $accredible = $this->create_accredible_instance($this->course->id);
+        $result = accredible_check_if_cert_earned($accredible, $user);
+
+        // It responds with false.
+        $this->assertEquals($result, false);
+
+        // When users has not attempted the quiz.
+        $quiz = $this->create_quiz_module($this->course->id);
+        $accredible = $this->create_accredible_instance($this->course->id, $quiz->id);
+        $result = accredible_check_if_cert_earned($accredible, $user);
+
+        // It responds with false.
+        $this->assertEquals($result, false);
+
+        // When user has attempted but not pass the quiz.
+        $quiz = $this->create_quiz_module(1, $this->user->id);
+        $this->create_quiz_grades($quiz->id, $this->user->id, 4);
+        $accredible = $this->create_accredible_instance($this->course->id, $quiz->id);
+        $result = accredible_check_if_cert_earned($accredible, $user);
+
+        // It responds with false.
+        $this->assertEquals($result, false);
+
+        // When user has attempted and pass the quiz.
+        $quiz = $this->create_quiz_module(1, $this->user->id);
+        $this->create_quiz_grades($quiz->id, $this->user->id, 7);
+        $accredible = $this->create_accredible_instance($this->course->id, $quiz->id);
+        $result = accredible_check_if_cert_earned($accredible, $user);
+
+        // It responds with false.
+        $this->assertEquals($result, true);
+    }
+
+    /**
+     * Create accredible activity.
+     *
+     * @param int $courseid
+     * @param int $finalquizid
+     */
+    private function create_accredible_instance($courseid, $finalquizid = 0) {
+        global $DB;
+        $dbrecord = array(
+            "name"                 => 'Accredible Test',
+            "course"               => $courseid,
+            "finalquiz"            => $finalquizid,
+            "passinggrade"         => 70,
+            "timecreated"          => time(),
+            "groupid"              => 1,
+            "completionactivities" => null
+        );
+
+        $id = $DB->insert_record('accredible', $dbrecord);
+        return $DB->get_record('accredible', array('id' => $id));
+
+    }
+
+    /**
      * Create quiz module test
      *
      * @param int $courseid
