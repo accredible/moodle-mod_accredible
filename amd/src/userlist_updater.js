@@ -57,7 +57,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             }
             t.lastSelectedGroup = $('select#id_groupid').val();
             if (t.lastSelectedGroup === '') {
-                t.displayNotUsersWarning();
+                t.displayNoUsersWarning();
             } else {
                 Ajax.call([{
                     methodname: 'mod_accredible_reload_users',
@@ -72,9 +72,9 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
         },
 
         /**
-         * Hide users and display warning when not group is selected.
+         * Hide users and display warning when no group is selected.
          */
-        displayNotUsersWarning: function() {
+        displayNoUsersWarning: function() {
             var userselements = $('#manual-issue-users-container .form-group, #unissued-users-container .form-group');
             userselements.remove();
             t.userwarning.removeClass('hidden');
