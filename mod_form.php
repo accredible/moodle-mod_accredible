@@ -33,6 +33,7 @@ use mod_accredible\Html2Text\Html2Text;
 use mod_accredible\local\credentials;
 use mod_accredible\local\groups;
 use mod_accredible\local\users;
+use mod_accredible\local\attribute_keys;
 
 /**
  * Accredible settings form.
@@ -53,6 +54,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         global $DB, $COURSE, $CFG, $PAGE;
 
         $credentialsclient = new credentials();
+        $attributekeysclient = new attribute_keys();
         $groupsclient = new groups();
         $usersclient = new users();
 
@@ -111,17 +113,31 @@ class mod_accredible_mod_form extends moodleform_mod {
         }
 
         // Load final quiz choices.
-        $quizchoices = array(0 => 'None');
-        if ($quizes = $DB->get_records_select('quiz', 'course = :course_id', array('course_id' => $id) )) {
+        $quizchoices = array(0 => 'Select a Quiz');
+        if ($quizes = $DB->get_records_select('quiz', 'course = :course_id', array('course_id' => $id), '', 'id, name')) {
             foreach ($quizes as $quiz) {
                 $quizchoices[$quiz->id] = $quiz->name;
+            }
+        }
+
+        // Load course assigments.
+        $assigmentschoices = array(0 => 'Select an Activity Grade');
+        $assigments = $DB->get_records_select('grade_items', 'courseid = :course_id', array('course_id' => $id), '',
+            'id, itemname');
+        if ($assigments) {
+            foreach ($assigments as $assigment) {
+                $assigmentschoices[$assigment->id] = $assigment->itemname;
             }
         }
 
         $inputstyle = array('style' => 'width: 399px');
 
         // Form start.
+<<<<<<< HEAD
         $PAGE->requires->js_call_amd('mod_accredible/userlist_updater', 'init');
+=======
+        $PAGE->requires->js_call_amd('mod_accredible/attribute_keys_displayer', 'init');
+>>>>>>> d997f18 (update mod form to include grade attributes inputs)
         $mform =& $this->_form;
         $mform->addElement('hidden', 'course', $id);
         if ($updatingcert) {
@@ -142,7 +158,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         }
 
         // Load available groups.
-        $templates = array('' => '') + $groupsclient->get_groups();
+        $templates = array('' => 'Select a Group') + $groupsclient->get_groups();
         $mform->addElement('select', 'groupid', get_string('accrediblegroup', 'accredible'), $templates, $inputstyle);
         $mform->addRule('groupid', null, 'required', null, 'client');
         if ($updatingcert && $accrediblecertificate->groupid) {
@@ -155,6 +171,35 @@ class mod_accredible_mod_form extends moodleform_mod {
         if ($alreadyexists) {
             $mform->addElement('static', 'additionalactivitiestwo', '', get_string('additionalactivitiestwo', 'accredible'));
         }
+
+        // Load Accredible attribute keys.
+        $attributekeys = $attributekeysclient->get_attribute_keys();
+        if (isset($attributekeys)) {
+            $attributekeyschoices = array('' => 'Select a Custom Attribute') + $attributekeys;
+            // Hidden element to check if we should disable the "gradeattributekeyname" select.
+            $mform->addElement('hidden', 'attributekysnumber', 1);
+        } else {
+            $mform->addElement('hidden', 'attributekysnumber', 0);
+        }
+
+        $mform->addElement('checkbox', 'includegradeattribute', get_string('includegradeattributedescription', 'accredible'),
+            get_string('includegradeattributecheckbox', 'accredible'));
+        if (isset( $accrediblecertificate->includegradeattribute )) {
+            $mform->setDefault('includegradeattribute', 1);
+            $includegradewrapperhtml = '<div id="include-grade-select-container" class="hidden">';
+        } else {
+            $includegradewrapperhtml = '<div id="include-grade-select-container">';
+        }
+
+        $mform->addElement('html', $includegradewrapperhtml);
+        $mform->addElement('select', 'gradeattributegradeitemid', get_string('gradeattributegradeitemselect', 'accredible'),
+            $assigmentschoices, $inputstyle);
+        $mform->addElement('select', 'gradeattributekeyname', get_string('gradeattributekeynameselect', 'accredible'),
+            $attributekeyschoices, $inputstyle);
+        $mform->disabledIf('gradeattributekeyname', 'attributekysnumber', 'eq', 0);
+        $mform->addElement('static', 'emptygradeattributekeyname', '', get_string('emptygradeattributekeyname', 'accredible',
+            $dashboardurl));
+        $mform->addElement('html', '</div>');
 
         if ($updatingcert && $accrediblecertificate->achievementid) {
             // Grab the list of templates available.
