@@ -122,8 +122,8 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         // Load course assigments.
         $assigmentschoices = array(0 => 'Select an Activity Grade');
-        $assigments = $DB->get_records_select('grade_items', 'courseid = :course_id', array('course_id' => $id), '',
-            'id, itemname');
+        $assigments = $DB->get_records_select('grade_items', 'courseid = :course_id AND itemtype = :item_type',
+            array('course_id' => $id, 'item_type' => 'mod'), '', 'id, itemname');
         if ($assigments) {
             foreach ($assigments as $assigment) {
                 $assigmentschoices[$assigment->id] = $assigment->itemname;
