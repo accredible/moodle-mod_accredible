@@ -60,8 +60,8 @@ class attribute_keys {
             // Query the Accredible API and loop until it returns that there is no next page.
             for ($i = 0; $i <= 100; $i++) {
                 $response = $this->apirest->search_attribute_keys($pagesize, $page);
-                foreach ($response->attribute_keys as $attribute_key) {
-                    $attributekeys[$attribute_key->id] = $attribute_key->name;
+                foreach ($response->attribute_keys as $attributekey) {
+                    $attributekeys[$attributekey->id] = $attributekey->name;
                 }
 
                 $page++;
