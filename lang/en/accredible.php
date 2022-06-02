@@ -42,6 +42,10 @@ $string['certificateurl'] = 'Certificate/Badge url';
 $string['chooseexam'] = 'Choose final quiz';
 $string['completionissueheader'] = 'Auto-issue criteria: by course completion';
 $string['completionissuecheckbox'] = 'Yes, issue upon course completion';
+$string['includegradeattributedescription'] = "Include Student's Grade in Credential";
+$string['includegradeattributecheckbox'] = "Yes, include grade in Credential.";
+$string['gradeattributegradeitemselect'] = "Choose Moodle grade to include:";
+$string['gradeattributekeynameselect'] = "Choose an Accredible design attribute:";
 $string['dashboardlink'] = 'Accredible dashboard link';
 $string['dashboardlinktext'] = 'To delete or style credentials, log in to the <a href="https://dashboard.accredible.com" target="_blank">dashboard</a>';
 $string['datecreated'] = 'Date created';
@@ -78,6 +82,7 @@ $string['gotodashboard'] = 'To update the appearance of your badges and certific
 $string['overview'] = 'Overview';
 $string['activitygroupdescription'] = 'Credentials groups need to have been created in the <a href="{$a}" target="_blank">Accredible Dashboard</a> before credentials can be issued. If none appear, check your API Key to make sure integration is set up correctly.';
 $string['accrediblegroup'] = 'Accredible Group';
+$string['emptygradeattributekeyname'] = 'The final course grade will be mapped to the selected Accredible custom attribute. If you have not yet created a custom attribute, you can do so on the <a href="{$a}" target="_blank">Accredible Platform</a>.';
 
 $string['privacy:metadata:accredible'] = 'In order to integrate with Accredible, user data needs to be exchanged with that service.';
 $string['privacy:metadata:accredible:email'] = 'Your email address is sent to Accredible to issue a credential.';
