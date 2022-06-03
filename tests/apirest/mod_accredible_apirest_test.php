@@ -886,7 +886,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // Mock API response data.
         $resdata = $this->mockapi->resdata('attribute_keys/search_success.json');
 
-        $reqdata = json_encode(array('page' => 1, 'page_size' => 20));
+        $reqdata = json_encode(array('page' => 1, 'page_size' => 20, 'kind' => 'text'));
 
         // Expect to call the endpoint once with page and page_size.
         $mockclient1->expects($this->once())
@@ -908,7 +908,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // Mock API response data.
         $resdata = $this->mockapi->resdata('attribute_keys/search_success.json');
 
-        $reqdata = json_encode(array('page' => 1, 'page_size' => 50));
+        $reqdata = json_encode(array('page' => 1, 'page_size' => 50, 'kind' => 'text'));
 
         // Expect to call the endpoint once with default page and page_size.
         $mockclient2->expects($this->once())
@@ -931,7 +931,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // Mock API response data.
         $resdata = $this->mockapi->resdata('unauthorized_error.json');
 
-        $reqdata = json_encode(array('page' => 1, 'page_size' => 10));
+        $reqdata = json_encode(array('page' => 1, 'page_size' => 10, 'kind' => 'text'));
 
         // Expect to call the endpoint once with page and page_size.
         $mockclient3->expects($this->once())
