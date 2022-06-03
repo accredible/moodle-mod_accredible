@@ -86,6 +86,9 @@ function accredible_add_instance($post) {
     $dbrecord->course = $post->course;
     $dbrecord->finalquiz = $post->finalquiz;
     $dbrecord->passinggrade = $post->passinggrade;
+    $dbrecord->includegradeattribute = $post->includegradeattribute;
+    $dbrecord->gradeattributegradeitemid = $post->gradeattributegradeitemid;
+    $dbrecord->gradeattributekeyname = $post->gradeattributekeyname;
     $dbrecord->timecreated = time();
     $dbrecord->groupid = $post->groupid;
 
@@ -228,26 +231,22 @@ function accredible_update_instance($post) {
         $groupid = $accrediblecertificate->groupid;
     }
 
+    $dbrecord = new stdClass();
+    $dbrecord->id = $post->instance;
+    $dbrecord->completionactivities = $post->completionactivities;
+    $dbrecord->name = $post->name;
+    $dbrecord->passinggrade = $post->passinggrade;
+    $dbrecord->finalquiz = $post->finalquiz;
+    $dbrecord->includegradeattribute = $post->includegradeattribute;
+    $dbrecord->gradeattributegradeitemid = $post->gradeattributegradeitemid;
+    $dbrecord->gradeattributekeyname = $post->gradeattributekeyname;
+
     // Save record.
     if ($accrediblecertificate->achievementid) {
-        $dbrecord = new stdClass();
-        $dbrecord->id = $post->instance;
-        $dbrecord->achievementid = $post->achievementid;
-        $dbrecord->completionactivities = $post->completionactivities;
-        $dbrecord->name = $post->name;
         $dbrecord->certificatename = $post->certificatename;
         $dbrecord->description = $post->description;
-        $dbrecord->passinggrade = $post->passinggrade;
-        $dbrecord->finalquiz = $post->finalquiz;
     } else {
-        $dbrecord = new stdClass();
-        $dbrecord->id = $post->instance;
-        $dbrecord->completionactivities = $post->completionactivities;
-        $dbrecord->name = $post->name;
         $dbrecord->course = $post->course;
-        $dbrecord->finalquiz = $post->finalquiz;
-        $dbrecord->passinggrade = $post->passinggrade;
-        $dbrecord->timecreated = time();
         $dbrecord->groupid = $groupid;
     }
 

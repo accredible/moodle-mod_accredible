@@ -102,7 +102,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         $users = get_enrolled_users($context, "mod/accredible:view", null, 'u.*');
 
         // Load final quiz choices.
-        $quizchoices = array(0 => 'Select a Quiz');
+        $quizchoices = array('' => 'Select a Quiz');
         if ($quizes = $DB->get_records_select('quiz', 'course = :course_id', array('course_id' => $id), '', 'id, name')) {
             foreach ($quizes as $quiz) {
                 $quizchoices[$quiz->id] = $quiz->name;
@@ -110,7 +110,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         }
 
         // Load course assigments.
-        $assigmentschoices = array(0 => 'Select an Activity Grade');
+        $assigmentschoices = array('' => 'Select an Activity Grade');
         $assigments = $DB->get_records_select('grade_items', 'courseid = :course_id AND itemtype = :item_type',
             array('course_id' => $id, 'item_type' => 'mod'), '', 'id, itemname');
         if ($assigments) {
@@ -163,11 +163,11 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         $mform->addElement('checkbox', 'includegradeattribute', get_string('includegradeattributedescription', 'accredible'),
             get_string('includegradeattributecheckbox', 'accredible'));
-        if (isset( $accrediblecertificate->includegradeattribute )) {
+        if (isset( $accrediblecertificate->includegradeattribute ) && $accrediblecertificate->includegradeattribute == 1) {
             $mform->setDefault('includegradeattribute', 1);
-            $includegradewrapperhtml = '<div id="include-grade-select-container" class="hidden">';
-        } else {
             $includegradewrapperhtml = '<div id="include-grade-select-container">';
+        } else {
+            $includegradewrapperhtml = '<div id="include-grade-select-container" class="hidden">';
         }
 
         $mform->addElement('html', $includegradewrapperhtml);

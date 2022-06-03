@@ -72,8 +72,8 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
         // Expect to call the endpoint once with page and page_size.
         $url = 'https://api.accredible.com/v1/attribute_keys/search';
 
-        $reqdata1 = json_encode(array('page' => 1, 'page_size' => 50));
-        $reqdata2 = json_encode(array('page' => 2, 'page_size' => 50));
+        $reqdata1 = json_encode(array('page' => 1, 'page_size' => 50, 'kind' => 'text'));
+        $reqdata2 = json_encode(array('page' => 2, 'page_size' => 50, 'kind' => 'text'));
 
         $mockclient1->expects($this->exactly(2))
             ->method('post')
