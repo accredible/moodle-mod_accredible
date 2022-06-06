@@ -160,9 +160,12 @@ class mod_accredible_mod_form extends moodleform_mod {
         } else {
             $mform->addElement('hidden', 'attributekysnumber', 0);
         }
+        $mform->setType('attributekysnumber', PARAM_INT);
 
         $mform->addElement('checkbox', 'includegradeattribute', get_string('includegradeattributedescription', 'accredible'),
             get_string('includegradeattributecheckbox', 'accredible'));
+
+        $mform->setType('includegradeattribute', PARAM_INT);
         if (isset( $accrediblecertificate->includegradeattribute ) && $accrediblecertificate->includegradeattribute == 1) {
             $mform->setDefault('includegradeattribute', 1);
             $includegradewrapperhtml = '<div id="include-grade-select-container">';
