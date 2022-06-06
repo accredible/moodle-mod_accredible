@@ -88,7 +88,7 @@ function accredible_add_instance($post) {
     $dbrecord->course = $post->course;
     $dbrecord->finalquiz = $post->finalquiz;
     $dbrecord->passinggrade = $post->passinggrade;
-    $dbrecord->includegradeattribute = $post->includegradeattribute;
+    $dbrecord->includegradeattribute = isset($post->includegradeattribute) ? $post->includegradeattribute : 0;
     $dbrecord->gradeattributegradeitemid = $post->gradeattributegradeitemid;
     $dbrecord->gradeattributekeyname = $post->gradeattributekeyname;
     $dbrecord->timecreated = time();
@@ -251,9 +251,11 @@ function accredible_update_instance($post) {
     if ($accrediblecertificate->achievementid) {
         $dbrecord->certificatename = $post->certificatename;
         $dbrecord->description = $post->description;
+        $dbrecord->achievementid = $post->achievementid;
     } else {
         $dbrecord->course = $post->course;
         $dbrecord->groupid = $groupid;
+        $dbrecord->timecreated = time();
     }
 
     return $DB->update_record('accredible', $dbrecord);

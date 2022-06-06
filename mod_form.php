@@ -133,11 +133,8 @@ class mod_accredible_mod_form extends moodleform_mod {
         $inputstyle = array('style' => 'width: 399px');
 
         // Form start.
-<<<<<<< HEAD
         $PAGE->requires->js_call_amd('mod_accredible/userlist_updater', 'init');
-=======
         $PAGE->requires->js_call_amd('mod_accredible/attribute_keys_displayer', 'init');
->>>>>>> d997f18 (update mod form to include grade attributes inputs)
         $mform =& $this->_form;
         $mform->addElement('hidden', 'course', $id);
         if ($updatingcert) {
@@ -181,9 +178,12 @@ class mod_accredible_mod_form extends moodleform_mod {
         } else {
             $mform->addElement('hidden', 'attributekysnumber', 0);
         }
+        $mform->setType('attributekysnumber', PARAM_INT);
 
         $mform->addElement('checkbox', 'includegradeattribute', get_string('includegradeattributedescription', 'accredible'),
             get_string('includegradeattributecheckbox', 'accredible'));
+
+        $mform->setType('includegradeattribute', PARAM_INT);
         if (isset( $accrediblecertificate->includegradeattribute ) && $accrediblecertificate->includegradeattribute == 1) {
             $mform->setDefault('includegradeattribute', 1);
             $includegradewrapperhtml = '<div id="include-grade-select-container">';
