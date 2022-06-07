@@ -123,7 +123,7 @@ class users {
         global $DB;
         $unissuedusers = array();
 
-        if ($accredibleinstanceid) {
+        if ($accredibleinstanceid || $accredibleinstanceid != 0) {
             $accrediblecertificate = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
 
             foreach ($users as $user) {

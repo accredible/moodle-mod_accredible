@@ -126,7 +126,10 @@ class mod_accredible_mod_form extends moodleform_mod {
         $mform->addElement('hidden', 'course', $id);
         if ($updatingcert) {
             $mform->addElement('hidden', 'instance-id', $cm->instance);
+        } else {
+            $mform->addElement('hidden', 'instance-id', 0);
         }
+        $mform->setType('instance-id', PARAM_INT);
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         $mform->addElement('text', 'name', get_string('activityname', 'accredible'), $inputstyle);
