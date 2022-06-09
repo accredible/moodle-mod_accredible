@@ -243,7 +243,7 @@ function accredible_update_instance($post) {
     $dbrecord->name = $post->name;
     $dbrecord->passinggrade = $post->passinggrade;
     $dbrecord->finalquiz = $post->finalquiz;
-    $dbrecord->includegradeattribute = $post->includegradeattribute;
+    $dbrecord->includegradeattribute = isset($post->includegradeattribute) ? $post->includegradeattribute : 0;
     $dbrecord->gradeattributegradeitemid = $post->gradeattributegradeitemid;
     $dbrecord->gradeattributekeyname = $post->gradeattributekeyname;
 
