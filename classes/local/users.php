@@ -19,14 +19,14 @@ namespace mod_accredible\local;
 use mod_accredible\apirest\apirest;
 
 /**
- * Local functions related to attribute keys.
+ * Local functions related to users.
  *
  * @package    mod_accredible
  * @subpackage accredible
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class attribute_keys {
+class users {
     /**
      * The apirest object used to call API requests.
      * @var apirest
@@ -38,42 +38,37 @@ class attribute_keys {
      *
      * @param stdObject $apirest a mock apirest for testing.
      */
-    public function __construct($apirest = null) {
+    public function __construct($apirest = null, $rand = null) {
         // An apirest with a mock client is passed when unit testing.
         if ($apirest) {
             $this->apirest = $apirest;
         } else {
             $this->apirest = new apirest();
         }
+
+        // A fixed value is passed when unit testing.
+        if ($rand) {
+            $this->rand = $rand;
+        } else {
+            $this->rand = mt_rand();
+        }
     }
 
     /**
-     * Get the attribute keys for the issuer
-     * @return array[stdClass] $attributekeys
+     * Get user grades from grade item.
+     * @param stdObject $data data from the submission of mod_form.
+     * @return array[stdClass] $gradeattributes
      */
-    public function get_attribute_keys() {
-        $pagesize = 50;
-        $page = 1;
+    public function get_user_grades($data) {
+        global $DB;
 
-        try {
-            $attributekeys = array();
-            // Query the Accredible API and loop until it returns that there is no next page.
-            for ($i = 0; $i <= 100; $i++) {
-                $response = $this->apirest->search_attribute_keys($pagesize, $page);
-                foreach ($response->attribute_keys as $attributekey) {
-                    $attributekeys[$attributekey->name] = $attributekey->name;
-                }
+        if (isset($data->includegradeattribute) && isset($data->gradeattributegradeitemid) && isset($data->gradeattributekeyname)) {
+            $users = array_keys($data->users);
+            $assigment = $DB->get_record('grade_items', array('id' => $data->gradeattributegradeitemid), '*', MUST_EXIST);
+            $grades = grade_get_grades($data->course, $assigment->itemtype, $assigment->itemmodule, $assigment->iteminstance, $users);
+            $gradeattributes = isset($grades->items[0]->grades) ? $grades->items[0]->grades : null;
 
-                $page++;
-                if ($response->meta->next_page === null) {
-                    // If the Accredible API returns that there
-                    // is no next page, end the loop.
-                    break;
-                }
-            }
-            return $attributekeys;
-        } catch (\Exception $e) {
-            throw new \moodle_exception('getattributekeysserror', 'accredible', 'https://help.accredible.com/hc/en-us');
+            return $gradeattributes;
         }
     }
 }
