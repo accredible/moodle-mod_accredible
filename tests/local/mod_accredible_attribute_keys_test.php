@@ -85,10 +85,10 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
         $localattributekeys = new attribute_keys($api);
         $result = $localattributekeys->get_attribute_keys();
         $this->assertEquals($result, array(
-            '1234' => 'Custom Attribute Key 1',
-            '1235' => 'Custom Attribute Key 2',
-            '1236' => 'Custom Attribute Key 3',
-            '1237' => 'Custom Attribute Key 4'
+            'Custom Attribute Key 1' => 'Custom Attribute Key 1',
+            'Custom Attribute Key 2' => 'Custom Attribute Key 2',
+            'Custom Attribute Key 3' => 'Custom Attribute Key 3',
+            'Custom Attribute Key 4' => 'Custom Attribute Key 4'
         ));
 
         // When the apirest returns an error response.

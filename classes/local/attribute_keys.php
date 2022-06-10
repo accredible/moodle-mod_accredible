@@ -61,7 +61,7 @@ class attribute_keys {
             for ($i = 0; $i <= 100; $i++) {
                 $response = $this->apirest->search_attribute_keys($pagesize, $page);
                 foreach ($response->attribute_keys as $attributekey) {
-                    $attributekeys[$attributekey->id] = $attributekey->name;
+                    $attributekeys[$attributekey->name] = $attributekey->name;
                 }
 
                 $page++;

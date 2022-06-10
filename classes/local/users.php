@@ -135,4 +135,23 @@ class users {
 
         return $unissuedusers;
     }
+
+    /**
+     * Get user grades from grade item.
+     * @param stdObject $data data from the submission of mod_form.
+     * @return array[stdClass] $gradeattributes
+     */
+    public function get_user_grades($data) {
+        global $DB;
+
+        if (isset($data->includegradeattribute) && isset($data->gradeattributegradeitemid) && isset($data->gradeattributekeyname)) {
+            $users = array_keys($data->users);
+            $assigment = $DB->get_record('grade_items', array('id' => $data->gradeattributegradeitemid), '*', MUST_EXIST);
+            $grades = grade_get_grades($data->course, $assigment->itemtype, $assigment->itemmodule,
+                $assigment->iteminstance, $users);
+            $gradeattributes = isset($grades->items[0]->grades) ? $grades->items[0]->grades : null;
+
+            return $gradeattributes;
+        }
+    }
 }
