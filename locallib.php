@@ -229,13 +229,8 @@ function accredible_quiz_submission_handler($event) {
                 $data->users = array($user->id => 1);
                 $data->course = $record->course;
 
-                $gradeattributes = $usersclient->get_user_grades($data);
-
-                if (isset($gradeattributes) && isset($gradeattributes[$user->id]->grade)) {
-                    $customattributes = array($record->gradeattributekeyname => $gradeattributes[$user->id]->str_grade);
-                } else {
-                    $customattributes = null;
-                }
+                $gradeattributes = $usersclient->get_user_grades($data, $user->id);
+                $customattributes = $usersclient->load_user_grade_as_custom_attributes($record, $gradeattributes, $userid);
 
                 // Check if we have a group mapping - if not use the old logic.
                 if ($record->groupid) {
@@ -414,20 +409,8 @@ function accredible_course_completed_handler($event) {
             // Check for the existence of an activity instance and an auto-issue rule.
             if ( $record and ($record->completionactivities && $record->completionactivities != 0) ) {
                 // Load user grade to attach in the credential.
-                $data = new stdClass();
-                $data->includegradeattribute = $record->includegradeattribute;
-                $data->gradeattributegradeitemid = $record->gradeattributegradeitemid;
-                $data->gradeattributekeyname = $record->gradeattributekeyname;
-                $data->users = array($user->id);
-                $data->course = $record->course;
-
-                $gradeattributes = $usersclient->get_user_grades($data);
-
-                if (isset($gradeattributes) && isset($gradeattributes[$user->id]->grade)) {
-                    $customattributes = array($record->gradeattributekeyname => $gradeattributes[$user->id]->str_grade);
-                } else {
-                    $customattributes = null;
-                }
+                $gradeattributes = $usersclient->get_user_grades($record, $user->id);
+                $customattributes = $usersclient->load_user_grade_as_custom_attributes($record, $gradeattributes, $user->id);
 
                 // Check if we have a group mapping - if not use the old logic.
                 if ($record->groupid) {

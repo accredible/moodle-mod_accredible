@@ -137,21 +137,39 @@ class users {
     }
 
     /**
-     * Get user grades from grade item.
-     * @param stdObject $data data from the submission of mod_form.
+     * Get user grades from a grade item.
+     * @param stdObject $accredible the accredible activity object.
+     * @param array|int $userids array of user IDs or a single ID.
      * @return array[stdClass] $gradeattributes
      */
-    public function get_user_grades($data) {
+    public function get_user_grades($accredible, $userids) {
         global $DB;
-
-        if (isset($data->includegradeattribute) && isset($data->gradeattributegradeitemid) && isset($data->gradeattributekeyname)) {
-            $users = array_keys($data->users);
-            $assigment = $DB->get_record('grade_items', array('id' => $data->gradeattributegradeitemid), '*', MUST_EXIST);
-            $grades = grade_get_grades($data->course, $assigment->itemtype, $assigment->itemmodule,
-                $assigment->iteminstance, $users);
+        if (isset($accredible->includegradeattribute) && isset($accredible->gradeattributegradeitemid)
+            && isset($accredible->gradeattributekeyname)) {
+            $gradeitem = $DB->get_record('grade_items', array('id' => $accredible->gradeattributegradeitemid), '*', MUST_EXIST);
+            $grades = grade_get_grades($accredible->course, $gradeitem->itemtype, $gradeitem->itemmodule,
+                $gradeitem->iteminstance, $userids);
             $gradeattributes = isset($grades->items[0]->grades) ? $grades->items[0]->grades : null;
 
             return $gradeattributes;
+        } else {
+            return null;
         }
+    }
+
+    /**
+     * Find user grade and map it with custom attribute name.
+     * @param stdObject $accredible the accredible activity object.
+     * @param array $grades array of user grades.
+     * @param int $userid
+     * @return array $customattributes
+     */
+    public function load_user_grade_as_custom_attributes($accredible, $grades, $userid) {
+        if (isset($grades) && isset($grades[$userid]->grade)) {
+            $customattributes = array($accredible->gradeattributekeyname => $grades[$userid]->str_grade);
+        } else {
+            $customattributes = null;
+        }
+        return $customattributes;
     }
 }
