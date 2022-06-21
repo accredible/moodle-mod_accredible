@@ -280,7 +280,7 @@ class mod_accredible_users_test extends \advanced_testcase {
 
         $grade = array("itemid" => $gradeitemid, "userid" => $generateduser2->id, "finalgrade" => 80);
         $gradeid = $DB->insert_record('grade_grades', $grade);
-        $this->assertEquals($gradeid, 1);
+        $this->assertNotNull($gradeid);
 
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, $gradeitemid, "Custom Attribute");
         $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
