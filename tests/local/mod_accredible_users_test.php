@@ -388,7 +388,8 @@ class mod_accredible_users_test extends \advanced_testcase {
             "itemtype" => 'mod',
             "itemmodule" => $itemmodule,
             "iteminstance" => $iteminstance,
-            "itemnumber" => 0
+            "itemnumber" => 0,
+            "gradetype" => GRADE_TYPE_SCALE
         );
         return $DB->insert_record('grade_items', $gradeitem);
     }

@@ -147,8 +147,13 @@ class users {
         if (isset($accredible->includegradeattribute) && isset($accredible->gradeattributegradeitemid)
             && isset($accredible->gradeattributekeyname)) {
             $gradeitem = $DB->get_record('grade_items', array('id' => $accredible->gradeattributegradeitemid), '*', MUST_EXIST);
-            $grades = grade_get_grades($accredible->course, $gradeitem->itemtype, $gradeitem->itemmodule,
-                $gradeitem->iteminstance, $userids);
+            $grades = grade_get_grades(
+                $accredible->course,
+                $gradeitem->itemtype,
+                $gradeitem->itemmodule,
+                $gradeitem->iteminstance,
+                $userids
+            );
             $gradeattributes = isset($grades->items[0]->grades) ? $grades->items[0]->grades : null;
 
             return $gradeattributes;
