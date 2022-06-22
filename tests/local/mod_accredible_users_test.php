@@ -280,6 +280,8 @@ class mod_accredible_users_test extends \advanced_testcase {
 
         $grade = array("itemid" => $gradeitemid, "userid" => $generateduser2->id, "finalgrade" => 80);
         $gradeid = $DB->insert_record('grade_grades', $grade);
+        $this->assertNotNull($gradeitemid);
+        $this->assertNotNull($generateduser2->id);
         $this->assertNotNull($gradeid);
         $this->assertNotEquals($generateduser2->id, $this->user->id);
 
@@ -296,7 +298,7 @@ class mod_accredible_users_test extends \advanced_testcase {
 
         $result = $userhelper->get_user_grades($accredibleinstance, $generateduser2->id);
 
-        $this->assertEquals($result, $expectedresponse);
+        $this->assertEquals($expectedresponse, $result);
     }
 
     /**
