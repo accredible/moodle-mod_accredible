@@ -287,7 +287,7 @@ class mod_accredible_users_test extends \advanced_testcase {
 
         $gradeitem = $DB->get_record(
             'grade_items',
-            array('id' => $accredible->gradeattributegradeitemid),
+            array('id' => $gradeitemid),
             '*',
             MUST_EXIST
         );
