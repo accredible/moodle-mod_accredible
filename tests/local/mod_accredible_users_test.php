@@ -20,8 +20,6 @@ use mod_accredible\local\user;
 use mod_accredible\client\client;
 use mod_accredible\apirest\apirest;
 
-require_once($CFG->libdir . '/grade/grade_grade.php');
-
 /**
  * Unit tests for mod/accredible/classes/helpers/user_helper.php
  *
@@ -293,6 +291,8 @@ class mod_accredible_users_test extends \advanced_testcase {
             '*',
             MUST_EXIST
         );
+        global $CFG;
+        require_once($CFG->libdir . '/grade/grade_grade.php');
         $grade_grades = grade_grade::fetch_users_grades($gradeitem, $generateduser2->id, true);
         $this->assertEquals(array(), $grade_grades);
 
