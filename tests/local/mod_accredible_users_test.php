@@ -20,6 +20,8 @@ use mod_accredible\local\user;
 use mod_accredible\client\client;
 use mod_accredible\apirest\apirest;
 
+require_once($CFG->libdir . '/grade/grade_grade.php');
+
 /**
  * Unit tests for mod/accredible/classes/helpers/user_helper.php
  *
@@ -284,6 +286,15 @@ class mod_accredible_users_test extends \advanced_testcase {
         $this->assertNotNull($generateduser2->id);
         $this->assertNotNull($gradeid);
         $this->assertNotEquals($generateduser2->id, $this->user->id);
+
+        $gradeitem = $DB->get_record(
+            'grade_items',
+            array('id' => $accredible->gradeattributegradeitemid),
+            '*',
+            MUST_EXIST
+        );
+        $grade_grades = grade_grade::fetch_users_grades($gradeitem, $generateduser2->id, true);
+        $this->assertEquals(array(), $grade_grades);
 
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, $gradeitemid, "Custom Attribute");
         $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
