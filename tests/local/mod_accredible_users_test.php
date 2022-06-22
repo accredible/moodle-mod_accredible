@@ -287,7 +287,7 @@ class mod_accredible_users_test extends \advanced_testcase {
         $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
         $result = $userhelper->get_user_grades($accredibleinstance, $users);
 
-        $this->assertEquals($result, $expectedresponse);
+        // $this->assertEquals($result, $expectedresponse);
 
         // When a user has a grade a only send a user ID.
         $expectedresponse = array(
