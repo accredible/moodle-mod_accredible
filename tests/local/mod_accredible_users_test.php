@@ -234,51 +234,17 @@ class mod_accredible_users_test extends \advanced_testcase {
         $this->assertEquals($result, null);
 
         // When there are not grades for the users.
-        $emptyusergrade = new \stdClass();
-        $emptyusergrade->grade = null;
-        $emptyusergrade->locked = false;
-        $emptyusergrade->hidden = false;
-        $emptyusergrade->overridden = 0;
-        $emptyusergrade->feedback = null;
-        $emptyusergrade->feedbackformat = 0;
-        $emptyusergrade->usermodified = null;
-        $emptyusergrade->datesubmitted = null;
-        $emptyusergrade->dategraded = null;
-        $emptyusergrade->str_grade = "-";
-        $emptyusergrade->str_long_grade = "-";
-        $emptyusergrade->str_feedback = "";
-
-        $expectedresponse = array(
-            $this->user->id => $emptyusergrade,
-            $generateduser2->id => $emptyusergrade
-        );
-
         $quiz = $this->create_quiz_module($this->course->id);
         $gradeitemid = $this->create_grade_item($this->course->id, $quiz->name, 'quiz', $quiz->id);
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, $gradeitemid, "Custom Attribute");
         $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
         $result = $userhelper->get_user_grades($accredibleinstance, $users);
 
-        $this->assertEquals($result, $expectedresponse);
+        $this->assertEquals($result, array());
 
         // When a user has a grade.
-        $usergrade = new \stdClass();
-        $usergrade->grade = "80.00000";
-        $usergrade->locked = false;
-        $usergrade->hidden = false;
-        $usergrade->overridden = "0";
-        $usergrade->feedback = null;
-        $usergrade->feedbackformat = "0";
-        $usergrade->usermodified = null;
-        $usergrade->datesubmitted = null;
-        $usergrade->dategraded = null;
-        $usergrade->str_grade = "80.00";
-        $usergrade->str_long_grade = "80.00 / 100.00";
-        $usergrade->str_feedback = "";
-
         $expectedresponse = array(
-            $generateduser2->id => $usergrade,
-            $this->user->id => $emptyusergrade
+            $generateduser2->id => "80.00"
         );
 
         $this->create_grade_grades($gradeitemid, $generateduser2->id, 80);
@@ -290,7 +256,7 @@ class mod_accredible_users_test extends \advanced_testcase {
 
         // When a user has a grade a only send a user ID.
         $expectedresponse = array(
-            $generateduser2->id => $usergrade
+            $generateduser2->id => "80.00"
         );
 
         $result = $userhelper->get_user_grades($accredibleinstance, $generateduser2->id);
@@ -315,22 +281,8 @@ class mod_accredible_users_test extends \advanced_testcase {
         $this->assertEquals($result, null);
 
         // When there's a grade for the user.
-        $usergrade = new \stdClass();
-        $usergrade->grade = "80.00000";
-        $usergrade->locked = false;
-        $usergrade->hidden = false;
-        $usergrade->overridden = "0";
-        $usergrade->feedback = null;
-        $usergrade->feedbackformat = "0";
-        $usergrade->usermodified = null;
-        $usergrade->datesubmitted = null;
-        $usergrade->dategraded = null;
-        $usergrade->str_grade = "80.00";
-        $usergrade->str_long_grade = "80.00 / 100.00";
-        $usergrade->str_feedback = "";
-
         $grades = array(
-            $this->user->id => $usergrade
+            $this->user->id => "80.00"
         );
 
         $expectedresponse = array("Custom Attribute" => "80.00");

@@ -19,6 +19,7 @@ namespace mod_accredible\local;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/accredible/locallib.php');
+require_once($CFG->libdir  . '/grade/grade_item.php');
 
 use mod_accredible\apirest\apirest;
 use mod_accredible\local\credentials;
@@ -140,18 +141,32 @@ class users {
      * Get user grades from a grade item.
      * @param stdObject $accredible the accredible activity object.
      * @param array|int $userids array of user IDs or a single ID.
-     * @return array[stdClass] $gradeattributes
+     * @return array[stdClass] $usergrades
      */
     public function get_user_grades($accredible, $userids) {
         global $DB;
+
         if (isset($accredible->includegradeattribute) && isset($accredible->gradeattributegradeitemid)
             && isset($accredible->gradeattributekeyname)) {
-            $gradeitem = $DB->get_record('grade_items', array('id' => $accredible->gradeattributegradeitemid), '*', MUST_EXIST);
-            $grades = grade_get_grades($accredible->course, $gradeitem->itemtype, $gradeitem->itemmodule,
-                $gradeitem->iteminstance, $userids);
-            $gradeattributes = isset($grades->items[0]->grades) ? $grades->items[0]->grades : null;
+            $usergrades = array();
+            $gradeitemdb = $DB->get_record('grade_items', array('id' => $accredible->gradeattributegradeitemid), '*', MUST_EXIST);
+            $gradeitem = new \grade_item($gradeitemdb);
 
-            return $gradeattributes;
+            if (is_array($userids)) {
+                $queryparams = array('gradeitem' => $gradeitem->id);
+                list($insql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+                $queryparams += $params;
+                $grades = $DB->get_records_select('grade_grades', 'itemid = :gradeitem AND userid '.$insql, $queryparams);
+            } else {
+                $queryparams = array('gradeitem' => $gradeitem->id, 'userid' => $userids);
+                $grades = $DB->get_records_select('grade_grades', 'itemid = :gradeitem AND userid = :userid', $queryparams);
+            }
+
+            foreach ($grades as $grade) {
+                $usergrades[$grade->userid] = grade_format_gradevalue($grade->finalgrade, $gradeitem);
+            }
+
+            return $usergrades;
         } else {
             return null;
         }
@@ -165,8 +180,8 @@ class users {
      * @return array $customattributes
      */
     public function load_user_grade_as_custom_attributes($accredible, $grades, $userid) {
-        if (isset($grades) && isset($grades[$userid]->grade)) {
-            $customattributes = array($accredible->gradeattributekeyname => $grades[$userid]->str_grade);
+        if (isset($grades) && isset($grades[$userid])) {
+            $customattributes = array($accredible->gradeattributekeyname => $grades[$userid]);
         } else {
             $customattributes = null;
         }

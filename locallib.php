@@ -226,7 +226,6 @@ function accredible_quiz_submission_handler($event) {
                 $data->includegradeattribute = $record->includegradeattribute;
                 $data->gradeattributegradeitemid = $record->gradeattributegradeitemid;
                 $data->gradeattributekeyname = $record->gradeattributekeyname;
-                $data->users = array($user->id => 1);
                 $data->course = $record->course;
 
                 $gradeattributes = $usersclient->get_user_grades($data, $user->id);
