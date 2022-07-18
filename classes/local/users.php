@@ -146,30 +146,25 @@ class users {
     public function get_user_grades($accredible, $userids) {
         global $DB;
 
-        if (isset($accredible->includegradeattribute) && isset($accredible->gradeattributegradeitemid)
-            && isset($accredible->gradeattributekeyname)) {
-            $usergrades = array();
-            $gradeitemdb = $DB->get_record('grade_items', array('id' => $accredible->gradeattributegradeitemid), '*', MUST_EXIST);
-            $gradeitem = new \grade_item($gradeitemdb);
-
-            if (is_array($userids)) {
-                $queryparams = array('gradeitem' => $gradeitem->id);
-                list($insql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
-                $queryparams += $params;
-                $grades = $DB->get_records_select('grade_grades', 'itemid = :gradeitem AND userid '.$insql, $queryparams);
-            } else {
-                $queryparams = array('gradeitem' => $gradeitem->id, 'userid' => $userids);
-                $grades = $DB->get_records_select('grade_grades', 'itemid = :gradeitem AND userid = :userid', $queryparams);
-            }
-
-            foreach ($grades as $grade) {
-                $usergrades[$grade->userid] = grade_format_gradevalue($grade->finalgrade, $gradeitem);
-            }
-
-            return $usergrades;
-        } else {
+        if (!isset($accredible) || !$accredible->includegradeattribute || !$accredible->gradeattributegradeitemid
+            || empty($accredible->gradeattributekeyname)) {
             return null;
         }
+
+        $usergrades = array();
+        $gradeitemdb = $DB->get_record('grade_items', array('id' => $accredible->gradeattributegradeitemid), '*', MUST_EXIST);
+        $gradeitem = new \grade_item($gradeitemdb);
+
+        $queryparams = array('gradeitem' => $gradeitem->id);
+        list($insql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        $queryparams += $params;
+        $grades = $DB->get_records_select('grade_grades', 'itemid = :gradeitem AND userid '.$insql, $queryparams);
+
+        foreach ($grades as $grade) {
+            $usergrades[$grade->userid] = grade_format_gradevalue($grade->finalgrade, $gradeitem);
+        }
+
+        return $usergrades;
     }
 
     /**
