@@ -227,8 +227,20 @@ class mod_accredible_users_test extends \advanced_testcase {
         $result = $userhelper->get_user_grades($accredibleinstance, $users);
         $this->assertEquals($result, null);
 
+        // When gradeattributegradeitemid is false.
+        $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, 0);
+        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $result = $userhelper->get_user_grades($accredibleinstance, $users);
+        $this->assertEquals($result, null);
+
         // When gradeattributekeyname is null.
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, 1);
+        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $result = $userhelper->get_user_grades($accredibleinstance, $users);
+        $this->assertEquals($result, null);
+
+        // When gradeattributekeyname is empty.
+        $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, 1, "");
         $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
         $result = $userhelper->get_user_grades($accredibleinstance, $users);
         $this->assertEquals($result, null);
@@ -254,7 +266,17 @@ class mod_accredible_users_test extends \advanced_testcase {
 
         $this->assertEquals($result, $expectedresponse);
 
-        // When a user has a grade a only send a user ID.
+        // When multiple users have a grade.
+        $this->create_grade_grades($gradeitemid, $this->user->id, 60);
+        $expectedresponse = array(
+            $this->user->id => "60.00",
+            $generateduser2->id => "80.00"
+        );
+        $result = $userhelper->get_user_grades($accredibleinstance, array($generateduser2->id, $this->user->id));
+
+        $this->assertEquals($result, $expectedresponse);
+
+        // When multiple users have a grade but only a user ID is sent.
         $expectedresponse = array(
             $generateduser2->id => "80.00"
         );

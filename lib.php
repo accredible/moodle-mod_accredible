@@ -50,8 +50,13 @@ function accredible_add_instance($post) {
     $evidenceitems = new evidenceitems();
     $usersclient = new users();
 
-    // Load grade attributes for users if need to be added in the credential.
-    $userids = array_keys($post->users);
+    // Load grade attributes for users who will get a credential issued if need to be added.
+    $userids = array();
+    foreach ($post->users as $userid => $issuecertificate) {
+        if ($issuecertificate) {
+            array_push($userids, $userid);
+        }
+    }
     $gradeattributes = $usersclient->get_user_grades($post, $userids);
 
     // Issue certs.
@@ -120,8 +125,18 @@ function accredible_update_instance($post) {
     $usersclient = new users();
 
     // Load grade attributes for users if need to be added in the credential.
-    $userids = array_keys($post->users);
-    $gradeattributes = $usersclient->get_user_grades($post, $userids);
+    $userids = array();
+    foreach ($post->users as $userid => $issuecertificate) {
+        if ($issuecertificate) {
+            array_push($userids, $userid);
+        }
+    }
+    foreach ($post->unissuedusers as $userid => $issuecertificate) {
+        if ($issuecertificate) {
+            array_push($userids, $userid);
+        }
+    }
+    $gradeattributes = $usersclient->get_user_grades($post, array_unique($userids));
 
     $accrediblecertificate = $DB->get_record('accredible', array('id' => $post->instance), '*', MUST_EXIST);
 
