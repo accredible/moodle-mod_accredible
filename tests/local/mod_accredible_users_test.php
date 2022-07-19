@@ -284,6 +284,11 @@ class mod_accredible_users_test extends \advanced_testcase {
         $result = $userhelper->get_user_grades($accredibleinstance, $generateduser2->id);
 
         $this->assertEquals($result, $expectedresponse);
+
+        // When user id is not sent.
+        $result = $userhelper->get_user_grades($accredibleinstance, null);
+
+        $this->assertEquals($result, null);
     }
 
     /**

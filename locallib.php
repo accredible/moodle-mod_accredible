@@ -222,13 +222,7 @@ function accredible_quiz_submission_handler($event) {
             // Check for the existence of an activity instance and an auto-issue rule.
             if ( $record and ($record->finalquiz or $record->completionactivities) ) {
                 // Load user grade to attach in the credential.
-                $data = new stdClass();
-                $data->includegradeattribute = $record->includegradeattribute;
-                $data->gradeattributegradeitemid = $record->gradeattributegradeitemid;
-                $data->gradeattributekeyname = $record->gradeattributekeyname;
-                $data->course = $record->course;
-
-                $gradeattributes = $usersclient->get_user_grades($data, $user->id);
+                $gradeattributes = $usersclient->get_user_grades($record, $user->id);
                 $customattributes = $usersclient->load_user_grade_as_custom_attributes($record, $gradeattributes, $userid);
 
                 // Check if we have a group mapping - if not use the old logic.

@@ -147,7 +147,7 @@ class users {
         global $DB;
 
         if (!isset($accredible) || !$accredible->includegradeattribute || !$accredible->gradeattributegradeitemid
-            || empty($accredible->gradeattributekeyname)) {
+            || empty($accredible->gradeattributekeyname) || empty($userids)) {
             return null;
         }
 
