@@ -88,7 +88,9 @@ class mod_accredible_credentials_test extends \advanced_testcase {
                 ),
                 "issued_on" => null,
                 "expired_on" => null,
-                "custom_attributes" => null
+                "custom_attributes" => array(
+                    "test" => 25
+                )
             )
         ));
 
@@ -100,7 +102,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         // Expect to return the created credential.
         $api = new apirest($mockclient1);
         $localcredentials = new credentials($api);
-        $result = $localcredentials->create_credential($this->user, $mockgroupid);
+        $result = $localcredentials->create_credential($this->user, $mockgroupid, null, array("test" => 25));
         $this->assertEquals($result, $resdata->credential);
 
         // When the apirest returns an error response.

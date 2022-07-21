@@ -196,24 +196,176 @@ class mod_accredible_users_test extends \advanced_testcase {
     }
 
     /**
+     * Return list of grades from a grade item.
+     */
+    public function test_get_user_grades() {
+        global $DB;
+        $userhelper = new users();
+
+        $generateduser2 = $this->getDataGenerator()->create_user(array('email' => 'person3@example.com'));
+        $this->getDataGenerator()->enrol_user($this->user->id, $this->course->id);
+        $this->getDataGenerator()->enrol_user($generateduser2->id, $this->course->id);
+
+        $users = array(
+            $this->user->id     => $this->user->id,
+            $generateduser2->id => $generateduser2->id
+        );
+
+        // When accredible instance not provided.
+        $result = $userhelper->get_user_grades(null, $users);
+        $this->assertEquals($result, null);
+
+        // When includegradeattribute is false.
+        $accredibleinstanceid = $this->create_accredible_instance($this->course->id);
+        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $result = $userhelper->get_user_grades($accredibleinstance, $users);
+        $this->assertEquals($result, null);
+
+        // When gradeattributegradeitemid is null.
+        $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1);
+        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $result = $userhelper->get_user_grades($accredibleinstance, $users);
+        $this->assertEquals($result, null);
+
+        // When gradeattributegradeitemid is false.
+        $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, 0);
+        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $result = $userhelper->get_user_grades($accredibleinstance, $users);
+        $this->assertEquals($result, null);
+
+        // When gradeattributekeyname is null.
+        $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, 1);
+        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $result = $userhelper->get_user_grades($accredibleinstance, $users);
+        $this->assertEquals($result, null);
+
+        // When gradeattributekeyname is empty.
+        $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, 1, "");
+        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $result = $userhelper->get_user_grades($accredibleinstance, $users);
+        $this->assertEquals($result, null);
+
+        // When there are not grades for the users.
+        $quiz = $this->create_quiz_module($this->course->id);
+        $gradeitemid = $this->create_grade_item($this->course->id, $quiz->name, 'quiz', $quiz->id);
+        $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, $gradeitemid, "Custom Attribute");
+        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $result = $userhelper->get_user_grades($accredibleinstance, $users);
+
+        $this->assertEquals($result, array());
+
+        // When a user has a grade.
+        $expectedresponse = array(
+            $generateduser2->id => "80.00"
+        );
+
+        $this->create_grade_grades($gradeitemid, $generateduser2->id, 80);
+        $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, $gradeitemid, "Custom Attribute");
+        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $result = $userhelper->get_user_grades($accredibleinstance, $users);
+
+        $this->assertEquals($result, $expectedresponse);
+
+        // When multiple users have a grade.
+        $this->create_grade_grades($gradeitemid, $this->user->id, 60);
+        $expectedresponse = array(
+            $this->user->id => "60.00",
+            $generateduser2->id => "80.00"
+        );
+        $result = $userhelper->get_user_grades($accredibleinstance, array($generateduser2->id, $this->user->id));
+
+        $this->assertEquals($result, $expectedresponse);
+
+        // When multiple users have a grade but only a user ID is sent.
+        $expectedresponse = array(
+            $generateduser2->id => "80.00"
+        );
+
+        $result = $userhelper->get_user_grades($accredibleinstance, $generateduser2->id);
+
+        $this->assertEquals($result, $expectedresponse);
+
+        // When user id is not sent.
+        $result = $userhelper->get_user_grades($accredibleinstance, null);
+
+        $this->assertEquals($result, null);
+    }
+
+    /**
+     * Return list of grades from a grade item.
+     */
+    public function test_load_user_grade_as_custom_attributes() {
+        global $DB;
+        $userhelper = new users();
+
+        $this->getDataGenerator()->enrol_user($this->user->id, $this->course->id);
+
+        $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, 1, "Custom Attribute");
+        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+
+        // When grades not provided.
+        $result = $userhelper->load_user_grade_as_custom_attributes($accredibleinstance, array(), $this->user->id);
+        $this->assertEquals($result, null);
+
+        // When there's a grade for the user.
+        $grades = array(
+            $this->user->id => "80.00"
+        );
+
+        $expectedresponse = array("Custom Attribute" => "80.00");
+
+        $result = $userhelper->load_user_grade_as_custom_attributes($accredibleinstance, $grades, $this->user->id);
+        $this->assertEquals($result, $expectedresponse);
+    }
+
+    /**
      * Create accredible activity.
      *
      * @param int $courseid
      * @param int $finalquizid
+     * @param int $includegradeattribute
+     * @param int $gradeattributegradeitemid
+     * @param string $gradeattributekeyname
      */
-    private function create_accredible_instance($courseid, $finalquizid = 0) {
+    private function create_accredible_instance($courseid, $finalquizid = 0, $includegradeattribute = 0,
+        $gradeattributegradeitemid = null, $gradeattributekeyname = null) {
+
         global $DB;
         $dbrecord = array(
-            "name"                 => 'Accredible Test',
-            "course"               => $courseid,
-            "finalquiz"            => $finalquizid,
-            "passinggrade"         => 70,
-            "timecreated"          => time(),
-            "groupid"              => 1,
-            "completionactivities" => null
+            "name"                      => 'Accredible Test',
+            "course"                    => $courseid,
+            "finalquiz"                 => $finalquizid,
+            "passinggrade"              => 70,
+            "timecreated"               => time(),
+            "groupid"                   => 1,
+            "completionactivities"      => null,
+            "includegradeattribute"     => $includegradeattribute,
+            "gradeattributegradeitemid" => $gradeattributegradeitemid,
+            "gradeattributekeyname"     => $gradeattributekeyname,
         );
 
         return $DB->insert_record('accredible', $dbrecord);
+    }
+
+    /**
+     * Create quiz module test
+     *
+     * @param int $courseid
+     * @param string $itemname
+     * @param string $itemmodule
+     * @param int $iteminstance
+     */
+    private function create_grade_item($courseid, $itemname, $itemmodule, $iteminstance) {
+        global $DB;
+        $gradeitem = array(
+            "courseid" => $courseid,
+            "itemname" => $itemname,
+            "itemtype" => 'mod',
+            "itemmodule" => $itemmodule,
+            "iteminstance" => $iteminstance,
+            "itemnumber" => 0
+        );
+        return $DB->insert_record('grade_items', $gradeitem);
     }
 
     /**
@@ -237,5 +389,23 @@ class mod_accredible_users_test extends \advanced_testcase {
         global $DB;
         $quizgrade = array("quiz" => $quizid, "userid" => $userid, "grade" => $grade);
         $DB->insert_record('quiz_grades', $quizgrade);
+    }
+
+    /**
+     * Create quiz grades test
+     *
+     * @param int $gradeitemid
+     * @param int $userid
+     * @param int $grade
+     */
+    private function create_grade_grades($gradeitemid, $userid, $grade) {
+        global $DB;
+        $quizgrade = array(
+            "itemid" => $gradeitemid,
+            "rawgrade" => $grade,
+            "userid" => $userid,
+            "finalgrade" => $grade
+        );
+        $DB->insert_record('grade_grades', $quizgrade);
     }
 }

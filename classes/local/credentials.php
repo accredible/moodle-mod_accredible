@@ -52,13 +52,15 @@ class credentials {
      * @param stdObject $user
      * @param int $groupid
      * @param date|null $issuedon
+     * @param array $customattributes
      * @return stdObject
      */
-    public function create_credential($user, $groupid, $issuedon = null) {
+    public function create_credential($user, $groupid, $issuedon = null, $customattributes = null) {
         global $CFG;
 
         try {
-            $credential = $this->apirest->create_credential(fullname($user), $user->email, $groupid, $issuedon);
+            $credential = $this->apirest->create_credential(fullname($user), $user->email, $groupid, $issuedon,
+                null, $customattributes);
 
             return $credential->credential;
         } catch (\Exception $e) {
@@ -79,14 +81,15 @@ class credentials {
      * @param string $coursedescription
      * @param int $courselink
      * @param int $issuedon
+     * @param array $customattributes
      * @return stdObject
      */
     public function create_credential_legacy($user, $achievementname, $coursename,
-        $coursedescription, $courselink, $issuedon) {
+        $coursedescription, $courselink, $issuedon, $customattributes = null) {
         global $CFG;
         try {
             $credential = $this->apirest->create_credential_legacy(fullname($user),
-                $user->email, $achievementname, $issuedon, null, $coursename, $coursedescription, $courselink);
+                $user->email, $achievementname, $issuedon, null, $coursename, $coursedescription, $courselink, $customattributes);
 
             return $credential->credential;
         } catch (\Exception $e) {

@@ -29,6 +29,7 @@ use mod_accredible\apirest\apirest;
 use mod_accredible\local\credentials;
 use mod_accredible\local\groups;
 use mod_accredible\local\evidenceitems;
+use mod_accredible\local\users;
 
 /**
  * Add certificate instance.
@@ -47,6 +48,16 @@ function accredible_add_instance($post) {
 
     $localcredentials = new credentials();
     $evidenceitems = new evidenceitems();
+    $usersclient = new users();
+
+    // Load grade attributes for users who will get a credential issued if need to be added.
+    $userids = array();
+    foreach ($post->users as $userid => $issuecertificate) {
+        if ($issuecertificate) {
+            $userids[] = $userid;
+        }
+    }
+    $gradeattributes = $usersclient->get_user_grades($post, $userids);
 
     // Issue certs.
     if ( isset($post->users) ) {
@@ -56,7 +67,9 @@ function accredible_add_instance($post) {
             if ($issuecertificate) {
                 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
 
-                $credential = $localcredentials->create_credential($user, $post->groupid);
+                $customattributes = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
+
+                $credential = $localcredentials->create_credential($user, $post->groupid, null, $customattributes);
 
                 if ($credential) {
                     // Evidence item posts.
@@ -109,6 +122,21 @@ function accredible_update_instance($post) {
 
     $localcredentials = new credentials();
     $evidenceitems = new evidenceitems();
+    $usersclient = new users();
+
+    // Load grade attributes for users if need to be added in the credential.
+    $userids = array();
+    foreach ($post->users as $userid => $issuecertificate) {
+        if ($issuecertificate) {
+            $userids[] = $userid;
+        }
+    }
+    foreach ($post->unissuedusers as $userid => $issuecertificate) {
+        if ($issuecertificate) {
+            $userids[] = $userid;
+        }
+    }
+    $gradeattributes = $usersclient->get_user_grades($post, array_unique($userids));
 
     $accrediblecertificate = $DB->get_record('accredible', array('id' => $post->instance), '*', MUST_EXIST);
 
@@ -128,9 +156,10 @@ function accredible_update_instance($post) {
                 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
                 $completedtimestamp = accredible_manual_issue_completion_timestamp($accrediblecertificate, $user);
                 $completeddate = date('Y-m-d', (int) $completedtimestamp);
+                $customattributes = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
                 if ($accrediblecertificate->groupid) {
                     // Create the credential.
-                    $credential = $localcredentials->create_credential($user, $groupid, $completeddate);
+                    $credential = $localcredentials->create_credential($user, $groupid, $completeddate, $customattributes);
                     if ($credential) {
                         $credentialid = $credential->id;
                         // Evidence item posts.
@@ -158,7 +187,7 @@ function accredible_update_instance($post) {
                     // TODO: testing.
                     $result = accredible_issue_default_certificate($user->id,
                         $accrediblecertificate->id, fullname($user), $user->email,
-                        $grade, $quiz->name, $completedtimestamp);
+                        $grade, $quiz->name, $completedtimestamp, $customattributes);
                     $credentialid = $result->credential->id;
                 }
                 // Log the creation.
@@ -182,15 +211,16 @@ function accredible_update_instance($post) {
                 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
                 $completedtimestamp = accredible_manual_issue_completion_timestamp($accrediblecertificate, $user);
                 $completeddate = date('Y-m-d', (int) $completedtimestamp);
+                $customattributes = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
                 if ($accrediblecertificate->achievementid) {
 
                     $courseurl = new moodle_url('/course/view.php', array('id' => $post->course));
                     $courselink = $courseurl->__toString();
 
                     $credential = $localcredentials->create_credential_legacy($user, $post->achievementid,
-                        $post->certificatename, $post->description, $courselink, $completeddate);
+                        $post->certificatename, $post->description, $courselink, $completeddate, $customattributes);
                 } else {
-                    $credential = $localcredentials->create_credential($user, $post->groupid, $completeddate);
+                    $credential = $localcredentials->create_credential($user, $post->groupid, $completeddate, $customattributes);
                 }
 
                 // Evidence item posts.

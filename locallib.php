@@ -30,6 +30,7 @@ use mod_accredible\apirest\apirest;
 use mod_accredible\Html2Text\Html2Text;
 use mod_accredible\local\credentials;
 use mod_accredible\local\evidenceitems;
+use mod_accredible\local\users;
 
 /**
  * Checks if a user has earned a specific credential according to the activity settings
@@ -126,9 +127,10 @@ function accredible_get_recipient_sso_linik($groupid, $email) {
  * @param string $grade
  * @param string $quizname
  * @param date|null $completedtimestamp
+ * @param array $customattributes
  */
 function accredible_issue_default_certificate($userid, $certificateid, $name, $email, $grade,
-    $quizname, $completedtimestamp = null) {
+    $quizname, $completedtimestamp = null, $customattributes = null) {
     global $DB, $CFG;
 
     if (!isset($completedtimestamp)) {
@@ -144,7 +146,7 @@ function accredible_issue_default_certificate($userid, $certificateid, $name, $e
 
     $restapi = new apirest();
     $credential = $restapi->create_credential_legacy($name, $email, $accrediblecertificate->achievementid, $issuedon, null,
-        $accrediblecertificate->certificatename, $accrediblecertificate->description, $courselink);
+        $accrediblecertificate->certificatename, $accrediblecertificate->description, $courselink, $customattributes);
 
     // Evidence item posts.
     $credentialid = $credential->credential->id;
@@ -209,6 +211,7 @@ function accredible_quiz_submission_handler($event) {
 
     $api = new apirest();
     $localcredentials = new credentials();
+    $usersclient = new users();
 
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
 
@@ -218,6 +221,10 @@ function accredible_quiz_submission_handler($event) {
         foreach ($accrediblecertificaterecords as $record) {
             // Check for the existence of an activity instance and an auto-issue rule.
             if ( $record and ($record->finalquiz or $record->completionactivities) ) {
+                // Load user grade to attach in the credential.
+                $gradeattributes = $usersclient->get_user_grades($record, $user->id);
+                $customattributes = $usersclient->load_user_grade_as_custom_attributes($record, $gradeattributes, $userid);
+
                 // Check if we have a group mapping - if not use the old logic.
                 if ($record->groupid) {
                     // Check which quiz is used as the deciding factor in this course.
@@ -233,7 +240,7 @@ function accredible_quiz_submission_handler($event) {
                             // Check for pass.
                             if ($gradeishighenough) {
                                 // Issue a ceritificate.
-                                $localcredentials->create_credential($user, $record->groupid);
+                                $localcredentials->create_credential($user, $record->groupid, null, $customattributes);
                             }
                         } else {
                             // Check the existing grade to see if this one is higher and update the credential if so.
@@ -280,7 +287,7 @@ function accredible_quiz_submission_handler($event) {
                             // Make sure there isn't already a certificate.
                             if (!$existingcertificate) {
                                 // Issue a ceritificate.
-                                $localcredentials->create_credential($user, $record->groupid);
+                                $localcredentials->create_credential($user, $record->groupid, null, $customattributes);
                             }
                         }
                     }
@@ -301,7 +308,7 @@ function accredible_quiz_submission_handler($event) {
                             if ($gradeishighenough) {
                                 // Issue a ceritificate.
                                 $apiresponse = accredible_issue_default_certificate( $user->id,
-                                    $record->id, fullname($user), $user->email, $usersgrade, $quiz->name);
+                                    $record->id, fullname($user), $user->email, $usersgrade, $quiz->name, null, $customattributes);
                                 $certificateevent = \mod_accredible\event\certificate_created::create(array(
                                   'objectid' => $apiresponse->credential->id,
                                   'context' => context_module::instance($event->contextinstanceid),
@@ -357,7 +364,7 @@ function accredible_quiz_submission_handler($event) {
                             if (!$existingcertificate) {
                                 // And issue a ceritificate.
                                 $apiresponse = accredible_issue_default_certificate( $user->id,
-                                    $record->id, fullname($user), $user->email, null, null);
+                                    $record->id, fullname($user), $user->email, null, null, null, $customattributes);
                                 $certificateevent = \mod_accredible\event\certificate_created::create(array(
                                   'objectid' => $apiresponse->credential->id,
                                   'context' => context_module::instance($event->contextinstanceid),
@@ -385,6 +392,7 @@ function accredible_course_completed_handler($event) {
     global $DB, $CFG;
 
     $localcredentials = new credentials();
+    $usersclient = new users();
 
     $user = $DB->get_record('user', array('id' => $event->relateduserid));
 
@@ -393,15 +401,18 @@ function accredible_course_completed_handler($event) {
         foreach ($accrediblecertificaterecords as $record) {
             // Check for the existence of an activity instance and an auto-issue rule.
             if ( $record and ($record->completionactivities && $record->completionactivities != 0) ) {
+                // Load user grade to attach in the credential.
+                $gradeattributes = $usersclient->get_user_grades($record, $user->id);
+                $customattributes = $usersclient->load_user_grade_as_custom_attributes($record, $gradeattributes, $user->id);
 
                 // Check if we have a group mapping - if not use the old logic.
                 if ($record->groupid) {
                     // Create the credential.
-                    $localcredentials->create_credential($user, $record->groupid);
+                    $localcredentials->create_credential($user, $record->groupid, null, $customattributes);
 
                 } else {
                     $apiresponse = accredible_issue_default_certificate( $user->id, $record->id,
-                        fullname($user), $user->email, null, null);
+                        fullname($user), $user->email, null, null, null, $customattributes);
                     $certificateevent = \mod_accredible\event\certificate_created::create(array(
                       'objectid' => $apiresponse->credential->id,
                       'context' => context_module::instance($event->contextinstanceid),
