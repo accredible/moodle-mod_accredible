@@ -130,5 +130,39 @@ function xmldb_accredible_upgrade($oldversion=0) {
 
     }
 
+    if ($oldversion < 2022053000) {
+        $table = new xmldb_table('accredible');
+
+        // Define field includegradeattribute to be added to accredible.
+        $field = new xmldb_field('includegradeattribute', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0',
+            'completionactivities');
+
+        // Conditionally launch add field groupid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field gradeattributegradeitemid to be added to accredible.
+        $field = new xmldb_field('gradeattributegradeitemid', XMLDB_TYPE_INTEGER, '10', null, null, null,
+            null, 'includegradeattribute');
+
+        // Conditionally launch add field groupid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field gradeattributekeyname to be added to accredible.
+        $field = new xmldb_field('gradeattributekeyname', XMLDB_TYPE_CHAR, '255', null, null, null,
+            null, 'gradeattributegradeitemid');
+
+        // Conditionally launch add field groupid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Accredible savepoint reached.
+        upgrade_mod_savepoint(true, 2022053000, 'accredible');
+    }
+
     return true;
 }
