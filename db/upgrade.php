@@ -130,7 +130,7 @@ function xmldb_accredible_upgrade($oldversion=0) {
 
     }
 
-    if ($oldversion < 2022053000) {
+    if ($oldversion < 2022060900) {
         $table = new xmldb_table('accredible');
 
         // Define field includegradeattribute to be added to accredible.
@@ -161,7 +161,7 @@ function xmldb_accredible_upgrade($oldversion=0) {
         }
 
         // Accredible savepoint reached.
-        upgrade_mod_savepoint(true, 2022053000, 'accredible');
+        upgrade_mod_savepoint(true, 2022060900, 'accredible');
     }
 
     return true;

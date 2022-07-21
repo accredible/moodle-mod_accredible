@@ -871,4 +871,78 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         $result = $api->get_groups(10000, 1);
         $this->assertEquals($result, $resdata);
     }
+
+    /**
+     * Tests if `POST /v1/attribute_keys/search` is properly called.
+     */
+    public function test_search_attribute_keys() {
+        $url = 'https://api.accredible.com/v1/attribute_keys/search';
+
+        // When the response is successful.
+        $mockclient1 = $this->getMockBuilder('client')
+            ->setMethods(['post'])
+            ->getMock();
+
+        // Mock API response data.
+        $resdata = $this->mockapi->resdata('attribute_keys/search_success.json');
+
+        $reqdata = json_encode(array('page' => 1, 'page_size' => 20, 'kind' => 'text'));
+
+        // Expect to call the endpoint once with page and page_size.
+        $mockclient1->expects($this->once())
+            ->method('post')
+            ->with($this->equalTo($url),
+                   $this->equalTo($reqdata))
+            ->willReturn($resdata);
+
+        // Expect to return resdata.
+        $api = new apirest($mockclient1);
+        $result = $api->search_attribute_keys(20, 1);
+        $this->assertEquals($result, $resdata);
+
+        // When the arguments are empty and the response is successful.
+        $mockclient2 = $this->getMockBuilder('client')
+            ->setMethods(['post'])
+            ->getMock();
+
+        // Mock API response data.
+        $resdata = $this->mockapi->resdata('attribute_keys/search_success.json');
+
+        $reqdata = json_encode(array('page' => 1, 'page_size' => 50, 'kind' => 'text'));
+
+        // Expect to call the endpoint once with default page and page_size.
+        $mockclient2->expects($this->once())
+            ->method('post')
+            ->with($this->equalTo($url),
+                   $this->equalTo($reqdata))
+            ->willReturn($resdata);
+
+        // Expect to return resdata.
+        $api = new apirest($mockclient2);
+        $result = $api->search_attribute_keys();
+        $this->assertEquals($result, $resdata);
+
+        // When the api key is invalid.
+        $mockclient3 = $this->getMockBuilder('client')
+            ->setMethods(['post'])
+            ->getMock();
+        $mockclient3->error = 'The requested URL returned error: 401 Unauthorized';
+
+        // Mock API response data.
+        $resdata = $this->mockapi->resdata('unauthorized_error.json');
+
+        $reqdata = json_encode(array('page' => 1, 'page_size' => 10, 'kind' => 'text'));
+
+        // Expect to call the endpoint once with page and page_size.
+        $mockclient3->expects($this->once())
+            ->method('post')
+            ->with($this->equalTo($url),
+                   $this->equalTo($reqdata))
+            ->willReturn($resdata);
+
+        // Expect to return resdata.
+        $api = new apirest($mockclient3);
+        $result = $api->search_attribute_keys(10, 1);
+        $this->assertEquals($result, $resdata);
+    }
 }

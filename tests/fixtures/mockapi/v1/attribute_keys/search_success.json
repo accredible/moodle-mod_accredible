@@ -1,0 +1,23 @@
+{
+  "attribute_keys": [
+    {
+      "id": 1234,
+      "name": "Custom Attribute Key 1",
+      "kind": "text",
+      "department_id": 123
+    },
+    {
+      "id": 1235,
+      "name": "Custom Attribute Key 2",
+      "kind": "text",
+      "department_id": 123
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "next_page": 2,
+    "prev_page": null,
+    "total_pages": 795,
+    "total_count": 1590
+  }
+}
