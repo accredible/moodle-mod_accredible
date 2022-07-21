@@ -148,7 +148,7 @@ class users {
 
         if (!isset($accredible) || !$accredible->includegradeattribute || !$accredible->gradeattributegradeitemid
             || empty($accredible->gradeattributekeyname) || empty($userids)) {
-            return null;
+            return;
         }
 
         $usergrades = array();

@@ -54,7 +54,7 @@ function accredible_add_instance($post) {
     $userids = array();
     foreach ($post->users as $userid => $issuecertificate) {
         if ($issuecertificate) {
-            array_push($userids, $userid);
+            $userids[] = $userid;
         }
     }
     $gradeattributes = $usersclient->get_user_grades($post, $userids);
@@ -128,12 +128,12 @@ function accredible_update_instance($post) {
     $userids = array();
     foreach ($post->users as $userid => $issuecertificate) {
         if ($issuecertificate) {
-            array_push($userids, $userid);
+            $userids[] = $userid;
         }
     }
     foreach ($post->unissuedusers as $userid => $issuecertificate) {
         if ($issuecertificate) {
-            array_push($userids, $userid);
+            $userids[] = $userid;
         }
     }
     $gradeattributes = $usersclient->get_user_grades($post, array_unique($userids));
