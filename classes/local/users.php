@@ -161,7 +161,9 @@ class users {
         $grades = $DB->get_records_select('grade_grades', 'itemid = :gradeitem AND userid '.$insql, $queryparams);
 
         foreach ($grades as $grade) {
-            $usergrades[$grade->userid] = grade_format_gradevalue($grade->finalgrade, $gradeitem);
+            if ($grade->finalgrade) {
+                $usergrades[$grade->userid] = grade_format_gradevalue($grade->finalgrade, $gradeitem);
+            }
         }
 
         return $usergrades;

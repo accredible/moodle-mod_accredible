@@ -86,6 +86,8 @@ class groups {
                     break;
                 }
             }
+            natcasesort($groups);
+
             return $groups;
         } catch (\Exception $e) {
             throw new \moodle_exception('getgroupserror', 'accredible', 'https://help.accredible.com/hc/en-us');

@@ -3,7 +3,7 @@
     "groups": [
       {
         "id": 12472,
-        "name": "new group1",
+        "name": "new group2",
         "course_description": "Desscription of course",
         "course_name": "Intro to Programming",
         "learning_outcomes": null,
@@ -24,7 +24,7 @@
       },
       {
         "id": 12473,
-        "name": "new group2",
+        "name": "new group1",
         "course_description": "Desscription of course",
         "course_name": "Intro to Programming",
         "learning_outcomes": null,
