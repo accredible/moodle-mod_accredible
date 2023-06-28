@@ -126,16 +126,21 @@ function accredible_update_instance($post) {
 
     // Load grade attributes for users if need to be added in the credential.
     $userids = array();
-    foreach ($post->users as $userid => $issuecertificate) {
-        if ($issuecertificate) {
-            $userids[] = $userid;
+    if (isset($post->users)) {
+        foreach ($post->users as $userid => $issuecertificate) {
+            if ($issuecertificate) {
+                $userids[] = $userid;
+            }
         }
     }
-    foreach ($post->unissuedusers as $userid => $issuecertificate) {
-        if ($issuecertificate) {
-            $userids[] = $userid;
+    if (isset($post->unissuedusers)) {
+        foreach ($post->unissuedusers as $userid => $issuecertificate) {
+            if ($issuecertificate) {
+                $userids[] = $userid;
+            }
         }
     }
+
     $gradeattributes = $usersclient->get_user_grades($post, array_unique($userids));
 
     $accrediblecertificate = $DB->get_record('accredible', array('id' => $post->instance), '*', MUST_EXIST);
