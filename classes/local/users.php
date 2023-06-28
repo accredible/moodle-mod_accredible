@@ -146,7 +146,7 @@ class users {
     public function get_user_grades($accredible, $userids) {
         global $DB;
 
-        if (!isset($accredible) || !$accredible->includegradeattribute || !$accredible->gradeattributegradeitemid
+        if (!isset($accredible) || !isset($accredible->includegradeattribute) || !$accredible->gradeattributegradeitemid
             || empty($accredible->gradeattributekeyname) || empty($userids)) {
             return;
         }
