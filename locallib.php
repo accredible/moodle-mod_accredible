@@ -388,7 +388,6 @@ function accredible_quiz_submission_handler($event) {
  * @param core/event $event
  */
 function accredible_course_completed_handler($event) {
-
     global $DB, $CFG;
 
     $localcredentials = new credentials();

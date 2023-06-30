@@ -210,7 +210,6 @@ class mod_accredible_locallib_test extends \advanced_testcase {
 
         $id = $DB->insert_record('accredible', $dbrecord);
         return $DB->get_record('accredible', array('id' => $id));
-
     }
 
     /**
