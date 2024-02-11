@@ -78,6 +78,9 @@ $string['viewimgincomplete'] = 'Course still in progress';
 $string['viewsubheaderold'] = 'Achievement ID: {$a}';
 $string['viewsubheader'] = 'Group ID: {$a}';
 
+$string['otheroptionsheader'] = 'Additional Attributes added to all certificats';
+
+
 $string['gotodashboard'] = 'To update the appearance of your badges and certificates, visit: <a href="https://dashboard.accredible.com" target="_blank">https://dashboard.accredible.com</a>';
 $string['overview'] = 'Overview';
 $string['activitygroupdescription'] = 'Credentials groups need to have been created in the <a href="{$a}" target="_blank">Accredible Dashboard</a> before credentials can be issued. If none appear, check your API Key to make sure integration is set up correctly.';

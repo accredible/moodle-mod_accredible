@@ -99,6 +99,7 @@ function accredible_add_instance($post) {
     $dbrecord->completionactivities = isset($post->completionactivities) ? $post->completionactivities : null;
     $dbrecord->name = $post->name;
     $dbrecord->course = $post->course;
+    $dbrecord->otheroptions = $post->otheroptions;
     $dbrecord->finalquiz = $post->finalquiz;
     $dbrecord->passinggrade = $post->passinggrade;
     $dbrecord->includegradeattribute = isset($post->includegradeattribute) ? $post->includegradeattribute : 0;
@@ -276,6 +277,7 @@ function accredible_update_instance($post) {
     $dbrecord->id = $post->instance;
     $dbrecord->completionactivities = $post->completionactivities;
     $dbrecord->name = $post->name;
+    $dbrecord->otheroptions = $post->otheroptions;
     $dbrecord->passinggrade = $post->passinggrade;
     $dbrecord->finalquiz = $post->finalquiz;
     $dbrecord->includegradeattribute = isset($post->includegradeattribute) ? $post->includegradeattribute : 0;

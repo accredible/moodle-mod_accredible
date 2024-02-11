@@ -35,7 +35,7 @@ class backup_accredible_activity_structure_step extends backup_activity_structur
     protected function define_structure() {
         // XML nodes declaration.
         $accredible = new backup_nested_element('accredible', array('id'), array(
-            'name', 'course', 'achievementid', 'description', 'finalquiz', 'passinggrade', 'completionactivities',
+            'name', 'course', 'achievementid', 'description', 'otheroptions', 'finalquiz', 'passinggrade', 'completionactivities',
             'includegradeattribute', 'gradeattributegradeitemid', 'gradeattributekeyname', 'groupid'));
 
         // Data sources - non-user data.

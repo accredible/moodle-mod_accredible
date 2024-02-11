@@ -177,11 +177,27 @@ class users {
      * @return array $customattributes
      */
     public function load_user_grade_as_custom_attributes($accredible, $grades, $userid) {
+
         if (isset($grades) && isset($grades[$userid])) {
             $customattributes = array($accredible->gradeattributekeyname => $grades[$userid]);
         } else {
             $customattributes = null;
         }
+
+        $otherattrs = null;
+        if ($accredible->otheroptions) { //not null
+            $otherattrs = json_decode($accredible->otheroptions, true);
+        }
+
+        if ($otherattrs) { 
+            if ($customattributes) {    
+                $customattributes = array_merge($otherattrs, $customattributes);
+            } else {
+                $customattributes = $otherattrs;
+            }
+
+        }
+
         return $customattributes;
     }
 }

@@ -164,5 +164,21 @@ function xmldb_accredible_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2022060900, 'accredible');
     }
 
+    if ($oldversion < 2024020800) {
+
+        // Define field certificatename to be added to accredible.
+        $table = new xmldb_table('accredible');
+        $field = new xmldb_field('otheroptions', XMLDB_TYPE_TEXT, null, null, null, null, null, 'description');
+
+        // Conditionally launch add field otheroptions.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+
+        // Accredible savepoint reached.
+        upgrade_mod_savepoint(true, 2024020800, 'accredible');
+    }
+
     return true;
 }

@@ -131,7 +131,7 @@ class apirest {
      * @return stdObject
      */
     public function search_attribute_keys($pagesize = 50, $page = 1) {
-        $data = json_encode(array('page' => $page, 'page_size' => $pagesize, 'kind' => 'text'));
+        $data = json_encode(array('page' => $page, 'page_size' => $pagesize));//, 'kind' => 'text'));
         return $this->client->post("{$this->apiendpoint}attribute_keys/search", $data);
     }
 

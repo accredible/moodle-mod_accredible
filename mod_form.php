@@ -171,6 +171,7 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         // Load Accredible attribute keys.
         $attributekeys = $attributekeysclient->get_attribute_keys();
+
         if (isset($attributekeys)) {
             $attributekeyschoices = array('' => 'Select a Custom Attribute') + $attributekeys;
             // Hidden element to check if we should disable the "gradeattributekeyname" select.
@@ -291,7 +292,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         $mform->setDefault('passinggrade', 70);
 
         $mform->addElement('header', 'completionissue', get_string('completionissueheader', 'accredible'));
-        if ($updatingcert) {
+        if ($updatingcert) { 
             $mform->addElement('checkbox', 'completionactivities', get_string('completionissuecheckbox', 'accredible'));
             if (isset( $accrediblecertificate->completionactivities )) {
                 $mform->setDefault('completionactivities', 1);
@@ -300,7 +301,87 @@ class mod_accredible_mod_form extends moodleform_mod {
             $mform->addElement('checkbox', 'completionactivities', get_string('completionissuecheckbox', 'accredible'));
         }
 
+ 
+       if (isset($attributekeys)) {
+        $mform->addElement('header', 'manualoptions', get_string('otheroptionsheader', 'accredible'));
+
+        $defaults = false;
+        $otheropts = $accrediblecertificate->otheroptions; // from db record
+        if ($otheropts) {
+            $otherats = json_decode($otheropts,true);
+            foreach($otherats as $key => $value) {
+                $otheratts[$this->slugify($key)] = $value;
+            }
+            $defaults = true;
+        }
+
+        foreach ($attributekeys as $attribute) {
+        
+            $key=$this->slugify($attribute);
+            $mform->addElement('text', 'other'.$key, $attribute); //get_string('passinggrade', 'accredible'));
+            $mform->setType('other'.$key, PARAM_TEXT);
+            if ($defaults && array_key_exists($key, $otheratts)) {
+                $mform->setDefault('other'.$key,  $otheratts[$key]);
+            }    
+            }
+            
+        }
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
+    }
+
+      
+    /**
+     *  Return the slug of a string to be used in a URL.
+     *
+     *  @return String
+     */
+public function slugify($text){
+    // replace non letter or digits by -
+    $text = preg_replace('~[^\pL\d]+~u', '_', $text);
+
+    // transliterate
+    $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+    // remove unwanted characters
+    $text = preg_replace('~[^-\w]+~', '', $text);
+
+    // trim
+    $text = trim($text, '_');
+
+    // remove duplicated - symbols
+    $text = preg_replace('~-+~', '_', $text);
+
+    // lowercase
+    $text = strtolower($text);
+
+    if (empty($text)) {
+      return 'n-a';
+    }
+
+    return $text;
+}
+
+
+    public function data_postprocessing($data) {
+        parent::data_postprocessing($data);
+
+        $attributekeysclient = new attribute_keys();
+        $attributekeys = $attributekeysclient->get_attribute_keys();
+        $att = array();
+        foreach ($attributekeys as $attribute) {
+            $att[$this->slugify($attribute)] = $attribute;
+        }
+
+        $otherattrs = array();
+        foreach ($data as $key => $value) { 
+            $pos = strpos($key, 'other');
+            if ($pos !== false) {
+                $key = substr($key, 5); //remove other
+                $otherattrs[$att[$key]] = $value;    
+            }
+        }
+        $otherattrs = json_encode($otherattrs);
+        $data->otheroptions = $otherattrs ;
     }
 }
