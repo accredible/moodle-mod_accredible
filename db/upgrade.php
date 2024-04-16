@@ -167,6 +167,7 @@ function xmldb_accredible_upgrade($oldversion=0) {
     if ($oldversion < 2024041600) {
         // Define field finalgradetopass to be added to accredible.
         $table = new xmldb_table('accredible');
+        
         $field = new xmldb_field('finalgradetopass', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0', 'groupid');
 
         // Conditionally launch add field finalgradetopass.
@@ -175,7 +176,6 @@ function xmldb_accredible_upgrade($oldversion=0) {
         }
 
         // Define field attributemapping to be added to accredible.
-        $table = new xmldb_table('accredible');
         $field = new xmldb_field('attributemapping', XMLDB_TYPE_TEXT, null, null, null, null, null, 'finalgradetopass');
 
         // Conditionally launch add field attributemapping.
