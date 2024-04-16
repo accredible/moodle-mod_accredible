@@ -164,5 +164,28 @@ function xmldb_accredible_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2022060900, 'accredible');
     }
 
+    if ($oldversion < 2024041600) {
+        // Define field finalgradetopass to be added to accredible.
+        $table = new xmldb_table('accredible');
+        $field = new xmldb_field('finalgradetopass', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null, 'groupid');
+
+        // Conditionally launch add field finalgradetopass.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field attributemapping to be added to accredible.
+        $table = new xmldb_table('accredible');
+        $field = new xmldb_field('attributemapping', XMLDB_TYPE_TEXT, null, null, null, null, null, 'finalgradetopass');
+
+        // Conditionally launch add field attributemapping.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Accredible savepoint reached.
+        upgrade_mod_savepoint(true, 2024041600, 'accredible');
+    }
+
     return true;
 }
