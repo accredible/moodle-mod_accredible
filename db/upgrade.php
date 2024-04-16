@@ -165,9 +165,9 @@ function xmldb_accredible_upgrade($oldversion=0) {
     }
 
     if ($oldversion < 2024041600) {
-        // Define field finalgradetopass to be added to accredible.
         $table = new xmldb_table('accredible');
         
+        // Define field finalgradetopass to be added to accredible.
         $field = new xmldb_field('finalgradetopass', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0', 'groupid');
 
         // Conditionally launch add field finalgradetopass.
