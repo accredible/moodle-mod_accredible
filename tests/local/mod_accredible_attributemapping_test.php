@@ -132,4 +132,20 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
         $attributemapping = new attributemapping($table, $accredibleattribute, $field, $id);
         $this->assertEquals($id, $attributemapping->id);
     }
+
+    /**
+     * Test whether it returns an attributemapping string.
+     */
+    public function test_get_text_content() {
+        // When $table has a valid value.
+        $table = 'course';
+        $field = 'fullname';
+        $accredibleattribute = 'grade';
+
+        $stringobject = '{"table":"'.$table.'","field":"'.$field.'","accredibleattribute":"'.$accredibleattribute.'"}';
+
+        // Expect strings to match.
+        $attributemapping = new attributemapping($table, $accredibleattribute, $field);
+        $this->assertEquals($stringobject, $attributemapping->get_text_content());
+    }
 }

@@ -51,7 +51,8 @@ class attributemapping {
     public $accredibleattribute;
 
     /**
-     * AttributeMapping constructor.
+     * Constructor method
+     *
      * @param string $table
      * @param string $accredibleattribute
      * @param string|null $field
@@ -68,6 +69,16 @@ class attributemapping {
         $this->field = $field;
         $this->id = $id;
         $this->accredibleattribute = $accredibleattribute;
+    }
+
+    /**
+     * Converts the attributemapping object into a string
+     * @return string stringified version of attributemapping object
+     */
+    public function get_text_content() {
+        // Filter empty values.
+        $object = array_filter((array) $this);
+        return json_encode($object);
     }
 
     /**
