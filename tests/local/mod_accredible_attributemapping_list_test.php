@@ -64,15 +64,29 @@ class mod_accredible_attributemapping_list_test extends \advanced_testcase {
      * Test whether it converts attributemappings into a string.
      */
     public function test_get_text_content() {
-        // When attributemapping_list has a valid value
+        // When attributemapping_list has a valid value.
         $mapping1 = new attributemapping('course', 'grade', 'fullname');
         $mapping2 = new attributemapping('user_info_field', 'user_id', 'mooodle_user_id', 100);
 
-        $mapping1string = '{"table":"'.$mapping1->table.'","field":"'.$mapping1->field.'","accredibleattribute":"'.$mapping1->accredibleattribute.'"}';
-        $mapping2string = '{"table":"'.$mapping2->table.'","field":"'.$mapping2->field.'","id":'.$mapping2->id.',"accredibleattribute":"'.$mapping2->accredibleattribute.'"}';
+        $format1 = '{"table":"%s","field":"%s","accredibleattribute":"%s"}';
+        $mapping1string = sprintf(
+            $format1,
+            $mapping1->table,
+            $mapping1->field,
+            $mapping1->accredibleattribute
+        );
+
+        $format2 = '{"table":"%s","field":"%s","id":%d,"accredibleattribute":"%s"}';
+        $mapping2string = sprintf(
+            $format2,
+            $mapping2->table,
+            $mapping2->field,
+            $mapping2->id,
+            $mapping2->accredibleattribute
+        );
 
         $result = "[$mapping1string,$mapping2string]";
-        
+
         // Expect strings to match.
         $attributemappinglist = new attributemapping_list(array($mapping1, $mapping2));
         $this->assertEquals($result, $attributemappinglist->get_text_content());
