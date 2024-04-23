@@ -72,13 +72,18 @@ class attributemapping {
     }
 
     /**
-     * Converts the attributemapping object into a string
-     * @return string stringified version of attributemapping object
+     * Updates the attributemapping object into an object suitable for saving into the db.
+     * @return stdObject updated attributemapping object
      */
-    public function get_text_content() {
-        // Filter empty values.
-        $object = array_filter((array) $this);
-        return json_encode($object);
+    public function get_db_object() {
+        // Remove empty values.
+        $object = (object) array_filter((array) $this);
+
+        // Replace accredibleattribute key with accredible_attribute.
+        unset($object->accredibleattribute);
+        $object->accredible_attribute = $this->accredibleattribute;
+
+        return $object;
     }
 
     /**
@@ -117,7 +122,7 @@ class attributemapping {
      */
     private function validate_id($table, $id) {
         if (($table === "user_info_field" || $table === "customfield_field") && $id === null) {
-            throw new \InvalidArgumentException("Id is required for table '$table'");
+            throw new \InvalidArgumentException("Id is required for the '$table' table");
         }
     }
 

@@ -134,18 +134,22 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
     }
 
     /**
-     * Test whether it returns an attributemapping string.
+     * Test whether it returns an updated attributemapping object.
      */
-    public function test_get_text_content() {
+    public function test_get_db_object() {
         // When $table has a valid value.
         $table = 'course';
         $field = 'fullname';
         $accredibleattribute = 'grade';
 
-        $stringobject = '{"table":"'.$table.'","field":"'.$field.'","accredibleattribute":"'.$accredibleattribute.'"}';
+        $dbobject = (object) [
+            'table' => $table,
+            'field' => $field,
+            'accredible_attribute' => $accredibleattribute
+        ];
 
         // Expect strings to match.
         $attributemapping = new attributemapping($table, $accredibleattribute, $field);
-        $this->assertEquals($stringobject, $attributemapping->get_text_content());
+        $this->assertEquals($dbobject, $attributemapping->get_db_object());
     }
 }
