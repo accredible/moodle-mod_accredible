@@ -82,7 +82,9 @@ class attributemapping_list {
         $uniqueattributes = [];
         foreach ($attributemappings as $attributemapping) {
             if (in_array($attributemapping->accredibleattribute, $uniqueattributes)) {
-                throw new \InvalidArgumentException("Duplicate accredibleattribute found: {$attributemapping->accredibleattribute}");
+                throw new \InvalidArgumentException(
+                    "Duplicate accredibleattribute found: {$attributemapping->accredibleattribute}"
+                );
             }
             $uniqueattributes[] = $attributemapping->accredibleattribute;
         }

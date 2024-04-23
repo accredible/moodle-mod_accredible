@@ -142,7 +142,7 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
         $field = 'fullname';
         $accredibleattribute = 'grade';
 
-        // Expect returned object to not have id
+        // Expect returned object to not have id.
         $attributemapping = new attributemapping($table, $accredibleattribute, $field, null);
         $this->assertTrue(!property_exists($attributemapping->get_db_object(), 'id'));
     }
