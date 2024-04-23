@@ -142,7 +142,7 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
         $field = 'fullname';
         $accredibleattribute = 'grade';
 
-        $dbobject = (object) [
+        $result = (object) [
             'table' => $table,
             'field' => $field,
             'accredible_attribute' => $accredibleattribute
@@ -150,6 +150,6 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
 
         // Expect strings to match.
         $attributemapping = new attributemapping($table, $accredibleattribute, $field);
-        $this->assertEquals($dbobject, $attributemapping->get_db_object());
+        $this->assertEquals($result, $attributemapping->get_db_object());
     }
 }
