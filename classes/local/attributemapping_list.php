@@ -81,11 +81,10 @@ class attributemapping_list {
     private function validate_attributemapping($attributemappings) {
         $uniqueattributes = [];
         foreach ($attributemappings as $attributemapping) {
-            $accredibleattribute = $attributemapping->accredibleattribute;
-            if (in_array($accredibleattribute, $uniqueattributes)) {
-                throw new \InvalidArgumentException("Duplicate accredibleattribute found: {$accredibleattribute}");
+            if (in_array($attributemapping->accredibleattribute, $uniqueattributes)) {
+                throw new \InvalidArgumentException("Duplicate accredibleattribute found: {$attributemapping->accredibleattribute}");
             }
-            $uniqueattributes[] = $accredibleattribute;
+            $uniqueattributes[] = $attributemapping->accredibleattribute;
         }
     }
 }

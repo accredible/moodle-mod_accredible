@@ -68,8 +68,8 @@ class mod_accredible_attributemapping_list_test extends \advanced_testcase {
         $mapping1 = new attributemapping('course', 'grade', 'fullname');
         $mapping2 = new attributemapping('user_info_field', 'user_id', 'mooodle_user_id', 100);
 
-        $mapping1string = '{"table":"'.$mapping1->table.'","field":"'.$mapping1->field.'","accredible_attribute":"'.$mapping1->accredibleattribute.'"}';
-        $mapping2string = '{"table":"'.$mapping2->table.'","field":"'.$mapping2->field.'","id":'.$mapping2->id.',"accredible_attribute":"'.$mapping2->accredibleattribute.'"}';
+        $mapping1string = '{"table":"'.$mapping1->table.'","field":"'.$mapping1->field.'","accredibleattribute":"'.$mapping1->accredibleattribute.'"}';
+        $mapping2string = '{"table":"'.$mapping2->table.'","field":"'.$mapping2->field.'","id":'.$mapping2->id.',"accredibleattribute":"'.$mapping2->accredibleattribute.'"}';
 
         $result = "[$mapping1string,$mapping2string]";
         

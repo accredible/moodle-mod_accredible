@@ -78,11 +78,6 @@ class attributemapping {
     public function get_db_object() {
         // Remove empty values.
         $object = (object) array_filter((array) $this);
-
-        // Replace accredibleattribute key with accredible_attribute.
-        unset($object->accredibleattribute);
-        $object->accredible_attribute = $this->accredibleattribute;
-
         return $object;
     }
 

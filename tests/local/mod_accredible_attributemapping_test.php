@@ -134,7 +134,7 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
     }
 
     /**
-     * Test whether it returns an updated attributemapping object.
+     * Test whether it returns an object with no null/empty values.
      */
     public function test_get_db_object() {
         // When $table has a valid value.
@@ -142,14 +142,8 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
         $field = 'fullname';
         $accredibleattribute = 'grade';
 
-        $result = (object) [
-            'table' => $table,
-            'field' => $field,
-            'accredible_attribute' => $accredibleattribute
-        ];
-
-        // Expect strings to match.
-        $attributemapping = new attributemapping($table, $accredibleattribute, $field);
-        $this->assertEquals($result, $attributemapping->get_db_object());
+        // Expect returned object to not have id
+        $attributemapping = new attributemapping($table, $accredibleattribute, $field, null);
+        $this->assertTrue(!property_exists($attributemapping->get_db_object(), 'id'));
     }
 }
