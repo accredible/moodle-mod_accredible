@@ -67,7 +67,7 @@ class attributemapping_list {
      */
     public function get_text_content() {
         $jsonarray = array();
-        foreach($this->attributemappings as $mapping) {
+        foreach ($this->attributemappings as $mapping) {
             $jsonarray[] = $mapping->get_db_object();
         }
         return json_encode($jsonarray);
