@@ -60,6 +60,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
     /**
      * Tests that the api endpoint changes depending on the config.
+     * @coversNothing
      */
     public function test_api_endpoint() {
         // When is_eu is NOT enabled.
@@ -79,6 +80,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
     /**
      * Tests if `GET /v1/credentials/:id` is properly called.
+     * @covers  ::get_credential
      */
     public function test_get_credential() {
         // When the response is successful.
@@ -146,6 +148,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
     /**
      * Tests if `GET /v1/all_credentials` is properly called.
+     * @covers  ::get_credentials
      */
     public function test_get_credentials() {
         // When the response is successful.
@@ -215,6 +218,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
     /**
      * Tests if `POST /v1/sso/generate_link` is properly called.
+     * @covers  ::recipient_sso_link
      */
     public function test_recipient_sso_link() {
         // When the response is successful.
@@ -273,6 +277,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
     /**
      * Tests if `POST /v1/credentials` is properly called.
+     * @covers  ::create_credential
      */
     public function test_create_credential() {
         // When the credential creation is successful.
@@ -346,6 +351,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
     /**
      * Tests if `POST /v1/credentials` is properly called.
+     * @covers  ::create_credential_legacy
      */
     public function test_create_credential_legacy() {
         // When the credential creation is successful.
@@ -410,6 +416,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
     /**
      * Tests if `POST /v1/issuer/groups/search` is properly called.
+     * @covers  ::search_groups
      */
     public function test_search_groups() {
         // When the response is successful.
@@ -486,6 +493,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
     /**
      * Tests if `POST /v1/credentials/:credential_id/evidence_items`
      * is properly called.
+     * @covers  ::create_evidence_item
      */
     public function test_create_evidence_item() {
         // When the throw_error is FALSE and the response is successful.
@@ -568,6 +576,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
     /**
      * Tests if `POST /v1/credentials/:credential_id/evidence_items`
      * is properly called when sending duration items.
+     * @covers  ::create_evidence_item_duration
      */
     public function test_create_evidence_item_duration() {
         // Mock API response data.
@@ -661,6 +670,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
     /**
      * Tests if `PUT /v1/credentials/:credential_id/evidence_items/:id`
      * is properly called.
+     * @covers  ::update_evidence_item_grade
      */
     public function test_update_evidence_item_grade() {
         // When the grade is a valid number and the response is successful.
@@ -761,6 +771,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
     /**
      * Tests if `GET /v1/issuer/groups/:group_id` is properly called.
+     * @covers  ::group
      */
     public function test_get_group() {
         // When the response is successful.
@@ -808,6 +819,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
     /**
      * Tests if `GET /v1/issuer/all_groups` is properly called.
+     * @covers  ::groups
      */
     public function test_get_groups() {
         // When the response is successful.
@@ -874,6 +886,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
     /**
      * Tests if `POST /v1/attribute_keys/search` is properly called.
+     * @covers  ::search_attribute_keys
      */
     public function test_search_attribute_keys() {
         $url = 'https://api.accredible.com/v1/attribute_keys/search';

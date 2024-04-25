@@ -41,6 +41,7 @@ class mod_accredible_client_test extends \advanced_testcase {
 
     /**
      * Tests whether it calls the curl get function.
+     * @covers  ::get
      */
     public function test_get() {
         $url = 'https://api.accredible.com/v1/all_credentials';
@@ -72,6 +73,7 @@ class mod_accredible_client_test extends \advanced_testcase {
 
     /**
      * Tests whether it calls the curl post function.
+     * @covers  ::post
      */
     public function test_post() {
         $url = 'https://api.accredible.com/v1/all_credentials';
@@ -104,6 +106,7 @@ class mod_accredible_client_test extends \advanced_testcase {
 
     /**
      * Tests whether it calls the curl put function.
+     * @covers  ::put
      */
     public function test_put() {
         $url = 'https://api.accredible.com/v1/all_credentials';
@@ -136,6 +139,7 @@ class mod_accredible_client_test extends \advanced_testcase {
 
     /**
      * Tests whether it returns an error messages when the request fails.
+     * @coversNothing
      */
     public function test_error() {
         $url = 'https://api.accredible.com/v1/all_credentials';
