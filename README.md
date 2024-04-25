@@ -239,6 +239,17 @@ Run unit tests for a single test class.
 vendor/bin/phpunit --filter mod_accredible_xxx_testcase
 ```
 
+If you encounter the following error while running tests,
+```
+Error in bootstrap script: 
+cache_exception: cache/Invalid cache configuration file 
+$a contents:
+```
+Run the script below to clear the `test` database and run the `init.php`  command above to initialize the test environment again.
+```
+php /bitnami/moodle/admin/tool/phpunit/cli/util.php --drop
+```
+
 ### Coding style
 
 This plugin is trying to be consistent and follow the recommendations according to [the Moodle coding style](http://docs.moodle.org/dev/Coding_style).
@@ -263,7 +274,7 @@ phpcs --version
 Download the Moodle coding standard with [Code checker](https://github.com/moodlehq/moodle-local_codechecker) and add it to PHPCS.
 
 ```
-git clone git://github.com/moodlehq/moodle-local_codechecker.git .codechecker
+git clone https://github.com/moodlehq/moodle-local_codechecker.git .codechecker
 phpcs --config-set installed_paths $(pwd)/.codechecker
 ```
 
