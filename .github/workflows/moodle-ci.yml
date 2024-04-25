@@ -37,6 +37,7 @@ jobs:
         include:
           - php: '8.0'
             moodle-branch: 'MOODLE_400_STABLE'
+            database: [pgsql, mariadb]
 
     steps:
       - name: Check out repository code
