@@ -60,6 +60,7 @@ class mod_accredible_locallib_test extends \advanced_testcase {
 
     /**
      * Get transcript test
+     * @covers ::accredible_get_transcript
      */
     public function test_accredible_get_transcript() {
         global $DB;
@@ -147,6 +148,7 @@ class mod_accredible_locallib_test extends \advanced_testcase {
 
     /**
      * Check if cert earned by user test.
+     * @covers ::accredible_get_transcript
      */
     public function test_accredible_check_if_cert_earned() {
         global $DB;
