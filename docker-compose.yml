@@ -30,7 +30,7 @@ services:
       - mariadb
 
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+    image: bitnami/phpmyadmin
     ports:
       - "8081:80"
     links:
