@@ -35,6 +35,7 @@ class mod_accredible_attributemapping_list_test extends \advanced_testcase {
 
     /**
      * Test whether it validates attribute mappings.
+     * @covers  ::validate_attributemapping
      */
     public function test_validate_attributemapping() {
         // When $accredibleattribute in mappings is duplicated.
@@ -62,6 +63,7 @@ class mod_accredible_attributemapping_list_test extends \advanced_testcase {
 
     /**
      * Test whether it converts attributemappings into a string.
+     * @covers  ::get_text_content
      */
     public function test_get_text_content() {
         // When attributemapping_list has a valid value.

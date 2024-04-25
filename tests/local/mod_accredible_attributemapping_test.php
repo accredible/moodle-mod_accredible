@@ -35,6 +35,7 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
 
     /**
      * Test whether it validates table property.
+     * @covers  ::validate_table
      */
     public function test_validate_table() {
         // When $table has an invalid value.
@@ -61,6 +62,7 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
 
     /**
      * Test whether it validates field property.
+     * @covers  ::validate_field
      */
     public function test_validate_field() {
         // When $table is course and $field has an invalid value.
@@ -88,6 +90,7 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
 
     /**
      * Test whether it validates id property.
+     * @covers  ::validate_id
      */
     public function test_validate_id() {
         // When $table is user_info_field and has no $id value.
@@ -135,6 +138,7 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
 
     /**
      * Test whether it returns an object with no null/empty values.
+     * @covers  ::get_db_object
      */
     public function test_get_db_object() {
         // When $table has a valid value.
