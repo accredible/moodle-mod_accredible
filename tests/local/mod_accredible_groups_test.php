@@ -29,7 +29,6 @@ use mod_accredible\local\groups;
  * @category   test
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversDefaultClass \mod_accredible\local\groups
  */
 class mod_accredible_groups_test extends \advanced_testcase {
     /**
@@ -62,6 +61,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
 
     /**
      * Test whether it returns groups
+     * @covers ::get_groups
      */
     public function test_get_groups() {
         // When the apirest returns groups.
@@ -144,6 +144,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
 
     /**
      * Test whether it returns group name arrays
+     * @covers ::get_templates
      */
     public function test_get_templates() {
         // When the apirest returns groups.

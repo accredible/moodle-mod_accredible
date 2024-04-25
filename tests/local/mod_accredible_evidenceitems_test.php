@@ -26,7 +26,6 @@ use mod_accredible\apirest\apirest;
  * @category   test
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversDefaultClass \mod_accredible\local\evidenceitems
  */
 class mod_accredible_evidenceitems_test extends \advanced_testcase {
     /**
@@ -62,6 +61,7 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
 
     /**
      * Post credential evidence test
+     * @covers ::post_evidence
      */
     public function test_post_evidence() {
         // When the throw_error is FALSE and the response is successful.
@@ -144,6 +144,7 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
 
     /**
      * Post credential evidence from essay answers test
+     * @covers ::post_essay_answers
      */
     public function test_post_essay_answers() {
         global $DB;
@@ -222,6 +223,7 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
 
     /**
      * Post credential evidence test
+     * @covers ::course_duration_evidence
      */
     public function test_course_duration_evidence() {
         global $DB;
