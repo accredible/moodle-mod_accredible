@@ -28,6 +28,7 @@ use mod_accredible\local\credentials;
  * @category   test
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @coversDefaultClass \mod_accredible\local\credentials
  */
 class mod_accredible_credentials_test extends \advanced_testcase {
     /**

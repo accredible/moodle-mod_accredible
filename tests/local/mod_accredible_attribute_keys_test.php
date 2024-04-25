@@ -26,6 +26,7 @@ use mod_accredible\apirest\apirest;
  * @category   test
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @coversDefaultClass \mod_accredible\local\attribute_keys
  */
 class mod_accredible_attribute_keys_test extends \advanced_testcase {
     /**

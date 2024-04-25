@@ -19,13 +19,14 @@ namespace mod_accredible\local;
 use mod_accredible\apirest\apirest;
 
 /**
- * Unit tests for mod/accredible/classes/local/credentials.php
+ * Unit tests for mod/accredible/classes/local/evidenceitems.php
  *
  * @package    mod_accredible
  * @subpackage accredible
  * @category   test
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @coversDefaultClass \mod_accredible\local\evidenceitems
  */
 class mod_accredible_evidenceitems_test extends \advanced_testcase {
     /**

@@ -21,13 +21,14 @@ use mod_accredible\client\client;
 use mod_accredible\apirest\apirest;
 
 /**
- * Unit tests for mod/accredible/classes/helpers/user_helper.php
+ * Unit tests for mod/accredible/classes/local/users.php
  *
  * @package    mod_accredible
  * @subpackage accredible
  * @category   test
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @coversDefaultClass \mod_accredible\local\users
  */
 class mod_accredible_users_test extends \advanced_testcase {
     /**
