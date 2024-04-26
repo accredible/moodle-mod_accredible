@@ -25,11 +25,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/accredible/locallib.php');
+
 use mod_accredible\apirest\apirest;
 use mod_accredible\local\credentials;
 use mod_accredible\local\groups;
 use mod_accredible\local\evidenceitems;
 use mod_accredible\local\users;
+use mod_accredible\local\accredible;
 
 /**
  * Add certificate instance.
@@ -49,6 +51,7 @@ function accredible_add_instance($post) {
     $localcredentials = new credentials();
     $evidenceitems = new evidenceitems();
     $usersclient = new users();
+    $accredible = new accredible();
 
     // Load grade attributes for users who will get a credential issued if need to be added.
     $userids = array();
@@ -94,20 +97,7 @@ function accredible_add_instance($post) {
         }
     }
 
-    // Save record.
-    $dbrecord = new stdClass();
-    $dbrecord->completionactivities = isset($post->completionactivities) ? $post->completionactivities : null;
-    $dbrecord->name = $post->name;
-    $dbrecord->course = $post->course;
-    $dbrecord->finalquiz = $post->finalquiz;
-    $dbrecord->passinggrade = $post->passinggrade;
-    $dbrecord->includegradeattribute = isset($post->includegradeattribute) ? $post->includegradeattribute : 0;
-    $dbrecord->gradeattributegradeitemid = $post->gradeattributegradeitemid;
-    $dbrecord->gradeattributekeyname = $post->gradeattributekeyname;
-    $dbrecord->timecreated = time();
-    $dbrecord->groupid = $post->groupid;
-
-    return $DB->insert_record('accredible', $dbrecord);
+    return $accredible->save_record($post);
 }
 
 /**
@@ -123,6 +113,7 @@ function accredible_update_instance($post) {
     $localcredentials = new credentials();
     $evidenceitems = new evidenceitems();
     $usersclient = new users();
+    $accredible = new accredible();
 
     // Load grade attributes for users if need to be added in the credential.
     $userids = array();
@@ -272,28 +263,7 @@ function accredible_update_instance($post) {
         $groupid = $accrediblecertificate->groupid;
     }
 
-    $dbrecord = new stdClass();
-    $dbrecord->id = $post->instance;
-    $dbrecord->completionactivities = $post->completionactivities;
-    $dbrecord->name = $post->name;
-    $dbrecord->passinggrade = $post->passinggrade;
-    $dbrecord->finalquiz = $post->finalquiz;
-    $dbrecord->includegradeattribute = isset($post->includegradeattribute) ? $post->includegradeattribute : 0;
-    $dbrecord->gradeattributegradeitemid = $post->gradeattributegradeitemid;
-    $dbrecord->gradeattributekeyname = $post->gradeattributekeyname;
-
-    // Save record.
-    if ($accrediblecertificate->achievementid) {
-        $dbrecord->certificatename = $post->certificatename;
-        $dbrecord->description = $post->description;
-        $dbrecord->achievementid = $post->achievementid;
-    } else {
-        $dbrecord->course = $post->course;
-        $dbrecord->groupid = $groupid;
-        $dbrecord->timecreated = time();
-    }
-
-    return $DB->update_record('accredible', $dbrecord);
+    return $accredible->save_record($post, $accrediblecertificate, $groupid);
 }
 
 /**
