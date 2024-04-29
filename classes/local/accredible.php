@@ -83,7 +83,11 @@ class accredible {
      */
     private function build_attribute_mapping_list($post) {
         $mergedmappings = array_merge($post->coursefieldmapping, $post->coursecustomfieldmapping, $post->userfieldmapping);
-
+        
+        if (empty($mergedmappings)) {
+            return null;
+        }
+        
         $attributemappings = array_map(function($mapping) {
            return new attributemapping($mapping->table, $mapping->accredibleattribute, $mapping->field, $mapping->id);
         }, $mergedmappings);
