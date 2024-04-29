@@ -51,7 +51,7 @@ class mod_accredible_mod_form extends moodleform_mod {
      * @return void
      */
     public function definition() {
-        global $DB, $COURSE, $CFG, $PAGE;
+        global $DB, $COURSE, $CFG, $PAGE, $OUTPUT;
 
         $credentialsclient = new credentials();
         $attributekeysclient = new attribute_keys();
@@ -135,6 +135,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         // Form start.
         $PAGE->requires->js_call_amd('mod_accredible/userlist_updater', 'init');
         $PAGE->requires->js_call_amd('mod_accredible/attribute_keys_displayer', 'init');
+        $PAGE->requires->js_call_amd('mod_accredible/mappings_updater', 'init');
         $mform =& $this->_form;
         $mform->addElement('hidden', 'course', $id);
         if ($updatingcert) {
@@ -299,6 +300,29 @@ class mod_accredible_mod_form extends moodleform_mod {
         } else {
             $mform->addElement('checkbox', 'completionactivities', get_string('completionissuecheckbox', 'accredible'));
         }
+
+        $mform->addElement('header', 'mytestsection', 'Test Section');
+        // $mform->addElement('text', 'mytest', 'Test Label');
+        // $mform->setType('mytest', PARAM_TEXT);
+
+        // $mform->addElement('text', 'mytestoutput', 'Test Output');
+        // $mform->setType('mytestoutput', PARAM_TEXT);
+        $line1 = new stdClass();
+        $line1->index = 1;
+        $line1->field = 'moodle_course';
+        $line1->accredibleattribute = 'acc_course';
+
+        $line2 = new stdClass();
+        $line2->index = 2;
+        $line2->field = 'moodle_grade';
+        $line2->accredibleattribute = 'acc_grade';
+
+        $testcontent = [
+            'mappings' => array($line1, $line2),
+            'hasmappings' => true
+        ];
+
+        $mform->addElement('html', $OUTPUT->render_from_template('mod_accredible/mappings', $testcontent));
 
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
