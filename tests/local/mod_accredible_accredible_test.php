@@ -26,6 +26,9 @@ namespace mod_accredible\local;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_accredible_accredible_test extends \advanced_testcase {
+    /**
+     * @var \mod_accredible\local\accredible The accredible instance.
+     */
     protected $accredible;
 
     /**
@@ -123,6 +126,14 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $this->assertNull($result);
     }
 
+    /**
+     * Invokes a method, even if it's protected or private.
+     *
+     * @param object $object The object to invoke the method on.
+     * @param string $methodname The name of the method to invoke.
+     * @param array $parameters The parameters to pass to the method.
+     * @return mixed The result of the method invocation.
+     */
     protected function invoke_method(&$object, $methodname, array $parameters = []) {
         $reflection = new \ReflectionClass(get_class($object));
         $method = $reflection->getMethod($methodname);
