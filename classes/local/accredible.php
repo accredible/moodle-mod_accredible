@@ -16,8 +16,6 @@
 
 namespace mod_accredible\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Defines local functions for handling interactions with the 'accredible' database table.
  *
@@ -78,7 +76,8 @@ class accredible {
     /**
      * Builds a JSON encoded attribute mapping list to be stored in the DB based on the provided post data.
      *
-     * @param object $post The post data containing the course field mappings, course custom field mappings, and user field mappings.
+     * @param object $post The post data containing the course field mappings, course custom field mappings,
+     * and user field mappings.
      * @return string JSON encoded attribute mapping list.
      */
     private function build_attribute_mapping_list($post) {

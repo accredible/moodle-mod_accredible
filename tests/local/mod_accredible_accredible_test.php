@@ -38,6 +38,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
     /**
      * Test save_record method when creating a new record.
+     * @covers ::save_record
      */
     public function test_save_record_new() {
         global $DB;
@@ -72,6 +73,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
     /**
      * Test save_record method when updating an existing record.
+     * @covers ::save_record
      */
     public function test_save_record_update() {
         global $DB;
@@ -107,6 +109,10 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $this->assertTrue($result);
     }
 
+    /**
+     * Test build_attribute_mapping_list method when no mappings are present.
+     * @covers ::build_attribute_mapping_list
+     */
     public function test_build_attribute_mapping_list_empty() {
         $post = new \stdClass();
         $post->coursefieldmapping = [];
