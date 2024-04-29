@@ -50,7 +50,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $DB = $this->createMock(\moodle_database::class);
 
         $post = $this->generatePostObject();
-        
+
         // Set up the expectation for the insert_record method.
         $DB->expects($this->once())
             ->method('insert_record')
@@ -70,7 +70,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         // Create a mock of the $DB object.
         $DB = $this->createMock(\moodle_database::class);
-        
+
         $overrides = new \stdClass();
         $overrides->name = 'Updated Certificate';
         $overrides->instance = 1;
@@ -90,12 +90,71 @@ class mod_accredible_accredible_test extends \advanced_testcase {
     }
 
     /**
+     * Test save_record method when attribute mappings are empty.
+     * @covers ::save_record
+     */
+    public function test_attributemapping_is_null_when_mappings_are_empty() {
+        global $DB;
+        $DB = $this->createMock(\moodle_database::class);
+
+        $overrides = new \stdClass();
+        $overrides->coursefieldmapping = [];
+        $overrides->coursecustomfieldmapping = [];
+        $overrides->userfieldmapping = [];
+        $post = $this->generatePostObject($overrides);
+
+        $DB->expects($this->once())
+            ->method('insert_record')
+            ->with(
+                'accredible',
+                $this->callback(function($subject) {
+                    return $subject->attributemapping === null;
+                })
+            )
+            ->willReturn(true);
+
+        $result = $this->accredible->save_record($post);
+        $this->assertEquals(1, $result);
+    }
+
+    /**
+     * Test save_record method when attribute mappings are present.
+     * @covers ::save_record
+     */
+    public function test_attributemapping_is_object_when_userfieldmapping_is_not_empty() {
+        global $DB;
+        $DB = $this->createMock(\moodle_database::class);
+
+        $attributemapping = new attributemapping('course', 'Moodle Course Start Date', 'startdate');
+
+        $overrides = new \stdClass();
+        $overrides->coursefieldmapping = [$attributemapping];
+        $overrides->coursecustomfieldmapping = [];
+        $overrides->userfieldmapping = [];
+        $post = $this->generatePostObject($overrides);
+
+        $DB->expects($this->once())
+            ->method('insert_record')
+            ->with(
+            'accredible',
+            $this->callback(function($subject) {
+                // Check if attributemapping is a string and is an array afer decoding
+                return is_string($subject->attributemapping) && is_array(json_decode($subject->attributemapping, true));
+            })
+        )
+        ->willReturn(true);
+
+        $result = $this->accredible->save_record($post);
+        $this->assertEquals(1, $result);
+    }
+
+    /**
      * Generates a mock $post object for testing.
-     * 
+     *
      * @param stdClass $overrides An object with properties to override.
      * @return stdClass The generated $post object.
      */
-    private function generatePostObject(\stdClass $overrides = null): \stdClass {
+    private function generatepostobject(\stdClass $overrides = null): \stdClass {
         $post = new \stdClass();
         $post->name = 'New Certificate';
         $post->instance = null;
