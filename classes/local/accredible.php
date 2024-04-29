@@ -50,6 +50,7 @@ class accredible {
         $dbrecord->gradeattributegradeitemid = $post->gradeattributegradeitemid;
         $dbrecord->gradeattributekeyname = $post->gradeattributekeyname;
         $dbrecord->groupid = $post->groupid;
+        $dbrecord->attributemapping = $this->build_attribute_mapping_list($post);
        
         if ($post->instance) {
             // Update the existing record if an instance ID is present.
@@ -72,5 +73,22 @@ class accredible {
 
             return $DB->insert_record('accredible', $dbrecord);
         }
+    }
+
+    /**
+     * Builds a JSON encoded attribute mapping list to be stored in the DB based on the provided post data.
+     *
+     * @param object $post The post data containing the course field mappings, course custom field mappings, and user field mappings.
+     * @return string JSON encoded attribute mapping list.
+     */
+    private function build_attribute_mapping_list($post) {
+        $mergedmappings = array_merge($post->coursefieldmapping, $post->coursecustomfieldmapping, $post->userfieldmapping);
+
+        $attributemappings = array_map(function($mapping) {
+           return new attributemapping($mapping->table, $mapping->accredibleattribute, $mapping->field, $mapping->id);
+        }, $mergedmappings);
+        
+        $attributemappinglist = new attributemapping_list($attributemappings);
+        return $attributemappinglist->get_text_content();
     }
 }
