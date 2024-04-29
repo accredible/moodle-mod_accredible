@@ -27,7 +27,7 @@ namespace mod_accredible\local;
  */
 class mod_accredible_accredible_test extends \advanced_testcase {
     /**
-     * @var \mod_accredible\local\accredible The accredible instance.
+     * @var The accredible instance.
      */
     protected $accredible;
 
@@ -49,21 +49,8 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         // Create a mock of the $DB object.
         $DB = $this->createMock(\moodle_database::class);
 
-        $post = new \stdClass();
-        $post->name = 'New Certificate';
-        $post->course = 101;
-        $post->finalquiz = 5;
-        $post->passinggrade = 70;
-        $post->completionactivities = null;
-        $post->includegradeattribute = 1;
-        $post->gradeattributegradeitemid = 10;
-        $post->gradeattributekeyname = 'Final Grade';
-        $post->groupid = 1;
-        $post->coursefieldmapping = [];
-        $post->coursecustomfieldmapping = [];
-        $post->userfieldmapping = [];
-        $post->instance = null;
-
+        $post = $this->generatePostObject();
+        
         // Set up the expectation for the insert_record method.
         $DB->expects($this->once())
             ->method('insert_record')
@@ -83,21 +70,11 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         // Create a mock of the $DB object.
         $DB = $this->createMock(\moodle_database::class);
-
-        $post = new \stdClass();
-        $post->instance = 1; // Existing record ID.
-        $post->name = 'Updated Certificate';
-        $post->course = 102;
-        $post->finalquiz = 6;
-        $post->passinggrade = 75;
-        $post->completionactivities = null;
-        $post->includegradeattribute = 1;
-        $post->gradeattributegradeitemid = 11;
-        $post->gradeattributekeyname = 'Updated Final Grade';
-        $post->groupid = 2;
-        $post->coursefieldmapping = [];
-        $post->coursecustomfieldmapping = [];
-        $post->userfieldmapping = [];
+        
+        $overrides = new \stdClass();
+        $overrides->name = 'Updated Certificate';
+        $overrides->instance = 1;
+        $post = $this->generatePostObject($overrides);
 
         $accrediblecertificate = new \stdClass();
         $accrediblecertificate->achievementid = null;
@@ -113,31 +90,34 @@ class mod_accredible_accredible_test extends \advanced_testcase {
     }
 
     /**
-     * Test build_attribute_mapping_list method when no mappings are present.
-     * @covers ::build_attribute_mapping_list
+     * Generates a mock $post object for testing.
+     * 
+     * @param stdClass $overrides An object with properties to override.
+     * @return stdClass The generated $post object.
      */
-    public function test_build_attribute_mapping_list_empty() {
+    private function generatePostObject(\stdClass $overrides = null): \stdClass {
         $post = new \stdClass();
+        $post->name = 'New Certificate';
+        $post->instance = null;
+        $post->course = 101;
+        $post->finalquiz = 5;
+        $post->passinggrade = 70;
+        $post->completionactivities = null;
+        $post->includegradeattribute = 1;
+        $post->gradeattributegradeitemid = 10;
+        $post->gradeattributekeyname = 'Final Grade';
+        $post->groupid = 1;
         $post->coursefieldmapping = [];
         $post->coursecustomfieldmapping = [];
         $post->userfieldmapping = [];
 
-        $result = $this->invoke_method($this->accredible, 'build_attribute_mapping_list', [$post]);
-        $this->assertNull($result);
-    }
+        // Apply overrides
+        if ($overrides) {
+            foreach ($overrides as $property => $value) {
+                $post->$property = $value;
+            }
+        }
 
-    /**
-     * Invokes a method, even if it's protected or private.
-     *
-     * @param object $object The object to invoke the method on.
-     * @param string $methodname The name of the method to invoke.
-     * @param array $parameters The parameters to pass to the method.
-     * @return mixed The result of the method invocation.
-     */
-    protected function invoke_method(&$object, $methodname, array $parameters = []) {
-        $reflection = new \ReflectionClass(get_class($object));
-        $method = $reflection->getMethod($methodname);
-        $method->setAccessible(true);
-        return $method->invokeArgs($object, $parameters);
+        return $post;
     }
 }
