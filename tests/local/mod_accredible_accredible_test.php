@@ -11,7 +11,7 @@ namespace mod_accredible\local;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class accredible_test extends \advanced_testcase {
+class mod_accredible_accredible_test extends \advanced_testcase {
     protected $accredible;
 
     /**
@@ -27,10 +27,10 @@ class accredible_test extends \advanced_testcase {
      */
     public function test_save_record_new() {
         global $DB;
-    
+
         // Create a mock of the $DB object.
         $DB = $this->createMock(\moodle_database::class);
-    
+
         $post = new \stdClass();
         $post->name = 'New Certificate';
         $post->course = 101;
@@ -45,13 +45,13 @@ class accredible_test extends \advanced_testcase {
         $post->coursecustomfieldmapping = [];
         $post->userfieldmapping = [];
         $post->instance = null;
-    
+
         // Set up the expectation for the insert_record method.
         $DB->expects($this->once())
             ->method('insert_record')
             ->with('accredible', $this->anything())
             ->willReturn(1);
-    
+
         $result = $this->accredible->save_record($post);
         $this->assertEquals(1, $result);
     }
@@ -98,14 +98,14 @@ class accredible_test extends \advanced_testcase {
         $post->coursefieldmapping = [];
         $post->coursecustomfieldmapping = [];
         $post->userfieldmapping = [];
-    
+
         $result = $this->invoke_method($this->accredible, 'build_attribute_mapping_list', [$post]);
         $this->assertNull($result);
-    }    
+    }
 
-    protected function invoke_method(&$object, $methodName, array $parameters = []) {
+    protected function invoke_method(&$object, $methodname, array $parameters = []) {
         $reflection = new \ReflectionClass(get_class($object));
-        $method = $reflection->getMethod($methodName);
+        $method = $reflection->getMethod($methodname);
         $method->setAccessible(true);
         return $method->invokeArgs($object, $parameters);
     }

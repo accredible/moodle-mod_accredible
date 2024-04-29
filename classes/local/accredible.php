@@ -39,7 +39,7 @@ class accredible {
      */
     public function save_record($post, $accrediblecertificate = null, $groupid = null) {
         global $DB;
-        
+
         $dbrecord = new \stdClass();
         $dbrecord->completionactivities = isset($post->completionactivities) ? $post->completionactivities : null;
         $dbrecord->name = $post->name;
@@ -51,7 +51,7 @@ class accredible {
         $dbrecord->gradeattributekeyname = $post->gradeattributekeyname;
         $dbrecord->groupid = $post->groupid;
         $dbrecord->attributemapping = $this->build_attribute_mapping_list($post);
-       
+
         if ($post->instance) {
             // Update the existing record if an instance ID is present.
             $dbrecord->id = $post->instance;
@@ -84,15 +84,15 @@ class accredible {
     private function build_attribute_mapping_list($post) {
         // Combine all the mappings into a single array. Expects empty arrays if no mappings are present.
         $mergedmappings = array_merge($post->coursefieldmapping, $post->coursecustomfieldmapping, $post->userfieldmapping);
-        
+
         if (empty($mergedmappings)) {
             return null;
         }
 
         $attributemappings = array_map(function($mapping) {
-           return new attributemapping($mapping->table, $mapping->accredibleattribute, $mapping->field, $mapping->id);
+            return new attributemapping($mapping->table, $mapping->accredibleattribute, $mapping->field, $mapping->id);
         }, $mergedmappings);
-        
+
         $attributemappinglist = new attributemapping_list($attributemappings);
         return $attributemappinglist->get_text_content();
     }
