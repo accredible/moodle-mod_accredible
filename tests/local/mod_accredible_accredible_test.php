@@ -138,7 +138,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
             ->with(
             'accredible',
             $this->callback(function($subject) {
-                // Check if attributemapping is a string and is an array afer decoding
+                // Check if attributemapping is a string and is an array afer decoding.
                 return is_string($subject->attributemapping) && is_array(json_decode($subject->attributemapping, true));
             })
         )
@@ -170,7 +170,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $post->coursecustomfieldmapping = [];
         $post->userfieldmapping = [];
 
-        // Apply overrides
+        // Apply overrides.
         if ($overrides) {
             foreach ($overrides as $property => $value) {
                 $post->$property = $value;
