@@ -40,7 +40,6 @@ class accredible {
         $dbrecord = new \stdClass();
         $dbrecord->completionactivities = isset($post->completionactivities) ? $post->completionactivities : null;
         $dbrecord->name = $post->name;
-        $dbrecord->course = $post->course;
         $dbrecord->finalquiz = $post->finalquiz;
         $dbrecord->passinggrade = $post->passinggrade;
         $dbrecord->includegradeattribute = isset($post->includegradeattribute) ? $post->includegradeattribute : 0;
@@ -65,6 +64,7 @@ class accredible {
 
             return $DB->update_record('accredible', $dbrecord);
         } else {
+            $dbrecord->course = $post->course;
             return $DB->insert_record('accredible', $dbrecord);
         }
     }
