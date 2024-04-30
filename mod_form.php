@@ -135,7 +135,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         // Form start.
         $PAGE->requires->js_call_amd('mod_accredible/userlist_updater', 'init');
         $PAGE->requires->js_call_amd('mod_accredible/attribute_keys_displayer', 'init');
-        $PAGE->requires->js_call_amd('mod_accredible/mappings_updater', 'init');
+        $PAGE->requires->js_call_amd('mod_accredible/mappings', 'init');
         $mform =& $this->_form;
         $mform->addElement('hidden', 'course', $id);
         if ($updatingcert) {
