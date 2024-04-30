@@ -31,11 +31,11 @@ class accredible {
      * This function handles both the creation of new records and the updating of existing ones.
      *
      * @param stdClass $post An object containing the incoming data from the form submission.
-     * @param stdClass|null $accrediblecertificate Optional. Existing certificate data to be updated.
+     * @param stdClass|null $existingrecord Optional. Existing certificate data to be updated.
      * @param int|null $groupid Optional. The group ID associated with the plugin instance.
      * @return bool|int Returns the new record ID on insert, or true on update success.
      */
-    public function save_record($post, $accrediblecertificate = null, $groupid = null) {
+    public function save_record($post, $existingrecord = null, $groupid = null) {
         global $DB;
 
         $dbrecord = new \stdClass();
@@ -54,7 +54,7 @@ class accredible {
             // Update the existing record if an instance ID is present.
             $dbrecord->id = $post->instance;
 
-            if ($accrediblecertificate->achievementid) {
+            if ($existingrecord->achievementid) {
                 $dbrecord->certificatename = $post->certificatename;
                 $dbrecord->description = $post->description;
                 $dbrecord->achievementid = $post->achievementid;

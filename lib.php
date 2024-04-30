@@ -134,7 +134,7 @@ function accredible_update_instance($post) {
 
     $gradeattributes = $usersclient->get_user_grades($post, array_unique($userids));
 
-    $accrediblecertificate = $DB->get_record('accredible', array('id' => $post->instance), '*', MUST_EXIST);
+    $existingrecord = $DB->get_record('accredible', array('id' => $post->instance), '*', MUST_EXIST);
 
     $course = $DB->get_record('course', array('id' => $post->course), '*', MUST_EXIST);
 
@@ -142,18 +142,18 @@ function accredible_update_instance($post) {
     if (isset($post->unissuedusers)) {
         // Checklist array from the form comes in the format:
         // Int userid => boolean issuecertificate.
-        if ($accrediblecertificate->achievementid) {
-            $groupid = $accrediblecertificate->achievementid;
-        } else if ($accrediblecertificate->groupid) {
-            $groupid = $accrediblecertificate->groupid;
+        if ($existingrecord->achievementid) {
+            $groupid = $existingrecord->achievementid;
+        } else if ($existingrecord->groupid) {
+            $groupid = $existingrecord->groupid;
         }
         foreach ($post->unissuedusers as $userid => $issuecertificate) {
             if ($issuecertificate) {
                 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
-                $completedtimestamp = accredible_manual_issue_completion_timestamp($accrediblecertificate, $user);
+                $completedtimestamp = accredible_manual_issue_completion_timestamp($existingrecord, $user);
                 $completeddate = date('Y-m-d', (int) $completedtimestamp);
                 $customattributes = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
-                if ($accrediblecertificate->groupid) {
+                if ($existingrecord->groupid) {
                     // Create the credential.
                     $credential = $localcredentials->create_credential($user, $groupid, $completeddate, $customattributes);
                     if ($credential) {
@@ -175,14 +175,14 @@ function accredible_update_instance($post) {
                         $evidenceitems->post_essay_answers($userid, $post->course, $credentialid);
                         $evidenceitems->course_duration_evidence($userid, $post->course, $credentialid, $completedtimestamp);
                     }
-                } else if ($accrediblecertificate->achievementid) {
+                } else if ($existingrecord->achievementid) {
                     if ($post->finalquiz) {
                         $quiz = $DB->get_record('quiz', array('id' => $post->finalquiz), '*', MUST_EXIST);
                         $grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
                     }
                     // TODO: testing.
                     $result = accredible_issue_default_certificate($user->id,
-                        $accrediblecertificate->id, fullname($user), $user->email,
+                        $existingrecord->id, fullname($user), $user->email,
                         $grade, $quiz->name, $completedtimestamp, $customattributes);
                     $credentialid = $result->credential->id;
                 }
@@ -205,10 +205,10 @@ function accredible_update_instance($post) {
         foreach ($post->users as $userid => $issuecertificate) {
             if ($issuecertificate) {
                 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
-                $completedtimestamp = accredible_manual_issue_completion_timestamp($accrediblecertificate, $user);
+                $completedtimestamp = accredible_manual_issue_completion_timestamp($existingrecord, $user);
                 $completeddate = date('Y-m-d', (int) $completedtimestamp);
                 $customattributes = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
-                if ($accrediblecertificate->achievementid) {
+                if ($existingrecord->achievementid) {
 
                     $courseurl = new moodle_url('/course/view.php', array('id' => $post->course));
                     $courselink = $courseurl->__toString();
@@ -257,13 +257,13 @@ function accredible_update_instance($post) {
     }
 
     // If the group was changed we should save that.
-    if (!$accrediblecertificate->achievementid && $post->groupid) {
+    if (!$existingrecord->achievementid && $post->groupid) {
         $groupid = $post->groupid;
     } else {
-        $groupid = $accrediblecertificate->groupid;
+        $groupid = $existingrecord->groupid;
     }
 
-    return $accredible->save_record($post, $accrediblecertificate, $groupid);
+    return $accredible->save_record($post, $existingrecord, $groupid);
 }
 
 /**
