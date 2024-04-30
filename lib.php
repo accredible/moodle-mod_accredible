@@ -42,8 +42,6 @@ use mod_accredible\local\accredible;
 function accredible_add_instance($post) {
     global $DB;
 
-    $course = $DB->get_record('course', array('id' => $post->course), '*', MUST_EXIST);
-
     $post->groupid = isset($post->groupid) ? $post->groupid : null;
 
     $post->instance = isset($post->instance) ? $post->instance : null;
@@ -135,8 +133,6 @@ function accredible_update_instance($post) {
     $gradeattributes = $usersclient->get_user_grades($post, array_unique($userids));
 
     $existingrecord = $DB->get_record('accredible', array('id' => $post->instance), '*', MUST_EXIST);
-
-    $course = $DB->get_record('course', array('id' => $post->course), '*', MUST_EXIST);
 
     // Issue certs for unissued users.
     if (isset($post->unissuedusers)) {
