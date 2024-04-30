@@ -252,14 +252,7 @@ function accredible_update_instance($post) {
         $post->completionactivities = 0;
     }
 
-    // If the group was changed we should save that.
-    if (!$existingrecord->achievementid && $post->groupid) {
-        $groupid = $post->groupid;
-    } else {
-        $groupid = $existingrecord->groupid;
-    }
-
-    return $accredible->save_record($post, $existingrecord, $groupid);
+    return $accredible->save_record($post, $existingrecord);
 }
 
 /**
