@@ -302,11 +302,6 @@ class mod_accredible_mod_form extends moodleform_mod {
         }
 
         $mform->addElement('header', 'mytestsection', 'Test Section');
-        // $mform->addElement('text', 'mytest', 'Test Label');
-        // $mform->setType('mytest', PARAM_TEXT);
-
-        // $mform->addElement('text', 'mytestoutput', 'Test Output');
-        // $mform->setType('mytestoutput', PARAM_TEXT);
         $line1 = new stdClass();
         $line1->index = 1;
         $line1->field = 'moodle_course';
