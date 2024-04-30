@@ -56,7 +56,7 @@ class accredible {
                 $dbrecord->certificatename = $post->certificatename;
                 $dbrecord->description = $post->description;
                 $dbrecord->achievementid = $post->achievementid;
-                // Keep the existing groupid
+                // Keep the existing groupid.
                 $dbrecord->groupid = $existingrecord->groupid;
             } else {
                 $dbrecord->course = $post->course;
