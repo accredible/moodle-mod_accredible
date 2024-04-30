@@ -48,6 +48,7 @@ class accredible {
         $dbrecord->gradeattributekeyname = $post->gradeattributekeyname;
         $dbrecord->groupid = $post->groupid;
         $dbrecord->attributemapping = $this->build_attribute_mapping_list($post);
+        $dbrecord->timecreated = time();
 
         if ($existingrecord) {
             $dbrecord->id = $post->instance;
@@ -60,12 +61,10 @@ class accredible {
                 $dbrecord->groupid = $existingrecord->groupid;
             } else {
                 $dbrecord->course = $post->course;
-                $dbrecord->timecreated = time();
             }
 
             return $DB->update_record('accredible', $dbrecord);
         } else {
-            $dbrecord->timecreated = time();
             return $DB->insert_record('accredible', $dbrecord);
         }
     }
