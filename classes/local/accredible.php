@@ -50,8 +50,7 @@ class accredible {
         $dbrecord->groupid = $post->groupid;
         $dbrecord->attributemapping = $this->build_attribute_mapping_list($post);
 
-        if ($post->instance) {
-            // Update the existing record if an instance ID is present.
+        if ($existingrecord) {
             $dbrecord->id = $post->instance;
 
             if ($existingrecord->achievementid) {
@@ -66,7 +65,6 @@ class accredible {
 
             return $DB->update_record('accredible', $dbrecord);
         } else {
-            // Insert a new record if no instance ID is present.
             $dbrecord->timecreated = time();
 
             return $DB->insert_record('accredible', $dbrecord);
