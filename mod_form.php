@@ -120,16 +120,6 @@ class mod_accredible_mod_form extends moodleform_mod {
             }
         }
 
-        // Load course assigments.
-        $assigmentschoices = array('' => 'Select an Activity Grade');
-        $assigments = $DB->get_records_select('grade_items', 'courseid = :course_id AND itemtype = :item_type',
-            array('course_id' => $id, 'item_type' => 'mod'), '', 'id, itemname');
-        if ($assigments) {
-            foreach ($assigments as $assigment) {
-                $assigmentschoices[$assigment->id] = $assigment->itemname;
-            }
-        }
-
         $inputstyle = array('style' => 'width: 399px');
 
         // Form start.
@@ -193,7 +183,7 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         $mform->addElement('html', $includegradewrapperhtml);
         $mform->addElement('select', 'gradeattributegradeitemid', get_string('gradeattributegradeitemselect', 'accredible'),
-            $assigmentschoices, $inputstyle);
+            $this->load_grade_item_options($id), $inputstyle);
         $mform->addElement('select', 'gradeattributekeyname', get_string('gradeattributekeynameselect', 'accredible'),
             $attributekeyschoices, $inputstyle);
         $mform->disabledIf('gradeattributekeyname', 'attributekysnumber', 'eq', 0);
@@ -302,5 +292,32 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
+    }
+
+    /**
+     * Load grade item options for the custom attribute mapping dropdown.
+     *
+     * This function retrieves grade items associated with the course and formats them for use in a select element.
+     * 
+     * @param int $courseid The ID of the course to retrieve
+     * @return array Associative array of grade item IDs and their names, suitable for form dropdown.
+     */
+    private function load_grade_item_options ($courseid) {     
+        global $DB;
+           
+        $options = array('' => 'Select an Activity Grade');
+        $gradeitems = $DB->get_records_select(
+            'grade_items',
+            'courseid = :course_id AND itemtype = :item_type',
+            array('course_id' => $courseid, 'item_type' => 'mod'),
+            '',
+            'id, itemname'
+        );
+        if ($gradeitems) {
+            foreach ($gradeitems as $item) {
+                $options[$item->id] = $item->itemname;
+            }
+        }
+        return $options;
     }
 }
