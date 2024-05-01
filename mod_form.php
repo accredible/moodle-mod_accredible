@@ -34,6 +34,8 @@ use mod_accredible\local\credentials;
 use mod_accredible\local\groups;
 use mod_accredible\local\users;
 use mod_accredible\local\attribute_keys;
+use mod_accredible\local\formhelper;
+
 
 /**
  * Accredible settings form.
@@ -57,6 +59,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         $attributekeysclient = new attribute_keys();
         $groupsclient = new groups();
         $usersclient = new users();
+        $formhelper = new formhelper();
 
         $updatingcert = false;
         $alreadyexists = false;
@@ -183,7 +186,7 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         $mform->addElement('html', $includegradewrapperhtml);
         $mform->addElement('select', 'gradeattributegradeitemid', get_string('gradeattributegradeitemselect', 'accredible'),
-            $this->load_grade_item_options($id), $inputstyle);
+            $formhelper->load_grade_item_options($id), $inputstyle);
         $mform->addElement('select', 'gradeattributekeyname', get_string('gradeattributekeynameselect', 'accredible'),
             $attributekeyschoices, $inputstyle);
         $mform->disabledIf('gradeattributekeyname', 'attributekysnumber', 'eq', 0);
@@ -292,32 +295,5 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
-    }
-
-    /**
-     * Load grade item options for the custom attribute mapping dropdown.
-     *
-     * This function retrieves grade items associated with the course and formats them for use in a select element.
-     * 
-     * @param int $courseid The ID of the course to retrieve
-     * @return array Associative array of grade item IDs and their names, suitable for form dropdown.
-     */
-    private function load_grade_item_options ($courseid) {     
-        global $DB;
-           
-        $options = array('' => 'Select an Activity Grade');
-        $gradeitems = $DB->get_records_select(
-            'grade_items',
-            'courseid = :course_id AND itemtype = :item_type',
-            array('course_id' => $courseid, 'item_type' => 'mod'),
-            '',
-            'id, itemname'
-        );
-        if ($gradeitems) {
-            foreach ($gradeitems as $item) {
-                $options[$item->id] = $item->itemname;
-            }
-        }
-        return $options;
     }
 }
