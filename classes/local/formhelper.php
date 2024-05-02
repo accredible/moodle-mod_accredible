@@ -47,7 +47,6 @@ class formhelper {
             'id',
             IGNORE_MULTIPLE
         );
-
         if ($coursegradeitem) {
             $options[$coursegradeitem->id] = get_string('coursetotal', 'accredible');
         }

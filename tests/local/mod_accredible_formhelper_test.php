@@ -50,32 +50,28 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * Test the load_grade_item_options method.
      */
     public function test_load_grade_item_options() {
-        global $DB;
-
         $formhelper = new formhelper();
-
-        $this->assertEmpty($DB->get_records('quiz'));
 
         // When there are no grade items.
         $expected = array(
-          '' => 'Select an Activity Grade',
-          $this->coursegradeitemid => get_string('coursetotal', 'accredible')
+            '' => 'Select an Activity Grade',
+            $this->coursegradeitemid => get_string('coursetotal', 'accredible')
         );
         $result = $formhelper->load_grade_item_options($this->course->id);
         $this->assertEquals($expected, $result);
 
         // When there are grade items.
-        $quiz1 = $this->create_quiz_module($this->course->id);
-        $gradeitem1 = $this->fetch_mod_grade_item($this->course->id, 'quiz', $quiz1->id);
+        $quizid1 = $this->create_quiz_module($this->course->id, 'Quiz 1');
+        $gradeitemid1 = $this->create_grade_item($this->course->id, 'Quiz 1', 'quiz', $quizid1);
 
-        $quiz2 = $this->create_quiz_module($this->course->id);
-        $gradeitem2 = $this->fetch_mod_grade_item($this->course->id, 'quiz', $quiz2->id);
+        $quizid2 = $this->create_quiz_module($this->course->id, 'Quiz 2');
+        $gradeitemid2 = $this->create_grade_item($this->course->id, 'Quiz 2', 'quiz', $quizid2);
 
         $expected = array(
             '' => 'Select an Activity Grade',
             $this->coursegradeitemid => get_string('coursetotal', 'accredible'),
-            $gradeitem1->id => $quiz1->name,
-            $gradeitem2->id => $quiz2->name
+            $gradeitemid1 => 'Quiz 1',
+            $gradeitemid2 => 'Quiz 2',
         );
         $result = $formhelper->load_grade_item_options($this->course->id);
         $this->assertEquals($expected, $result);
@@ -90,37 +86,14 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         global $DB;
 
         return $DB->get_record(
-          'grade_items',
-          array(
-            'courseid' => $courseid,
-            'itemtype' => 'course',
-            'itemmodule' => null
-          ),
-          '*',
-          MUST_EXIST
-        );
-    }
-
-    /**
-     * fetch mod grate item record
-     *
-     * @param int $courseid
-     * @param string $itemmodule
-     * @param int $iteminstance
-     */
-    private function fetch_mod_grade_item($courseid, $itemmodule, $iteminstance) {
-        global $DB;
-
-        return $DB->get_record(
-          'grade_items',
-          array(
-            'courseid' => $courseid,
-            'itemtype' => 'mod',
-            'itemmodule' => $itemmodule,
-            'iteminstance' => $iteminstance
-          ),
-          '*',
-          MUST_EXIST
+            'grade_items',
+            array(
+                'courseid' => $courseid,
+                'itemtype' => 'course',
+                'itemmodule' => null
+            ),
+            '*',
+            MUST_EXIST
         );
     }
 
@@ -128,9 +101,39 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * Create quiz module test
      *
      * @param int $courseid
+     * @param string $name
      */
-    private function create_quiz_module($courseid) {
-        $quiz = array('course' => $courseid, 'grade' => 10);
-        return $this->getDataGenerator()->create_module('quiz', $quiz);
+    private function create_quiz_module($courseid, $name) {
+        global $DB;
+
+        return $DB->insert_record('quiz',
+            array(
+                'course' => $courseid,
+                'name' => $name,
+                'intro' => 'Default intro',
+                'grade' => 10
+            )
+        );
+    }
+
+    /**
+     * Create quiz module test
+     *
+     * @param int $courseid
+     * @param string $itemname
+     * @param string $itemmodule
+     * @param int $iteminstance
+     */
+    private function create_grade_item($courseid, $itemname, $itemmodule, $iteminstance) {
+        global $DB;
+        $gradeitem = array(
+            "courseid" => $courseid,
+            "itemname" => $itemname,
+            "itemtype" => 'mod',
+            "itemmodule" => $itemmodule,
+            "iteminstance" => $iteminstance,
+            "itemnumber" => 0
+        );
+        return $DB->insert_record('grade_items', $gradeitem);
     }
 }
