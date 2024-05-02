@@ -36,6 +36,15 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $this->course = $this->getDataGenerator()->create_course();
+        $gradeitem = array(
+            'courseid' => $this->course->id,
+            'itemtype' => 'course',
+            'itemmodule' => null
+        );
+        if (!$DB->record_exists('grade_items', $gradeitem)) {
+          $DB->insert_record('grade_items', $gradeitem);
+        }
+        $this->coursegradeitemid = $DB->get_field('grade_items', 'id', $gradeitem);
     }
 
     /**
@@ -46,25 +55,51 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
 
         $formhelper = new formhelper();
 
+        $this->assertEmpty($DB->get_records('quiz'));
+
         // When there are no grade items.
-        $expected = array('' => 'Select an Activity Grade');
+        $expected = array(
+          '' => 'Select an Activity Grade',
+          $this->coursegradeitemid => get_string('coursetotal', 'accredible')
+        );
         $result = $formhelper->load_grade_item_options($this->course->id);
         $this->assertEquals($expected, $result);
         
         // When there are grade items.
         $quiz1 = $this->create_quiz_module($this->course->id);
-        $gradeitem1 = $this->fetch_grade_item($this->course->id, 'mod', 'quiz', $quiz1->id);
+        $gradeitem1 = $this->fetch_mod_grade_item($this->course->id, 'quiz', $quiz1->id);
 
         $quiz2 = $this->create_quiz_module($this->course->id);
-        $gradeitem2 = $this->fetch_grade_item($this->course->id, 'mod', 'quiz', $quiz2->id);
+        $gradeitem2 = $this->fetch_mod_grade_item($this->course->id, 'quiz', $quiz2->id);
 
         $expected = array(
             '' => 'Select an Activity Grade',
+            $this->coursegradeitemid => get_string('coursetotal', 'accredible'),
             $gradeitem1->id => $quiz1->name,
             $gradeitem2->id => $quiz2->name
         );
         $result = $formhelper->load_grade_item_options($this->course->id);
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * fetch course grate item record
+     *
+     * @param int $courseid
+     */
+    private function fetch_course_grade_item($courseid) {
+        global $DB;
+
+        return $DB->get_record(
+          'grade_items',
+          array(
+            'courseid' => $courseid,
+            'itemtype' => 'course',
+            'itemmodule' => null
+          ),
+          '*',
+          MUST_EXIST
+        );
     }
 
     /**
@@ -74,14 +109,14 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * @param string $itemmodule
      * @param int $iteminstance
      */
-    private function fetch_grade_item($courseid, $itemtype, $itemmodule, $iteminstance) {
+    private function fetch_mod_grade_item($courseid, $itemmodule, $iteminstance) {
         global $DB;
 
         return $DB->get_record(
           'grade_items',
           array(
             'courseid' => $courseid,
-            'itemtype' => $itemtype,
+            'itemtype' => 'mod',
             'itemmodule' => $itemmodule,
             'iteminstance' => $iteminstance
           ),
@@ -96,7 +131,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * @param int $courseid
      */
     private function create_quiz_module($courseid) {
-        $quiz = array("course" => $courseid, "grade" => 10);
+        $quiz = array('course' => $courseid, 'grade' => 10);
         return $this->getDataGenerator()->create_module('quiz', $quiz);
     }
 }

@@ -37,18 +37,34 @@ class formhelper {
         global $DB;
         
         $options = array('' => 'Select an Activity Grade');
-        $gradeitems = $DB->get_records_select(
+
+        $coursegradeitem = $DB->get_record(
+            'grade_items',
+            array(
+                'courseid' => $courseid,
+                'itemtype' => 'course'
+            ),
+            'id',
+            IGNORE_MULTIPLE
+        );
+
+        if ($coursegradeitem) {
+            $options[$coursegradeitem->id] = get_string('coursetotal', 'accredible');
+        }
+
+        $modgradeitems = $DB->get_records_select(
             'grade_items',
             'courseid = :course_id AND itemtype = :item_type',
             array('course_id' => $courseid, 'item_type' => 'mod'),
             '',
             'id, itemname'
         );
-        if ($gradeitems) {
-            foreach ($gradeitems as $item) {
+        if ($modgradeitems) {
+            foreach ($modgradeitems as $item) {
                 $options[$item->id] = $item->itemname;
             }
         }
+
         return $options;
     }
 }
