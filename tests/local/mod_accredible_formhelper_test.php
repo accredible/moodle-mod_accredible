@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of the Accredible Certificate module for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -42,7 +41,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
             'itemmodule' => null
         );
         if (!$DB->record_exists('grade_items', $gradeitem)) {
-          $DB->insert_record('grade_items', $gradeitem);
+            $DB->insert_record('grade_items', $gradeitem);
         }
         $this->coursegradeitemid = $DB->get_field('grade_items', 'id', $gradeitem);
     }
@@ -64,7 +63,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         );
         $result = $formhelper->load_grade_item_options($this->course->id);
         $this->assertEquals($expected, $result);
-        
+
         // When there are grade items.
         $quiz1 = $this->create_quiz_module($this->course->id);
         $gradeitem1 = $this->fetch_mod_grade_item($this->course->id, 'quiz', $quiz1->id);

@@ -35,7 +35,7 @@ class formhelper {
      */
     public function load_grade_item_options($courseid) {
         global $DB;
-        
+
         $options = array('' => 'Select an Activity Grade');
 
         $coursegradeitem = $DB->get_record(
