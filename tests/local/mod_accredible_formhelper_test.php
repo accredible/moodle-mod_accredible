@@ -48,6 +48,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
 
     /**
      * Test the load_grade_item_options method.
+     * @covers ::load_grade_item_options
      */
     public function test_load_grade_item_options() {
         $formhelper = new formhelper();
