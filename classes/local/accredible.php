@@ -37,17 +37,18 @@ class accredible {
     public function save_record($post, $existingrecord = null) {
         global $DB;
 
-        $dbrecord = new \stdClass();
-        $dbrecord->completionactivities = isset($post->completionactivities) ? $post->completionactivities : null;
-        $dbrecord->name = $post->name;
-        $dbrecord->finalquiz = $post->finalquiz;
-        $dbrecord->passinggrade = $post->passinggrade;
-        $dbrecord->includegradeattribute = isset($post->includegradeattribute) ? $post->includegradeattribute : 0;
-        $dbrecord->gradeattributegradeitemid = $post->gradeattributegradeitemid;
-        $dbrecord->gradeattributekeyname = $post->gradeattributekeyname;
-        $dbrecord->groupid = $post->groupid;
-        $dbrecord->attributemapping = $this->build_attribute_mapping_list($post);
-        $dbrecord->timecreated = time();
+        $dbrecord = (object) [
+            'completionactivities' => $post->completionactivities ?? null,
+            'name' => $post->name,
+            'finalquiz' => $post->finalquiz,
+            'passinggrade' => $post->passinggrade,
+            'includegradeattribute' => $post->includegradeattribute ?? 0,
+            'gradeattributegradeitemid' => $post->gradeattributegradeitemid,
+            'gradeattributekeyname' => $post->gradeattributekeyname,
+            'groupid' => $post->groupid,
+            'attributemapping' => $this->build_attribute_mapping_list($post),
+            'timecreated' => time()
+        ];
 
         if ($existingrecord) {
             $dbrecord->id = $post->instance;
