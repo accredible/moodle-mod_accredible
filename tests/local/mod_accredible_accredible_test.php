@@ -32,7 +32,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
     protected $accredible;
 
     /**
-     * Setup testcase.
+     * Setup before every test.
      */
     public function setUp(): void {
         $this->resetAfterTest();
@@ -40,18 +40,17 @@ class mod_accredible_accredible_test extends \advanced_testcase {
     }
 
     /**
-     * Test save_record method when creating a new record.
+     * Test save_record method.
      * @covers ::save_record
      */
-    public function test_save_record_new() {
+    public function test_save_record() {
         global $DB;
 
-        // Create a mock of the $DB object.
-        $DB = $this->createMock(\moodle_database::class);
-
+        // When creating a new record.
         $post = $this->generatePostObject();
 
         // Set up the expectation for the insert_record method.
+        $DB = $this->createMock(\moodle_database::class);
         $DB->expects($this->once())
             ->method('insert_record')
             ->with('accredible', $this->anything())
@@ -59,18 +58,9 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->save_record($post);
         $this->assertEquals(1, $result);
-    }
 
-    /**
-     * Test save_record method when updating an existing record.
-     * @covers ::save_record
-     */
-    public function test_save_record_update() {
-        global $DB;
 
-        // Create a mock of the $DB object.
-        $DB = $this->createMock(\moodle_database::class);
-
+        // When updating an existing record.
         $overrides = new \stdClass();
         $overrides->name = 'Updated Certificate';
         $overrides->instance = 1;
@@ -80,6 +70,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $accrediblecertificate->achievementid = null;
 
         // Simulating update_record return value.
+        $DB = $this->createMock(\moodle_database::class);
         $DB->expects($this->once())
             ->method('update_record')
             ->with('accredible', $this->anything())
@@ -87,22 +78,16 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->save_record($post, $accrediblecertificate);
         $this->assertTrue($result);
-    }
 
-    /**
-     * Test save_record method when attribute mappings are empty.
-     * @covers ::save_record
-     */
-    public function test_attributemapping_is_null_when_mappings_are_empty() {
-        global $DB;
-        $DB = $this->createMock(\moodle_database::class);
-
+        
+        // When attribute mappings are empty.
         $overrides = new \stdClass();
         $overrides->coursefieldmapping = [];
         $overrides->coursecustomfieldmapping = [];
         $overrides->userfieldmapping = [];
         $post = $this->generatePostObject($overrides);
 
+        $DB = $this->createMock(\moodle_database::class);
         $DB->expects($this->once())
             ->method('insert_record')
             ->with(
@@ -115,16 +100,9 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->save_record($post);
         $this->assertEquals(1, $result);
-    }
 
-    /**
-     * Test save_record method when attribute mappings are present.
-     * @covers ::save_record
-     */
-    public function test_attributemapping_is_object_when_userfieldmapping_is_not_empty() {
-        global $DB;
-        $DB = $this->createMock(\moodle_database::class);
 
+        // When attribute mappings are present.
         $attributemapping = new attributemapping('course', 'Moodle Course Start Date', 'startdate');
 
         $overrides = new \stdClass();
@@ -133,6 +111,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $overrides->userfieldmapping = [];
         $post = $this->generatePostObject($overrides);
 
+        $DB = $this->createMock(\moodle_database::class);
         $DB->expects($this->once())
             ->method('insert_record')
             ->with(
@@ -155,20 +134,21 @@ class mod_accredible_accredible_test extends \advanced_testcase {
      * @return stdClass The generated $post object.
      */
     private function generatepostobject(\stdClass $overrides = null): \stdClass {
-        $post = new \stdClass();
-        $post->name = 'New Certificate';
-        $post->instance = null;
-        $post->course = 101;
-        $post->finalquiz = 5;
-        $post->passinggrade = 70;
-        $post->completionactivities = null;
-        $post->includegradeattribute = 1;
-        $post->gradeattributegradeitemid = 10;
-        $post->gradeattributekeyname = 'Final Grade';
-        $post->groupid = 1;
-        $post->coursefieldmapping = [];
-        $post->coursecustomfieldmapping = [];
-        $post->userfieldmapping = [];
+        $post = (object) [
+            'name' => 'New Certificate',
+            'instance' => null,
+            'course' => 101,
+            'finalquiz' => 5,
+            'passinggrade' => 70,
+            'completionactivities' => null,
+            'includegradeattribute' => 1,
+            'gradeattributegradeitemid' => 10,
+            'gradeattributekeyname' => 'Final Grade',
+            'groupid' => 1,
+            'coursefieldmapping' => [],
+            'coursecustomfieldmapping' => [],
+            'userfieldmapping' => []
+        ];
 
         // Apply overrides.
         if ($overrides) {
