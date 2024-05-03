@@ -59,7 +59,6 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $result = $this->accredible->save_record($post);
         $this->assertEquals(1, $result);
 
-
         // When updating an existing record.
         $overrides = new \stdClass();
         $overrides->name = 'Updated Certificate';
@@ -79,7 +78,6 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $result = $this->accredible->save_record($post, $accrediblecertificate);
         $this->assertTrue($result);
 
-        
         // When attribute mappings are empty.
         $overrides = new \stdClass();
         $overrides->coursefieldmapping = [];
@@ -100,7 +98,6 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->save_record($post);
         $this->assertEquals(1, $result);
-
 
         // When attribute mappings are present.
         $attributemapping = new attributemapping('course', 'Moodle Course Start Date', 'startdate');
