@@ -153,7 +153,6 @@ If the error keeps happening, it would be better to clear the containers with th
 
 ```
 docker-compose down -v
-rm -rf .docker/volumes/mariadb/data
 ```
 
 and set it up again from the beginning.
