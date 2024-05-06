@@ -165,7 +165,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         // Load Accredible attribute keys.
         $attributekeys = $attributekeysclient->get_attribute_keys();
         if (isset($attributekeys)) {
-            $attributekeyschoices = array('' => 'Select a Custom Attribute') + $attributekeys;
+            $attributekeyschoices = array('' => get_string('accrediblecustomattributeselectprompt', 'accredible')) + $attributekeys;
             // Hidden element to check if we should disable the "gradeattributekeyname" select.
             $mform->addElement('hidden', 'attributekysnumber', 1);
         } else {
@@ -292,6 +292,89 @@ class mod_accredible_mod_form extends moodleform_mod {
         } else {
             $mform->addElement('checkbox', 'completionactivities', get_string('completionissuecheckbox', 'accredible'));
         }
+
+        $attributemapping_default_values =
+            $formhelper->attributemapping_default_values(
+                $accrediblecertificate->attributemapping
+            );
+
+        // Attribute mapping: course fields.
+        $mform->addElement('header', 'attributemappingcoursefields', get_string('attributemappingcoursefields', 'accredible'));
+        $mform->addElement(
+            'select',
+            'coursefieldmapping[0][field]',
+            get_string('moodlecoursefield', 'accredible'),
+            $formhelper->load_course_field_options(),
+            $inputstyle
+        );
+        $mform->setDefault(
+            'coursefieldmapping[0][field]',
+            $attributemapping_default_values['coursefieldmapping'][0]['field']
+        );
+
+        $mform->addElement(
+            'select',
+            'coursefieldmapping[0][accredibleattribute]',
+            get_string('accrediblecustomattributename', 'accredible'),
+            $attributekeyschoices,
+            $inputstyle
+        );
+        $mform->setDefault(
+            'coursefieldmapping[0][accredibleattribute]',
+            $attributemapping_default_values['coursefieldmapping'][0]['accredibleattribute']
+        );
+
+        // Attribute mapping: course custom fields.
+        $mform->addElement('header', 'attributemappingcoursecustomfields', get_string('attributemappingcoursecustomfields', 'accredible'));
+        $mform->addElement(
+            'select',
+            'coursecustomfieldmapping[0][id]',
+            get_string('moodlecoursecustomfield', 'accredible'),
+            $formhelper->load_course_custom_field_options(),
+            $inputstyle
+        );
+        $mform->setDefault(
+            'coursecustomfieldmapping[0][id]',
+            $attributemapping_default_values['coursecustomfieldmapping'][0]['id']
+        );
+
+        $mform->addElement(
+            'select',
+            'coursecustomfieldmapping[0][accredibleattribute]',
+            get_string('accrediblecustomattributename', 'accredible'),
+            $attributekeyschoices,
+            $inputstyle
+        );
+        $mform->setDefault(
+            'coursecustomfieldmapping[0][accredibleattribute]',
+            $attributemapping_default_values['coursecustomfieldmapping'][0]['accredibleattribute']
+        );
+
+        // Attribute mapping: user profile fields.
+        $mform->addElement('header', 'attributemappinguserprofilefields', get_string('attributemappinguserprofilefields', 'accredible'));
+        $mform->addElement(
+            'select',
+            'userprofilefieldmapping[0][field]',
+            get_string('moodleuserprofilefield', 'accredible'),
+            $formhelper->load_user_profile_field_options(),
+            $inputstyle
+        );
+        $mform->setDefault(
+            'userprofilefieldmapping[0][id]',
+            $attributemapping_default_values['userprofilefieldmapping'][0]['id']
+        );
+
+        $mform->addElement(
+            'select',
+            'userprofilefieldmapping[0][accredibleattribute]',
+            get_string('accrediblecustomattributename', 'accredible'),
+            $attributekeyschoices,
+            $inputstyle
+        );
+        $mform->setDefault(
+            'userprofilefieldmapping[0][accredibleattribute]',
+            $attributemapping_default_values['userprofilefieldmapping'][0]['accredibleattribute']
+        );
 
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();

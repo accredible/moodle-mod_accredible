@@ -78,9 +78,19 @@ class accredible {
      * @return string JSON encoded attribute mapping list.
      */
     private function build_attribute_mapping_list($post) {
-        // Combine all the mappings into a single array. Expects empty arrays if no mappings are present.
-        $mergedmappings = array_merge($post->coursefieldmapping, $post->coursecustomfieldmapping, $post->userfieldmapping);
-
+        $coursefieldmapping = $this->parse_attributemapping(
+            'course',
+            $post->coursefieldmapping
+        );
+        $coursecustomfieldmapping = $this->parse_attributemapping(
+            'customfield_field',
+            $post->coursecustomfieldmapping
+        );
+        $userfieldmapping = $this->parse_attributemapping(
+            'user_info_field',
+            $post->userfieldmapping
+        );
+        $mergedmappings = array_merge($coursefieldmapping, $coursecustomfieldmapping, $userfieldmapping);
         if (empty($mergedmappings)) {
             return null;
         }
@@ -91,5 +101,37 @@ class accredible {
 
         $attributemappinglist = new attributemapping_list($attributemappings);
         return $attributemappinglist->get_text_content();
+    }
+
+    /**
+     * Parses attribute mappings from posted data into a structured array of objects.
+     *
+     * This function takes a table name and the posted mapping data, then constructs
+     * an array of objects where each object represents a mapping configuration.
+     * The structure and fields of the object depend on the table type specified.
+     *
+     * @param string $table The type of table the mapping applies to ('course', 'user_info_field', or 'customfield_field').
+     * @param array $postedmapping The array of mappings posted from the form.
+     * @return array An array of objects, each representing a mapping configuration.
+     */
+    private function parse_attributemapping($table, $postedmapping) {
+        $parsedmapping = [];
+        foreach ($postedmapping as $mapping) {
+            $entry = (object) [
+                'table' => $table,
+                'accredibleattribute' => $mapping['accredibleattribute']
+            ];
+
+            if ($table === 'course') {
+                $entry->id = null;
+                $entry->field = $mapping['field'];
+            }
+            if ($table === 'user_info_field' || $table === 'customfield_field') {
+                $entry->id = (int) $mapping['id'];
+                $entry->field = null;
+            }
+            $parsedmapping[] = $entry;
+        }
+        return $parsedmapping;
     }
 }

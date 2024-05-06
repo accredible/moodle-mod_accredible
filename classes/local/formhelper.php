@@ -66,4 +66,106 @@ class formhelper {
 
         return $options;
     }
+
+    /**
+     * Load course field options for dropdown selection.
+     *
+     * This function retrieves all column names from the 'course' table in the database
+     * and formats them as options for a select element.
+     *
+     * @return array Associative array of course field names suitable for form dropdown.
+     */
+    public function load_course_field_options() {
+        global $DB;
+
+        $options = array('' => 'Select a Moodle course field');
+        $fields = $DB->get_columns('course');
+        foreach ($fields as $field => $_info) {
+            $options[$field] = $field;
+        }
+        return $options;
+    }
+
+    /**
+     * Load course custom field options for dropdown selection.
+     *
+     * This function retrieves all custom fields associated with Moodle courses
+     * from the 'customfield_field' table and formats them as options for a select element.
+     *
+     * @return array Associative array of custom field IDs and their names, suitable for form dropdown.
+     */
+    public function load_course_custom_field_options() {
+        global $DB;
+
+        $options = array('' => 'Select a Moodle course custom field');
+        $customfields = $DB->get_records('customfield_field', array(), '', 'id, name');
+        foreach ($customfields as $field) {
+            $options[$field->id] = $field->name;
+        }
+        return $options;
+    }
+
+    /**
+     * Load user profile field options for dropdown selection.
+     *
+     * This function retrieves all user profile fields from the 'user_info_field' table
+     * and formats them as options for a select element, mapping field IDs to their names.
+     *
+     * @return array Associative array of user profile field IDs and their names, suitable for form dropdown.
+     */
+    public function load_user_profile_field_options() {
+        global $DB;
+
+        $options = array('' => 'Select a Moodle user profile field');
+        $profilefields = $DB->get_records('user_info_field', array(), '', 'id, name');
+        foreach ($profilefields as $field) {
+            $options[$field->id] = $field->name;
+        }
+        return $options;
+    }
+
+
+    /**
+     * Generate default values for attribute mapping based on a JSON string.
+     *
+     * This function decodes a JSON string representing attribute mappings and organizes them into
+     * structured arrays for each type of mapping (course fields, course custom fields, and user profile fields).
+     *
+     * @param string $attributemapping JSON string containing the attribute mappings.
+     * @return array Associative array with keys 'coursefieldmapping', 'coursecustomfieldmapping', and 'userprofilefieldmapping',
+     *               each containing an array of mappings relevant to that category.
+     */ 
+    public function attributemapping_default_values($attributemapping) {
+        $defaultvalues = [
+            'coursefieldmapping' => [],
+            'coursecustomfieldmapping' => [],
+            'userprofilefieldmapping' => []
+        ];
+        if (!$attributemapping) return $defaultvalues;
+
+        $decodedmapping = json_decode($attributemapping);
+        foreach ($decodedmapping as $mapping) {
+            switch ($mapping->table) {
+                case 'course':
+                    $defaultvalues['coursefieldmapping'][] = [
+                        'field' => $mapping->field,
+                        'accredibleattribute' => $mapping->accredibleattribute
+                    ];
+                    break;
+                case 'customfield_field':
+                    $defaultvalues['coursecustomfieldmapping'][] = [
+                        'id' => $mapping->id,
+                        'accredibleattribute' => $mapping->accredibleattribute
+                    ];
+                    break;
+                case 'user_info_field':
+                    $defaultvalues['userprofilefieldmapping'][] = [
+                        'id' => $mapping->id,
+                        'accredibleattribute' => $mapping->accredibleattribute
+                    ];
+                    break;
+            }
+        }
+        return $defaultvalues;
+    }
 }

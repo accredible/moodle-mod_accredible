@@ -59,6 +59,13 @@ class mod_accredible_attributemapping_list_test extends \advanced_testcase {
         $attributemappinglist = new attributemapping_list(array($mapping1, $mapping2));
         $this->assertEquals($mapping1, $attributemappinglist->attributemappings[0]);
         $this->assertEquals($mapping2, $attributemappinglist->attributemappings[1]);
+
+        // When $accredibleattribute has multiple non-selected values.
+        $mapping1->accredibleattribute = '';
+        $mapping2->accredibleattribute = '';
+        $attributemappinglist = new attributemapping_list(array($mapping1, $mapping2));
+        $this->assertEquals($mapping1, $attributemappinglist->attributemappings[0]);
+        $this->assertEquals($mapping2, $attributemappinglist->attributemappings[1]);
     }
 
     /**

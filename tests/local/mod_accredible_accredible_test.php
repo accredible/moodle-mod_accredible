@@ -99,13 +99,25 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $result = $this->accredible->save_record($post);
         $this->assertEquals(1, $result);
 
-        // When attribute mappings are present.
-        $attributemapping = new attributemapping('course', 'Moodle Course Start Date', 'startdate');
-
         $overrides = new \stdClass();
-        $overrides->coursefieldmapping = [$attributemapping];
-        $overrides->coursecustomfieldmapping = [];
-        $overrides->userfieldmapping = [];
+        $overrides->coursefieldmapping = [
+            [
+                'field' => 'startdate',
+                'accredibleattribute' => 'Moodle Course Start Date'
+            ]
+        ];
+        $overrides->coursecustomfieldmapping = [
+            [
+                'id' => '123',
+                'accredibleattribute' => 'Moodle Course Custom Field'
+            ]
+        ];
+        $overrides->userfieldmapping = [
+            [
+                'id' => '345',
+                'accredibleattribute' => 'Moodle User Profile Field'
+            ]
+        ];
         $post = $this->generatePostObject($overrides);
 
         $DB = $this->createMock(\moodle_database::class);

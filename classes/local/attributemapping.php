@@ -100,6 +100,8 @@ class attributemapping {
      * @throws InvalidArgumentException If the field name is invalid
      */
     private function validate_field($table, $field) {
+        if (!$field) return;
+
         if ($table === "course") {
             // Valid fields for the 'course' table.
             $validfields = ["fullname", "shortname", "startdate", "enddate"];
@@ -116,6 +118,8 @@ class attributemapping {
      * @throws InvalidArgumentException If the ID is invalid
      */
     private function validate_id($table, $id) {
+        if (!$id) return;
+
         if (($table === "user_info_field" || $table === "customfield_field") && $id === null) {
             throw new \InvalidArgumentException("Id is required for the '$table' table");
         }

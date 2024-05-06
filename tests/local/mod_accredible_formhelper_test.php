@@ -78,6 +78,160 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $this->assertEquals($expected, $result);
     }
 
+
+    /**
+     * Test the load_course_field_options method.
+     * @covers ::load_course_field_options
+     */
+    public function test_load_course_field_options() {
+        global $DB;
+        
+        $formhelper = new formhelper();
+
+        $expected = array('' => 'Select a Moodle course field');
+        $fields = $DB->get_columns('course');
+        foreach ($fields as $field => $_info) {
+            $expected[$field] = $field;
+        }
+
+        $result = $formhelper->load_course_field_options();
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Test the load_course_custom_field_options method.
+     * @covers ::load_course_custom_field_options
+     */
+    public function test_load_course_custom_field_options() {
+        global $DB;
+
+        $formhelper = new formhelper();
+
+        // When there are no custom fields.
+        $expected = array('' => 'Select a Moodle course custom field');
+        $result = $formhelper->load_course_custom_field_options();
+        $this->assertEquals($expected, $result);
+
+        // When there are custom fields.
+        $customfield1 = array(
+            'shortname' => 'customfield1',
+            'name' => 'Custom Field 1',
+            'timecreated' => time(),
+            'timemodified' => time()
+        );
+        $customfield1id = $DB->insert_record('customfield_field', $customfield1);
+
+        $customfield2 = array(
+            'shortname' => 'customfield2',
+            'name' => 'Custom Field 2',
+            'timecreated' => time(),
+            'timemodified' => time()
+        );
+        $customfield2id = $DB->insert_record('customfield_field', $customfield2);
+
+        $expected = array(
+          '' => 'Select a Moodle course custom field',
+          $customfield1id => 'Custom Field 1',
+          $customfield2id => 'Custom Field 2'
+        );
+        $result = $formhelper->load_course_custom_field_options();
+        $this->assertEquals($expected, $result);
+    }
+
+    
+    /**
+     * Test the load_user_profile_field_options method.
+     * @covers ::load_user_profile_field_options
+     */
+    public function test_load_user_profile_field_options() {
+        global $DB;
+        $formhelper = new formhelper();
+
+        // When there are no user_info_field records
+        $expected = array('' => 'Select a Moodle user profile field');
+        $result = $formhelper->load_user_profile_field_options();
+        $this->assertEquals($expected, $result);
+
+        // When there are user_info_field records
+        $userinfofield1 = array(
+            'shortname' => 'userinfo1',
+            'name' => 'User Info 1'
+        );
+        $userinfofield1id = $DB->insert_record('user_info_field', $userinfofield1);
+
+        $userinfofield2 = array(
+            'shortname' => 'userinfo2',
+            'name' => 'User Info 2'
+        );
+        $userinfofield2id = $DB->insert_record('user_info_field', $userinfofield2);
+
+        $expected = array(
+            '' => 'Select a Moodle user profile field',
+            $userinfofield1id => 'User Info 1',
+            $userinfofield2id => 'User Info 2'
+        );
+        $result = $formhelper->load_user_profile_field_options();
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Test the attributemapping_default_values method.
+     * @covers ::attributemapping_default_values
+     */
+    public function test_attributemapping_default_values() {
+        $formhelper = new formhelper();
+
+       // When the JSON string $attributemapping is null.
+        $result = $formhelper->attributemapping_default_values(null);
+        $expected = [
+            'coursefieldmapping' => [],
+            'coursecustomfieldmapping' => [],
+            'userprofilefieldmapping' => []
+        ];
+        $this->assertEquals($expected, $result);
+
+        // When the JSON string $attributemapping is provided
+        $jsonInput = json_encode([
+            (object)[
+                'table' => 'course',
+                'field' => 'startdate',
+                'accredibleattribute' => 'Moodle Course Start Date'
+            ],
+            (object)[
+                'table' => 'user_info_field',
+                'id' => 123,
+                'accredibleattribute' => 'Moodle User Birthday'
+            ],
+            (object)[
+                'table' => 'customfield_field',
+                'id' => 321,
+                'accredibleattribute' => 'Moodle Typology'
+            ]
+        ]);
+        $result = $formhelper->attributemapping_default_values($jsonInput);
+        $expected = [
+            'coursefieldmapping' => [
+                [
+                    'field' => 'startdate',
+                    'accredibleattribute' => 'Moodle Course Start Date'
+                ]
+            ],
+            'coursecustomfieldmapping' => [
+                [
+                    'id' => 321,
+                    'accredibleattribute' => 'Moodle Typology'
+                ]
+            ],
+            'userprofilefieldmapping' => [
+                [
+                    'id' => 123,
+                    'accredibleattribute' => 'Moodle User Birthday'
+                ]
+            ]
+        ];
+        $this->assertEquals($expected, $result);
+    }
+
     /**
      * fetch course grate item record
      *
