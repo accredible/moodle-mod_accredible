@@ -153,7 +153,6 @@ If the error keeps happening, it would be better to clear the containers with th
 
 ```
 docker-compose down -v
-rm -rf .docker/volumes/mariadb/data
 ```
 
 and set it up again from the beginning.
@@ -191,7 +190,7 @@ Please refer to [Writing PHPUnit tests](https://docs.moodle.org/dev/Writing_PHPU
 After running Moodle with the Accredible plugin, log in to the Moodle container.
 
 ```
-docker exec -it moodle-mod_accredible_moodle_1 bash
+docker exec -it moodle-mod_accredible-moodle-1 bash
 ```
 
 Add the following lines to `config.php`.
@@ -223,7 +222,7 @@ php /bitnami/moodle/admin/tool/phpunit/cli/init.php
 Log in to the Moodle container.
 
 ```
-docker exec -it moodle-mod_accredible_moodle_1 bash
+docker exec -it moodle-mod_accredible-moodle-1 bash
 ```
 
 Run unit tests of this plugin using the following command.

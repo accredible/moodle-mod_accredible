@@ -1,4 +1,3 @@
-version: '2'
 services:
   mariadb:
     image: docker.io/bitnami/mariadb:10.5
@@ -10,7 +9,7 @@ services:
       - MARIADB_COLLATE=utf8mb4_unicode_ci
     volumes:
       # For persistence of the MariaDB data
-      - './.docker/volumes/mariadb:/bitnami/mariadb'
+      - 'mariadb_data:/bitnami/mariadb'
 
   moodle:
     build: .
@@ -43,3 +42,4 @@ services:
 volumes:
   moodle_data:
   moodledata_data:
+  mariadb_data:
