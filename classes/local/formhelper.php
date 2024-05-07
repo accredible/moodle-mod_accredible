@@ -16,6 +16,8 @@
 
 namespace mod_accredible\local;
 
+use mod_accredible\local\attributemapping;
+
 /**
  * Helper class for mod_form.php.
  *
@@ -79,8 +81,8 @@ class formhelper {
         global $DB;
 
         $options = array('' => 'Select a Moodle course field');
-        $fields = $DB->get_columns('course');
-        foreach ($fields as $field => $info) {
+        $fields = attributemapping::VALID_COURSE_FIELDS;
+        foreach ($fields as $field) {
             $options[$field] = $field;
         }
         return $options;

@@ -88,12 +88,13 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
 
         $formhelper = new formhelper();
 
-        $expected = array('' => 'Select a Moodle course field');
-        $fields = $DB->get_columns('course');
-        foreach ($fields as $field => $info) {
-            $expected[$field] = $field;
-        }
-
+        $expected = array(
+            '' => 'Select a Moodle course field',
+            'fullname' => 'fullname',
+            'shortname' => 'shortname',
+            'startdate' => 'startdate',
+            'enddate' => 'enddate'
+        );
         $result = $formhelper->load_course_field_options();
         $this->assertEquals($expected, $result);
     }

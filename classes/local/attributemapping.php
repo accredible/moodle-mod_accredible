@@ -25,6 +25,11 @@ namespace mod_accredible\local;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class attributemapping {
+    /**
+     * Valid fields for the 'course' table that can be mapped.
+     * @var string[] VALID_COURSE_FIELDS
+     */
+    const VALID_COURSE_FIELDS = ["fullname", "shortname", "startdate", "enddate"];
 
     /**
      * The name of the table (must be one of 'course', 'user_info_field', 'customfield_field')
@@ -105,9 +110,7 @@ class attributemapping {
         }
 
         if ($table === "course") {
-            // Valid fields for the 'course' table.
-            $validfields = ["fullname", "shortname", "startdate", "enddate"];
-            if (!in_array($field, $validfields)) {
+            if (!in_array($field, self::VALID_COURSE_FIELDS)) {
                 throw new \InvalidArgumentException("Invalid field value for the 'course' table");
             }
         }
