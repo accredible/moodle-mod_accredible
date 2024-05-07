@@ -293,7 +293,7 @@ class mod_accredible_mod_form extends moodleform_mod {
             $mform->addElement('checkbox', 'completionactivities', get_string('completionissuecheckbox', 'accredible'));
         }
 
-        $attributemapping_default_values =
+        $attributemappingdefaultvalues =
             $formhelper->attributemapping_default_values(
                 $accrediblecertificate->attributemapping
             );
@@ -309,7 +309,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         );
         $mform->setDefault(
             'coursefieldmapping[0][field]',
-            $attributemapping_default_values['coursefieldmapping'][0]['field']
+            $attributemappingdefaultvalues['coursefieldmapping'][0]['field']
         );
 
         $mform->addElement(
@@ -321,11 +321,15 @@ class mod_accredible_mod_form extends moodleform_mod {
         );
         $mform->setDefault(
             'coursefieldmapping[0][accredibleattribute]',
-            $attributemapping_default_values['coursefieldmapping'][0]['accredibleattribute']
+            $attributemappingdefaultvalues['coursefieldmapping'][0]['accredibleattribute']
         );
 
         // Attribute mapping: course custom fields.
-        $mform->addElement('header', 'attributemappingcoursecustomfields', get_string('attributemappingcoursecustomfields', 'accredible'));
+        $mform->addElement(
+            'header',
+            'attributemappingcoursecustomfields',
+            get_string('attributemappingcoursecustomfields', 'accredible')
+        );
         $mform->addElement(
             'select',
             'coursecustomfieldmapping[0][id]',
@@ -335,7 +339,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         );
         $mform->setDefault(
             'coursecustomfieldmapping[0][id]',
-            $attributemapping_default_values['coursecustomfieldmapping'][0]['id']
+            $attributemappingdefaultvalues['coursecustomfieldmapping'][0]['id']
         );
 
         $mform->addElement(
@@ -347,11 +351,14 @@ class mod_accredible_mod_form extends moodleform_mod {
         );
         $mform->setDefault(
             'coursecustomfieldmapping[0][accredibleattribute]',
-            $attributemapping_default_values['coursecustomfieldmapping'][0]['accredibleattribute']
+            $attributemappingdefaultvalues['coursecustomfieldmapping'][0]['accredibleattribute']
         );
 
         // Attribute mapping: user profile fields.
-        $mform->addElement('header', 'attributemappinguserprofilefields', get_string('attributemappinguserprofilefields', 'accredible'));
+        $mform->addElement('header',
+            'attributemappinguserprofilefields',
+            get_string('attributemappinguserprofilefields', 'accredible')
+        );
         $mform->addElement(
             'select',
             'userprofilefieldmapping[0][field]',
@@ -361,7 +368,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         );
         $mform->setDefault(
             'userprofilefieldmapping[0][id]',
-            $attributemapping_default_values['userprofilefieldmapping'][0]['id']
+            $attributemappingdefaultvalues['userprofilefieldmapping'][0]['id']
         );
 
         $mform->addElement(
@@ -373,7 +380,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         );
         $mform->setDefault(
             'userprofilefieldmapping[0][accredibleattribute]',
-            $attributemapping_default_values['userprofilefieldmapping'][0]['accredibleattribute']
+            $attributemappingdefaultvalues['userprofilefieldmapping'][0]['accredibleattribute']
         );
 
         $this->standard_coursemodule_elements();

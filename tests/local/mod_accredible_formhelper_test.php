@@ -85,12 +85,12 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      */
     public function test_load_course_field_options() {
         global $DB;
-        
+
         $formhelper = new formhelper();
 
         $expected = array('' => 'Select a Moodle course field');
         $fields = $DB->get_columns('course');
-        foreach ($fields as $field => $_info) {
+        foreach ($fields as $field => $info) {
             $expected[$field] = $field;
         }
 
@@ -138,7 +138,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $this->assertEquals($expected, $result);
     }
 
-    
+
     /**
      * Test the load_user_profile_field_options method.
      * @covers ::load_user_profile_field_options
@@ -147,12 +147,12 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         global $DB;
         $formhelper = new formhelper();
 
-        // When there are no user_info_field records
+        // When there are no user_info_field records.
         $expected = array('' => 'Select a Moodle user profile field');
         $result = $formhelper->load_user_profile_field_options();
         $this->assertEquals($expected, $result);
 
-        // When there are user_info_field records
+        // When there are user_info_field records.
         $userinfofield1 = array(
             'shortname' => 'userinfo1',
             'name' => 'User Info 1'
@@ -181,7 +181,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
     public function test_attributemapping_default_values() {
         $formhelper = new formhelper();
 
-       // When the JSON string $attributemapping is null.
+        // When the JSON string $attributemapping is null.
         $result = $formhelper->attributemapping_default_values(null);
         $expected = [
             'coursefieldmapping' => [],
@@ -190,8 +190,8 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         ];
         $this->assertEquals($expected, $result);
 
-        // When the JSON string $attributemapping is provided
-        $jsonInput = json_encode([
+        // When the JSON string $attributemapping is provided.
+        $jsoninput = json_encode([
             (object)[
                 'table' => 'course',
                 'field' => 'startdate',
@@ -208,7 +208,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
                 'accredibleattribute' => 'Moodle Typology'
             ]
         ]);
-        $result = $formhelper->attributemapping_default_values($jsonInput);
+        $result = $formhelper->attributemapping_default_values($jsoninput);
         $expected = [
             'coursefieldmapping' => [
                 [

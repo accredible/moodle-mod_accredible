@@ -81,7 +81,9 @@ class attributemapping_list {
     private function validate_attributemapping($attributemappings) {
         $uniqueattributes = [];
         foreach ($attributemappings as $attributemapping) {
-            if (!$attributemapping->accredibleattribute) continue;
+            if (!$attributemapping->accredibleattribute) {
+                continue;
+            }
 
             if (in_array($attributemapping->accredibleattribute, $uniqueattributes)) {
                 throw new \InvalidArgumentException(

@@ -80,7 +80,7 @@ class formhelper {
 
         $options = array('' => 'Select a Moodle course field');
         $fields = $DB->get_columns('course');
-        foreach ($fields as $field => $_info) {
+        foreach ($fields as $field => $info) {
             $options[$field] = $field;
         }
         return $options;
@@ -134,14 +134,16 @@ class formhelper {
      * @param string $attributemapping JSON string containing the attribute mappings.
      * @return array Associative array with keys 'coursefieldmapping', 'coursecustomfieldmapping', and 'userprofilefieldmapping',
      *               each containing an array of mappings relevant to that category.
-     */ 
+     */
     public function attributemapping_default_values($attributemapping) {
         $defaultvalues = [
             'coursefieldmapping' => [],
             'coursecustomfieldmapping' => [],
             'userprofilefieldmapping' => []
         ];
-        if (!$attributemapping) return $defaultvalues;
+        if (!$attributemapping) {
+            return $defaultvalues;
+        }
 
         $decodedmapping = json_decode($attributemapping);
         foreach ($decodedmapping as $mapping) {
