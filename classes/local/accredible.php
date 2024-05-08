@@ -80,15 +80,15 @@ class accredible {
     private function build_attribute_mapping_list($post) {
         $coursefieldmapping = $this->parse_attributemapping(
             'course',
-            $post->coursefieldmapping
+            isset($post->coursefieldmapping) ? $post->coursefieldmapping : []
         );
         $coursecustomfieldmapping = $this->parse_attributemapping(
             'customfield_field',
-            $post->coursecustomfieldmapping
+            isset($post->coursecustomfieldmapping) ? $post->coursecustomfieldmapping : []
         );
         $userfieldmapping = $this->parse_attributemapping(
             'user_info_field',
-            $post->userfieldmapping
+            isset($post->userfieldmapping) ? $post->userfieldmapping : []
         );
         $mergedmappings = array_merge($coursefieldmapping, $coursecustomfieldmapping, $userfieldmapping);
         if (empty($mergedmappings)) {
