@@ -78,8 +78,6 @@ class formhelper {
      * @return array Associative array of course field names suitable for form dropdown.
      */
     public function load_course_field_options() {
-        global $DB;
-
         $options = array('' => 'Select a Moodle course field');
         $fields = attributemapping::VALID_COURSE_FIELDS;
         foreach ($fields as $field) {
