@@ -78,8 +78,16 @@ class accredible {
      * @return string JSON encoded attribute mapping list.
      */
     private function build_attribute_mapping_list($post) {
+        $coursefieldmapping = isset($post->coursefieldmapping) ? $post->coursefieldmapping : [];
+        $coursecustomfieldmapping = isset($post->coursecustomfieldmapping) ? $post->coursecustomfieldmapping : [];
+        $userfieldmapping = isset($post->userfieldmapping) ? $post->userfieldmapping : [];
+
         // Combine all the mappings into a single array. Expects empty arrays if no mappings are present.
-        $mergedmappings = array_merge($post->coursefieldmapping, $post->coursecustomfieldmapping, $post->userfieldmapping);
+        $mergedmappings = array_merge(
+            $coursefieldmapping,
+            $coursecustomfieldmapping,
+            $userfieldmapping
+        );
 
         if (empty($mergedmappings)) {
             return null;
