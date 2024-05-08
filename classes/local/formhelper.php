@@ -72,7 +72,7 @@ class formhelper {
     /**
      * Load course field options for dropdown selection.
      *
-     * This function retrieves all column names from the 'course' table in the database
+     * This function retrieves predefined valid course field names from the attributemapping class
      * and formats them as options for a select element.
      *
      * @return array Associative array of course field names suitable for form dropdown.
