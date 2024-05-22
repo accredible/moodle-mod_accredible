@@ -71,6 +71,126 @@ class accredible {
     }
 
     /**
+     * Loads custom attributes for a credential based on the attribute mappings stored in the 'accredible' object.
+     * This function processes the attribute mappings and retrieves values from various tables like course, custom fields, and user info fields.
+     *
+     * @param stdClass $accredible An object containing the 'accredible' record data including attribute mappings.
+     * @param int $userid The ID of the user for whom the credential is being loaded.
+     * @param stdClass|null $course Optional. The course object. If not provided, it will be fetched based on the course ID in the 'accredible' object.
+     * @return array An associative array of custom attributes where keys are the attribute names and values are the corresponding values from the database.
+     */
+    public function load_credential_custom_attributes($accredible, $userid, $course = null) {
+        $customattributes = [];
+        if (!isset($accredible->attributemapping) || empty($accredible->attributemapping)) {
+            return $customattributes;
+        }
+
+        $decodedmapping = json_decode($accredible->attributemapping);
+        foreach ($decodedmapping as $mapping) {
+            if (!isset($mapping->accredibleattribute) || empty($mapping->accredibleattribute)) {
+                continue;
+            }
+            if ($mapping->table === 'course' && !isset($mapping->field)) {
+                continue;
+            }
+            $idrequiredtables = ['customfield_field', 'user_info_field'];
+            if (in_array($mapping->table, $idrequiredtables) && !isset($mapping->id)) {
+                continue;
+            }
+            $value = null;
+            switch ($mapping->table) {
+                case 'course':
+                    $value = $this->load_course_field_value($mapping->field, $accredible->course, $course);
+                    break;
+                case 'customfield_field':
+                    $value = $this->load_customfield_field_value($mapping->id, $accredible->course);
+                    break;
+                case 'user_info_field':
+                    $value = $this->load_user_info_field_value($mapping->id, $userid);
+                    break;
+            }
+
+            if ($value !== null && $value !== '') {
+                $customattributes[$mapping->accredibleattribute] = $value;
+            }
+        }
+        return $customattributes;
+    }
+
+    /**
+     * Loads the value of a specified field from a course record.
+     * If the course object is not provided, it fetches the course record from the database using the course ID.
+     *
+     * @param string $field The name of the field to retrieve from the course record.
+     * @param int $courseid The ID of the course from which to retrieve the field value.
+     * @param stdClass|null $course Optional. The course object from which to retrieve the field value. If null, the course is fetched from the database.
+     * @return mixed|null Returns the value of the specified field if found, or null if the course or field is not found.
+     */
+    private function load_course_field_value($field, $courseid, $course = null) {
+        global $DB;
+
+        if (!$course) {
+            $course = $DB->get_record(
+                'course',
+                array('id' => $courseid),
+                '*',
+                IGNORE_MISSING
+            );
+        }
+        return $course ? $course->{$field} : null;
+    }
+
+     /**
+     * Loads the value of a specified custom field for a given course.
+     *
+     * This function retrieves the value of a custom field based on the field ID and the instance ID of the course.
+     * It queries the 'customfield_data' table to find the relevant data.
+     *
+     * @param int $customfieldfieldid The ID of the custom field.
+     * @param int $courseid The ID of the course instance.
+     * @return mixed|null Returns the value of the custom field if found, or null if not found.
+     */
+    private function load_customfield_field_value($customfieldfieldid, $courseid) {
+        global $DB;
+
+        $customfielddata = $DB->get_record(
+            'customfield_data',
+            array(
+                'fieldid' => $customfieldfieldid,
+                'instanceid' => $courseid
+            ),
+            '*',
+            IGNORE_MISSING
+        );
+        return $customfielddata ? $customfielddata->value : null;
+    }
+
+    /**
+     * Loads the value of a specified user info field for a given user.
+     *
+     * This function retrieves the value of a user info field based on the field ID and the user ID.
+     * It queries the 'user_info_data' table to find the relevant data.
+     *
+     * @param int $userinfofieldid The ID of the user info field.
+     * @param int $userid The ID of the user.
+     * @return mixed|null Returns the value of the user info field if found, or null if not found.
+     */
+    private function load_user_info_field_value($userinfofieldid, $userid) {
+        global $DB;
+
+        $userinfodata = $DB->get_record(
+            'user_info_data',
+            array(
+                'fieldid' => $userinfofieldid,
+                'userid' => $userid
+            ),
+            '*',
+            IGNORE_MISSING
+        );
+        return $userinfodata ? $userinfodata->data : null;
+    }
+
+    /**
      * Builds a JSON encoded attribute mapping list to be stored in the DB based on the provided post data.
      *
      * @param object $post The post data containing the course field mappings, course custom field mappings,

@@ -136,6 +136,171 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $this->assertEquals(1, $result);
     }
 
+
+    /**
+     * Test load_credential_custom_attributes method.
+     * @covers ::load_credential_custom_attributes
+     */
+    public function test_load_credential_custom_attributes() {
+        global $DB;
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_user();
+
+        // Insert custom field definition
+        $customfieldfield = new \stdClass();
+        $customfieldfield->shortname = 'testfield';
+        $customfieldfield->name = 'Test Field';
+        $customfieldfield->type = 'text';
+        $customfieldfield->timecreated = time();
+        $customfieldfield->timemodified = time();
+        $customfieldfieldid = $DB->insert_record('customfield_field', $customfieldfield);
+
+        // Insert custom field data
+        $customfielddata = new \stdClass();
+        $customfielddata->fieldid = $customfieldfieldid;
+        $customfielddata->instanceid = $course->id;
+        $customfielddata->value = 'Custom Value';
+        $customfielddata->valueformat = 1;
+        $customfielddata->timecreated = time();
+        $customfielddata->timemodified = time();
+        $customfielddataid = $DB->insert_record('customfield_data', $customfielddata);
+
+        // Insert user info field definition
+        $userinfofield = new \stdClass();
+        $userinfofield->shortname = 'birthday';
+        $userinfofield->name = 'Birthday';
+        $userinfofield->datatype = 'datetime';
+        $userinfofield->description = "<p dir=\"ltr\" style=\"text-align: left;\">Birthday<br></p>";
+        $userinfofield->descriptionformat = 1;
+        $userinfofield->datatype = 'datetime';
+        $userinfofield->sortorder = 1;
+        $userinfofield->required = 0;
+        $userinfofieldid = $DB->insert_record('user_info_field', $userinfofield);
+
+        // Insert user info data
+        $userinfodata = new \stdClass();
+        $userinfodata->fieldid = $userinfofieldid;
+        $userinfodata->userid = $user->id;
+        $userinfodata->data = '1707436800';
+        $userinfodata->dataformat = 0;
+        $DB->insert_record('user_info_data', $userinfodata);
+
+        // When saving a record with incompleted mappings.
+        $overrides = new \stdClass();
+        $overrides->course = $course->id;
+        $overrides->coursefieldmapping = [
+            [
+                'field' => 'fullname',
+                'accredibleattribute' => null
+            ]
+        ];
+        $overrides->coursecustomfieldmapping = [
+            [
+                'id' => $customfieldfieldid,
+                'accredibleattribute' => ''
+            ]
+        ];
+        $overrides->userfieldmapping = [
+            [
+                'id' => null,
+                'accredibleattribute' => 'Moodle User Profile Field'
+            ]
+        ];
+        $post = $this->generatePostObject($overrides);
+        $accredibleid = $this->accredible->save_record($post);
+        $accrediblerecord = $DB->get_record('accredible', ['id' => $accredibleid]);
+
+        $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
+        $this->assertEquals([], $result);
+
+        // When saving a record with course field mapping.
+        $overrides = new \stdClass();
+        $overrides->course = $course->id;
+        $overrides->coursefieldmapping = [
+            [
+                'field' => 'fullname',
+                'accredibleattribute' => 'Moodle Course Field'
+            ]
+        ];
+        $post = $this->generatePostObject($overrides);
+        $accredibleid = $this->accredible->save_record($post);
+        $accrediblerecord = $DB->get_record('accredible', ['id' => $accredibleid]);
+
+        $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
+        $this->assertEquals([
+            'Moodle Course Field' => $course->fullname
+        ], $result);
+
+        // When saving a record with course custom field mapping.
+        $overrides = new \stdClass();
+        $overrides->course = $course->id;
+        $overrides->coursecustomfieldmapping = [
+            [
+                'id' => $customfieldfieldid,
+                'accredibleattribute' => 'Moodle Course Custom Field'
+            ]
+        ];
+        $post = $this->generatePostObject($overrides);
+        $accredibleid = $this->accredible->save_record($post);
+        $accrediblerecord = $DB->get_record('accredible', ['id' => $accredibleid]);
+
+        $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
+        $this->assertEquals([
+            'Moodle Course Custom Field' => $customfielddata->value
+        ], $result);
+
+        // When saving a record with user info field mapping.
+        $overrides = new \stdClass();
+        $overrides->course = $course->id;
+        $overrides->userfieldmapping = [
+            [
+                'id' => $userinfofieldid,
+                'accredibleattribute' => 'Moodle User Profile Field'
+            ]
+        ];
+        $post = $this->generatePostObject($overrides);
+        $accredibleid = $this->accredible->save_record($post);
+        $accrediblerecord = $DB->get_record('accredible', ['id' => $accredibleid]);
+
+        $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
+        $this->assertEquals([
+            'Moodle User Profile Field' => $userinfodata->data
+        ], $result);
+
+        // When saving a record with all mapping fields.
+        $overrides = new \stdClass();
+        $overrides->course = $course->id;
+        $overrides->coursefieldmapping = [
+            [
+                'field' => 'fullname',
+                'accredibleattribute' => 'Moodle Course Field'
+            ]
+        ];
+        $overrides->coursecustomfieldmapping = [
+            [
+                'id' => $customfieldfieldid,
+                'accredibleattribute' => 'Moodle Course Custom Field'
+            ]
+        ];
+        $overrides->userfieldmapping = [
+            [
+                'id' => $userinfofieldid,
+                'accredibleattribute' => 'Moodle User Profile Field'
+            ]
+        ];
+        $post = $this->generatePostObject($overrides);
+        $accredibleid = $this->accredible->save_record($post);
+        $accrediblerecord = $DB->get_record('accredible', ['id' => $accredibleid]);
+
+        $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
+        $this->assertEquals([
+            'Moodle Course Field' => $course->fullname,
+            'Moodle Course Custom Field' => $customfielddata->value,
+            'Moodle User Profile Field' => $userinfodata->data
+        ], $result);
+    }
+
     /**
      * Generates a mock $post object for testing.
      *
