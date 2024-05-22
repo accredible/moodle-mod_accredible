@@ -223,7 +223,10 @@ function accredible_quiz_submission_handler($event) {
             if ( $record && ($record->finalquiz || $record->completionactivities) ) {
                 // Load user grade to attach in the credential.
                 $gradeattributes = $usersclient->get_user_grades($record, $user->id);
-                $customattributes = $usersclient->load_user_grade_as_custom_attributes($record, $gradeattributes, $user->id);
+                # later: refactor the attribute mapping generation into a class function.
+                $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($record, $gradeattributes, $user->id);
+                $additionalattributemapping = $accredible->load_credential_custom_attributes($record, $user->id);
+                $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
 
                 // Check if we have a group mapping - if not use the old logic.
                 if ($record->groupid) {
@@ -402,7 +405,10 @@ function accredible_course_completed_handler($event) {
             if ( $record && ($record->completionactivities && $record->completionactivities != 0) ) {
                 // Load user grade to attach in the credential.
                 $gradeattributes = $usersclient->get_user_grades($record, $user->id);
-                $customattributes = $usersclient->load_user_grade_as_custom_attributes($record, $gradeattributes, $user->id);
+                # later: refactor the attribute mapping generation into a class function.
+                $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($record, $gradeattributes, $user->id);
+                $additionalattributemapping = $accredible->load_credential_custom_attributes($record, $user->id);
+                $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
 
                 // Check if we have a group mapping - if not use the old logic.
                 if ($record->groupid) {
