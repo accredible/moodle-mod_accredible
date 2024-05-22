@@ -76,10 +76,9 @@ class accredible {
      *
      * @param stdClass $accredible An object containing the 'accredible' record data including attribute mappings.
      * @param int $userid The ID of the user for whom the credential is being loaded.
-     * @param stdClass|null $course Optional. The course object. If not provided, it will be fetched based on the course ID in the 'accredible' object.
      * @return array An associative array of custom attributes where keys are the attribute names and values are the corresponding values from the database.
      */
-    public function load_credential_custom_attributes($accredible, $userid, $course = null) {
+    public function load_credential_custom_attributes($accredible, $userid) {
         $customattributes = [];
         if (!isset($accredible->attributemapping) || empty($accredible->attributemapping)) {
             return $customattributes;
@@ -100,7 +99,7 @@ class accredible {
             $value = null;
             switch ($mapping->table) {
                 case 'course':
-                    $value = $this->load_course_field_value($mapping->field, $accredible->course, $course);
+                    $value = $this->load_course_field_value($mapping->field, $accredible->course);
                     break;
                 case 'customfield_field':
                     $value = $this->load_customfield_field_value($mapping->id, $accredible->course);
@@ -123,20 +122,17 @@ class accredible {
      *
      * @param string $field The name of the field to retrieve from the course record.
      * @param int $courseid The ID of the course from which to retrieve the field value.
-     * @param stdClass|null $course Optional. The course object from which to retrieve the field value. If null, the course is fetched from the database.
      * @return mixed|null Returns the value of the specified field if found, or null if the course or field is not found.
      */
-    private function load_course_field_value($field, $courseid, $course = null) {
+    private function load_course_field_value($field, $courseid) {
         global $DB;
 
-        if (!$course) {
-            $course = $DB->get_record(
-                'course',
-                array('id' => $courseid),
-                '*',
-                IGNORE_MISSING
-            );
-        }
+        $course = $DB->get_record(
+            'course',
+            array('id' => $courseid),
+            '*',
+            IGNORE_MISSING
+        );
         return $course ? $course->{$field} : null;
     }
 
