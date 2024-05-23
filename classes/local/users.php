@@ -180,7 +180,7 @@ class users {
         if (isset($grades) && isset($grades[$userid])) {
             $customattributes = array($accredible->gradeattributekeyname => $grades[$userid]);
         } else {
-            $customattributes = null;
+            $customattributes = [];
         }
         return $customattributes;
     }

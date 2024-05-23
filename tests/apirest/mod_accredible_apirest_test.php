@@ -910,7 +910,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // Expect to return resdata.
         $api = new apirest($mockclient1);
-        $result = $api->search_attribute_keys(20, 1);
+        $result = $api->search_attribute_keys(20, 1, 'text');
         $this->assertEquals($result, $resdata);
 
         // When the arguments are empty and the response is successful.
@@ -944,7 +944,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // Mock API response data.
         $resdata = $this->mockapi->resdata('unauthorized_error.json');
 
-        $reqdata = json_encode(array('page' => 1, 'page_size' => 10, 'kind' => 'text'));
+        $reqdata = json_encode(array('page' => 1, 'page_size' => 10, 'kind' => 'date'));
 
         // Expect to call the endpoint once with page and page_size.
         $mockclient3->expects($this->once())
@@ -955,7 +955,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // Expect to return resdata.
         $api = new apirest($mockclient3);
-        $result = $api->search_attribute_keys(10, 1);
+        $result = $api->search_attribute_keys(10, 1, 'date');
         $this->assertEquals($result, $resdata);
     }
 }

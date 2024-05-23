@@ -16,6 +16,8 @@
 
 namespace mod_accredible\local;
 
+use mod_accredible\local\attributemapping;
+
 /**
  * Defines local functions for handling interactions with the 'accredible' database table.
  *
@@ -133,7 +135,16 @@ class accredible {
             '*',
             IGNORE_MISSING
         );
-        return $course ? $course->{$field} : null;
+        if (!$course) {
+            return;
+        }
+
+        $value = $course->{$field};
+        if ((in_array($field, attributemapping::VALID_COURSE_DATE_FIELDS))) {
+            return $this->userdate($value);
+        } else {
+            return $value;
+        }
     }
 
      /**
@@ -158,7 +169,52 @@ class accredible {
             '*',
             IGNORE_MISSING
         );
-        return $customfielddata ? $customfielddata->value : null;
+        if (!$customfielddata) {
+            return null;
+        }
+
+        $value = $this->get_customfield_data_value($customfielddata);
+        if ($value === null || $value === '') {
+            return;
+        }
+
+        $customfield = $DB->get_record(
+            'customfield_field',
+            array('id' => $customfieldfieldid),
+            '*',
+            MUST_EXIST
+        );
+        if ($customfield->type === 'datetime') {
+            return $this->userdate($value);
+        } elseif ($customfield->type === 'textarea') {
+            return strip_tags($value);
+        } else {
+            return $value;
+        }
+    }
+
+    /**
+     * Retrieves the appropriate value from a custom field data object based on the data type.
+     * This function checks various fields (value, charvalue, shortcharvalue, decvalue, intvalue)
+     * to return the first non-null and non-empty value it finds.
+     *
+     * @param stdClass $customfielddata The custom field data object containing different possible value fields.
+     * @return mixed|null Returns the value of the custom field if found and not empty; otherwise, returns null.
+     */
+    public function get_customfield_data_value($customfielddata) {
+       if ($customfielddata->value !== null && $customfielddata->value !== '') {
+            return $customfielddata->value;
+        } elseif ($customfielddata->charvalue !== null && $customfielddata->charvalue !== '') {
+            return $customfielddata->charvalue;
+        } elseif ($customfielddata->shortcharvalue !== null && $customfielddata->shortcharvalue !== '') {
+            return $customfielddata->shortcharvalue;
+        } elseif ($customfielddata->decvalue !== null && $customfielddata->decvalue !== '') {
+            return $customfielddata->decvalue;
+        } elseif ($customfielddata->intvalue !== null && $customfielddata->intvalue !== '') {
+            return $customfielddata->intvalue;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -183,7 +239,34 @@ class accredible {
             '*',
             IGNORE_MISSING
         );
-        return $userinfodata ? $userinfodata->data : null;
+        if (!$userinfodata) {
+            return null;
+        }
+
+        $userinfofield = $DB->get_record(
+            'user_info_field',
+            array('id' => $userinfofieldid),
+            '*',
+            MUST_EXIST
+        );
+        if ($userinfofield->datatype === 'datetime') {
+            return $this->userdate($userinfodata->data);
+        } elseif ($userinfofield->datatype === 'textarea') {
+            return strip_tags($userinfodata->data);
+        } else {
+            return $userinfodata->data;
+        }
+    }
+
+    /**
+     * Formats a timestamp into a human-readable date string based on the site's locale settings.
+     *
+     * @param int $value The timestamp to be formatted.
+     * @return string The formatted date string.
+     */
+    private function userdate($value) {
+        $accredibledateformat = '%Y-%m-%d';
+        return userdate($value, $accredibledateformat);
     }
 
     /**
@@ -202,11 +285,11 @@ class accredible {
             'customfield_field',
             isset($post->coursecustomfieldmapping) ? $post->coursecustomfieldmapping : []
         );
-        $userfieldmapping = $this->parse_attributemapping(
+        $userprofilefieldmapping = $this->parse_attributemapping(
             'user_info_field',
-            isset($post->userfieldmapping) ? $post->userfieldmapping : []
+            isset($post->userprofilefieldmapping) ? $post->userprofilefieldmapping : []
         );
-        $mergedmappings = array_merge($coursefieldmapping, $coursecustomfieldmapping, $userfieldmapping);
+        $mergedmappings = array_merge($coursefieldmapping, $coursecustomfieldmapping, $userprofilefieldmapping);
         if (empty($mergedmappings)) {
             return null;
         }

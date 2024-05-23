@@ -150,20 +150,20 @@ class formhelper {
             switch ($mapping->table) {
                 case 'course':
                     $defaultvalues['coursefieldmapping'][] = [
-                        'field' => $mapping->field,
-                        'accredibleattribute' => $mapping->accredibleattribute
+                        'field' => isset($mapping->field) ? $mapping->field : '',
+                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : ''
                     ];
                     break;
                 case 'customfield_field':
                     $defaultvalues['coursecustomfieldmapping'][] = [
-                        'id' => $mapping->id,
-                        'accredibleattribute' => $mapping->accredibleattribute
+                        'id' => isset($mapping->id) ? $mapping->id : '',
+                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : ''
                     ];
                     break;
                 case 'user_info_field':
                     $defaultvalues['userprofilefieldmapping'][] = [
-                        'id' => $mapping->id,
-                        'accredibleattribute' => $mapping->accredibleattribute
+                        'id' => isset($mapping->id) ? $mapping->id : '',
+                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : ''
                     ];
                     break;
             }
