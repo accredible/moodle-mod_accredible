@@ -145,11 +145,11 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         global $DB;
 
         $course = $this->getDataGenerator()->create_course(
-            array('startdate'=>1707436800)
+            array('startdate' => 1707436800)
         );
         $user = $this->getDataGenerator()->create_user();
 
-        // Insert custom field definition
+        // Insert custom field definition.
         $customfieldfield = new \stdClass();
         $customfieldfield->shortname = 'testfield';
         $customfieldfield->name = 'Test Field';
@@ -158,7 +158,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $customfieldfield->timemodified = time();
         $customfieldfieldid = $DB->insert_record('customfield_field', $customfieldfield);
 
-        // Insert custom field data
+        // Insert custom field data.
         $customfielddata = new \stdClass();
         $customfielddata->fieldid = $customfieldfieldid;
         $customfielddata->instanceid = $course->id;
@@ -168,7 +168,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $customfielddata->timemodified = time();
         $customfielddataid = $DB->insert_record('customfield_data', $customfielddata);
 
-        // Insert user info field definition
+        // Insert user info field definition.
         $userinfofield = new \stdClass();
         $userinfofield->shortname = 'birthday';
         $userinfofield->name = 'Birthday';
@@ -180,7 +180,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $userinfofield->required = 0;
         $userinfofieldid = $DB->insert_record('user_info_field', $userinfofield);
 
-        // Insert user info data
+        // Insert user info data.
         $userinfodata = new \stdClass();
         $userinfodata->fieldid = $userinfofieldid;
         $userinfodata->userid = $user->id;
@@ -249,7 +249,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
         $this->assertEquals([
-            'Moodle Course Field' => '2024-02-09'
+            'Moodle Course Field' => userdate('1707436800', '%Y-%m-%d')
         ], $result);
 
         // When saving a record with a course custom field mapping (textarea).
@@ -271,30 +271,30 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         ], $result);
 
         // When saving a record with a course custom field mapping (datetime).
-        // Insert custom field definition
-        $customfieldfield_date = new \stdClass();
-        $customfieldfield_date->shortname = 'testfield';
-        $customfieldfield_date->name = 'Test Field';
-        $customfieldfield_date->type = 'datetime';
-        $customfieldfield_date->timecreated = time();
-        $customfieldfield_date->timemodified = time();
-        $customfieldfieldid_date = $DB->insert_record('customfield_field', $customfieldfield_date);
+        // Insert custom field definition.
+        $customfieldfielddate = new \stdClass();
+        $customfieldfielddate->shortname = 'testfield';
+        $customfieldfielddate->name = 'Test Field';
+        $customfieldfielddate->type = 'datetime';
+        $customfieldfielddate->timecreated = time();
+        $customfieldfielddate->timemodified = time();
+        $customfieldfieldiddate = $DB->insert_record('customfield_field', $customfieldfielddate);
 
-        // Insert custom field data
-        $customfielddata_date = new \stdClass();
-        $customfielddata_date->fieldid = $customfieldfieldid_date;
-        $customfielddata_date->instanceid = $course->id;
-        $customfielddata_date->value = '1707436800';
-        $customfielddata_date->valueformat = 0;
-        $customfielddata_date->timecreated = time();
-        $customfielddata_date->timemodified = time();
-        $customfielddataid_date = $DB->insert_record('customfield_data', $customfielddata_date);
+        // Insert custom field data.
+        $customfielddatadate = new \stdClass();
+        $customfielddatadate->fieldid = $customfieldfieldiddate;
+        $customfielddatadate->instanceid = $course->id;
+        $customfielddatadate->value = '1707436800';
+        $customfielddatadate->valueformat = 0;
+        $customfielddatadate->timecreated = time();
+        $customfielddatadate->timemodified = time();
+        $customfielddataiddate = $DB->insert_record('customfield_data', $customfielddatadate);
 
         $overrides = new \stdClass();
         $overrides->course = $course->id;
         $overrides->coursecustomfieldmapping = [
             [
-                'id' => $customfieldfieldid_date,
+                'id' => $customfieldfieldiddate,
                 'accredibleattribute' => 'Moodle Course Custom Field'
             ]
         ];
@@ -304,7 +304,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
         $this->assertEquals([
-            'Moodle Course Custom Field' => '2024-02-09'
+            'Moodle Course Custom Field' => userdate('1707436800', '%Y-%m-%d')
         ], $result);
 
         // When saving a record with user info field mapping (datetime).
@@ -322,35 +322,35 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
         $this->assertEquals([
-            'Moodle User Profile Field' => '2024-02-09'
+            'Moodle User Profile Field' => userdate('1707436800', '%Y-%m-%d')
         ], $result);
 
         // When saving a record with user info field mapping (textarea).
-        // Insert user info field definition
-        $userinfofield_text = new \stdClass();
-        $userinfofield_text->shortname = 'sometext';
-        $userinfofield_text->name = 'Some text';
-        $userinfofield_text->datatype = 'datetime';
-        $userinfofield_text->description = "<p dir=\"ltr\" style=\"text-align: left;\">Birthday<br></p>";
-        $userinfofield_text->descriptionformat = 1;
-        $userinfofield_text->datatype = 'textarea';
-        $userinfofield_text->sortorder = 1;
-        $userinfofield_text->required = 0;
-        $userinfofieldid_text = $DB->insert_record('user_info_field', $userinfofield_text);
+        // Insert user info field definition.
+        $userinfofieldtext = new \stdClass();
+        $userinfofieldtext->shortname = 'sometext';
+        $userinfofieldtext->name = 'Some text';
+        $userinfofieldtext->datatype = 'datetime';
+        $userinfofieldtext->description = "<p dir=\"ltr\" style=\"text-align: left;\">Birthday<br></p>";
+        $userinfofieldtext->descriptionformat = 1;
+        $userinfofieldtext->datatype = 'textarea';
+        $userinfofieldtext->sortorder = 1;
+        $userinfofieldtext->required = 0;
+        $userinfofieldidtext = $DB->insert_record('user_info_field', $userinfofieldtext);
 
-        // Insert user info data
-        $userinfodata_text = new \stdClass();
-        $userinfodata_text->fieldid = $userinfofieldid_text;
-        $userinfodata_text->userid = $user->id;
-        $userinfodata_text->data = '<p dir=\"ltr\" style=\"text-align: left;\">huga huga</p>';
-        $userinfodata_text->dataformat = 1;
-        $DB->insert_record('user_info_data', $userinfodata_text);
+        // Insert user info data.
+        $userinfodatatext = new \stdClass();
+        $userinfodatatext->fieldid = $userinfofieldidtext;
+        $userinfodatatext->userid = $user->id;
+        $userinfodatatext->data = '<p dir=\"ltr\" style=\"text-align: left;\">huga huga</p>';
+        $userinfodatatext->dataformat = 1;
+        $DB->insert_record('user_info_data', $userinfodatatext);
 
         $overrides = new \stdClass();
         $overrides->course = $course->id;
         $overrides->userprofilefieldmapping = [
             [
-                'id' => $userinfofieldid_text,
+                'id' => $userinfofieldidtext,
                 'accredibleattribute' => 'Moodle User Profile Field'
             ]
         ];
@@ -392,7 +392,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $this->assertEquals([
             'Moodle Course Field' => $course->fullname,
             'Moodle Course Custom Field' => 'hoge hoge',
-            'Moodle User Profile Field' => '2024-02-09'
+            'Moodle User Profile Field' => userdate('1707436800', '%Y-%m-%d')
         ], $result);
     }
 

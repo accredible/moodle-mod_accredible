@@ -74,11 +74,10 @@ class accredible {
 
     /**
      * Loads custom attributes for a credential based on the attribute mappings stored in the 'accredible' object.
-     * This function processes the attribute mappings and retrieves values from various tables like course, custom fields, and user info fields.
      *
      * @param stdClass $accredible An object containing the 'accredible' record data including attribute mappings.
      * @param int $userid The ID of the user for whom the credential is being loaded.
-     * @return array An associative array of custom attributes where keys are the attribute names and values are the corresponding values from the database.
+     * @return array An associative array of custom attributes for an Accredible credential.
      */
     public function load_credential_custom_attributes($accredible, $userid) {
         $customattributes = [];
@@ -147,7 +146,7 @@ class accredible {
         }
     }
 
-     /**
+    /**
      * Loads the value of a specified custom field for a given course.
      *
      * This function retrieves the value of a custom field based on the field ID and the instance ID of the course.
@@ -186,7 +185,7 @@ class accredible {
         );
         if ($customfield->type === 'datetime') {
             return $this->userdate($value);
-        } elseif ($customfield->type === 'textarea') {
+        } else if ($customfield->type === 'textarea') {
             return strip_tags($value);
         } else {
             return $value;
@@ -227,7 +226,7 @@ class accredible {
         );
         if ($userinfofield->datatype === 'datetime') {
             return $this->userdate($userinfodata->data);
-        } elseif ($userinfofield->datatype === 'textarea') {
+        } else if ($userinfofield->datatype === 'textarea') {
             return strip_tags($userinfodata->data);
         } else {
             return $userinfodata->data;

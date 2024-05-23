@@ -342,7 +342,13 @@ class mod_accredible_mod_form extends moodleform_mod {
             $attributekeyschoices,
             $inputstyle
         );
-        $this->set_mapping_field_default($mform, $attributemappingdefaultvalues, 'coursecustomfieldmapping', 'accredibleattribute', 0);
+        $this->set_mapping_field_default(
+            $mform,
+            $attributemappingdefaultvalues,
+            'coursecustomfieldmapping',
+            'accredibleattribute',
+            0
+        );
 
         // Attribute mapping: user profile fields.
         $mform->addElement('header',
@@ -365,12 +371,28 @@ class mod_accredible_mod_form extends moodleform_mod {
             $attributekeyschoices,
             $inputstyle
         );
-        $this->set_mapping_field_default($mform, $attributemappingdefaultvalues, 'userprofilefieldmapping', 'accredibleattribute', 0);
+        $this->set_mapping_field_default(
+            $mform,
+            $attributemappingdefaultvalues,
+            'userprofilefieldmapping',
+            'accredibleattribute',
+            0
+        );
 
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
     }
 
+
+    /**
+     * Sets the default value for a mapping field in the form.
+     *
+     * @param MoodleQuickForm $mform The form instance to modify.
+     * @param array $defaultvalues The default values for the form fields.
+     * @param string $mappingname The name of the mapping field.
+     * @param string $fieldname The specific field within the mapping to set.
+     * @param int $num The index of the field in case of multiple fields with the same name.
+     */
     private function set_mapping_field_default($mform, $defaultvalues, $mappingname, $fieldname, $num = 0) {
         $value = '';
         if (isset($defaultvalues[$mappingname][$num][$fieldname])) {

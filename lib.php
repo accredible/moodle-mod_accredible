@@ -71,7 +71,7 @@ function accredible_add_instance($post) {
             if ($issuecertificate) {
                 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
 
-                # later: refactor the attribute mapping generation into a class function.
+                // Later: refactor the attribute mapping generation into a class function.
                 $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
                 $additionalattributemapping = $accredible->load_credential_custom_attributes($record, $userid);
                 $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
@@ -153,7 +153,7 @@ function accredible_update_instance($post) {
                 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
                 $completedtimestamp = accredible_manual_issue_completion_timestamp($existingrecord, $user);
                 $completeddate = date('Y-m-d', (int) $completedtimestamp);
-                # later: refactor the attribute mapping generation into a class function.
+                // Later: refactor the attribute mapping generation into a class function.
                 $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
                 $additionalattributemapping = $accredible->load_credential_custom_attributes($existingrecord, $userid);
                 $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
@@ -211,7 +211,7 @@ function accredible_update_instance($post) {
                 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
                 $completedtimestamp = accredible_manual_issue_completion_timestamp($existingrecord, $user);
                 $completeddate = date('Y-m-d', (int) $completedtimestamp);
-                # later: refactor the attribute mapping generation into a class function.
+                // Later: refactor the attribute mapping generation into a class function.
                 $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
                 $additionalattributemapping = $accredible->load_credential_custom_attributes($existingrecord, $userid);
                 $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
