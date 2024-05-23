@@ -173,7 +173,7 @@ class accredible {
             return null;
         }
 
-        $value = $this->get_customfield_data_value($customfielddata);
+        $value = $customfielddata->value;
         if ($value === null || $value === '') {
             return;
         }
@@ -190,30 +190,6 @@ class accredible {
             return strip_tags($value);
         } else {
             return $value;
-        }
-    }
-
-    /**
-     * Retrieves the appropriate value from a custom field data object based on the data type.
-     * This function checks various fields (value, charvalue, shortcharvalue, decvalue, intvalue)
-     * to return the first non-null and non-empty value it finds.
-     *
-     * @param stdClass $customfielddata The custom field data object containing different possible value fields.
-     * @return mixed|null Returns the value of the custom field if found and not empty; otherwise, returns null.
-     */
-    public function get_customfield_data_value($customfielddata) {
-       if ($customfielddata->value !== null && $customfielddata->value !== '') {
-            return $customfielddata->value;
-        } elseif ($customfielddata->charvalue !== null && $customfielddata->charvalue !== '') {
-            return $customfielddata->charvalue;
-        } elseif ($customfielddata->shortcharvalue !== null && $customfielddata->shortcharvalue !== '') {
-            return $customfielddata->shortcharvalue;
-        } elseif ($customfielddata->decvalue !== null && $customfielddata->decvalue !== '') {
-            return $customfielddata->decvalue;
-        } elseif ($customfielddata->intvalue !== null && $customfielddata->intvalue !== '') {
-            return $customfielddata->intvalue;
-        } else {
-            return null;
         }
     }
 
