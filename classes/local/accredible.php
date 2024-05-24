@@ -140,7 +140,7 @@ class accredible {
 
         $value = $course->{$field};
         if ((in_array($field, attributemapping::VALID_COURSE_DATE_FIELDS))) {
-            return $this->userdate($value);
+            return $this->date($value);
         } else {
             return $value;
         }
@@ -184,7 +184,7 @@ class accredible {
             MUST_EXIST
         );
         if ($customfield->type === 'datetime') {
-            return $this->userdate($value);
+            return $this->date($value);
         } else if ($customfield->type === 'textarea') {
             return strip_tags($value);
         } else {
@@ -225,7 +225,7 @@ class accredible {
             MUST_EXIST
         );
         if ($userinfofield->datatype === 'datetime') {
-            return $this->userdate($userinfodata->data);
+            return $this->date($userinfodata->data);
         } else if ($userinfofield->datatype === 'textarea') {
             return strip_tags($userinfodata->data);
         } else {
@@ -239,9 +239,12 @@ class accredible {
      * @param int $value The timestamp to be formatted.
      * @return string The formatted date string.
      */
-    private function userdate($value) {
-        $accredibledateformat = '%Y-%m-%d';
-        return userdate($value, $accredibledateformat);
+    private function date($value) {
+        if ($value === null || $value === '') {
+            return;
+        }
+        $accredibledateformat = 'Y-m-d';
+        return date($accredibledateformat, $value);
     }
 
     /**

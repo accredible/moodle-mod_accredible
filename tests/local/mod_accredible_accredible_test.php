@@ -249,7 +249,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
         $this->assertEquals([
-            'Moodle Course Field' => userdate('1707436800', '%Y-%m-%d')
+            'Moodle Course Field' => '2024-02-09'
         ], $result);
 
         // When saving a record with a course custom field mapping (textarea).
@@ -304,7 +304,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
         $this->assertEquals([
-            'Moodle Course Custom Field' => userdate('1707436800', '%Y-%m-%d')
+            'Moodle Course Custom Field' => '2024-02-09'
         ], $result);
 
         // When saving a record with user info field mapping (datetime).
@@ -322,7 +322,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
         $this->assertEquals([
-            'Moodle User Profile Field' => userdate('1707436800', '%Y-%m-%d')
+            'Moodle User Profile Field' => '2024-02-09'
         ], $result);
 
         // When saving a record with user info field mapping (textarea).
@@ -392,7 +392,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $this->assertEquals([
             'Moodle Course Field' => $course->fullname,
             'Moodle Course Custom Field' => 'hoge hoge',
-            'Moodle User Profile Field' => userdate('1707436800', '%Y-%m-%d')
+            'Moodle User Profile Field' => '2024-02-09'
         ], $result);
     }
 
