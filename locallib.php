@@ -31,6 +31,7 @@ use mod_accredible\Html2Text\Html2Text;
 use mod_accredible\local\credentials;
 use mod_accredible\local\evidenceitems;
 use mod_accredible\local\users;
+use mod_accredible\local\accredible;
 
 /**
  * Checks if a user has earned a specific credential according to the activity settings
@@ -212,6 +213,7 @@ function accredible_quiz_submission_handler($event) {
     $api = new apirest();
     $localcredentials = new credentials();
     $usersclient = new users();
+    $accredible = new accredible();
 
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
 
@@ -395,6 +397,7 @@ function accredible_course_completed_handler($event) {
 
     $localcredentials = new credentials();
     $usersclient = new users();
+    $accredible = new accredible();
 
     $user = $DB->get_record('user', array('id' => $event->relateduserid));
 
