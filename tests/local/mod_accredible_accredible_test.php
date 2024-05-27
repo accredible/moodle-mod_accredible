@@ -275,7 +275,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $customfieldfielddate = new \stdClass();
         $customfieldfielddate->shortname = 'testfield';
         $customfieldfielddate->name = 'Test Field';
-        $customfieldfielddate->type = 'datetime';
+        $customfieldfielddate->type = 'date';
         $customfieldfielddate->timecreated = time();
         $customfieldfielddate->timemodified = time();
         $customfieldfieldiddate = $DB->insert_record('customfield_field', $customfieldfielddate);

@@ -183,7 +183,7 @@ class accredible {
             '*',
             MUST_EXIST
         );
-        if ($customfield->type === 'datetime') {
+        if ($customfield->type === 'date') {
             return $this->date($value);
         } else if ($customfield->type === 'textarea') {
             return strip_tags($value);
