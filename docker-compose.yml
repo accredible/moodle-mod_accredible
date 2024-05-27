@@ -31,13 +31,11 @@ services:
   phpmyadmin:
     image: bitnami/phpmyadmin
     ports:
-      - "8081:80"
-    links:
-      - mariadb:database
+      - "8081:8080"
     depends_on:
       - mariadb
     environment:
-      PMA_HOST: database
+      PMA_HOST: mariadb
 
 volumes:
   moodle_data:

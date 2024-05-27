@@ -139,7 +139,7 @@ class accredible {
         }
 
         $value = $course->{$field};
-        if ((in_array($field, attributemapping::VALID_COURSE_DATE_FIELDS))) {
+        if (in_array($field, attributemapping::VALID_COURSE_DATE_FIELDS)) {
             return $this->date($value);
         } else {
             return $value;
@@ -183,7 +183,7 @@ class accredible {
             '*',
             MUST_EXIST
         );
-        if ($customfield->type === 'datetime') {
+        if ($customfield->type === 'date') {
             return $this->date($value);
         } else if ($customfield->type === 'textarea') {
             return strip_tags($value);
