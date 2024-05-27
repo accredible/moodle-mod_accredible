@@ -139,7 +139,7 @@ class accredible {
         }
 
         $value = $course->{$field};
-        if ((in_array($field, attributemapping::VALID_COURSE_DATE_FIELDS))) {
+        if (in_array($field, attributemapping::VALID_COURSE_DATE_FIELDS)) {
             return $this->date($value);
         } else {
             return $value;
