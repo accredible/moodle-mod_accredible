@@ -47,7 +47,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         global $DB;
 
         // When creating a new record.
-        $post = $this->generatePostObject();
+        $post = $this->generatepostobject();
 
         // Set up the expectation for the insert_record method.
         $DB = $this->createMock(\moodle_database::class);
@@ -63,7 +63,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $overrides = new \stdClass();
         $overrides->name = 'Updated Certificate';
         $overrides->instance = 1;
-        $post = $this->generatePostObject($overrides);
+        $post = $this->generatepostobject($overrides);
 
         $accrediblecertificate = new \stdClass();
         $accrediblecertificate->achievementid = null;
@@ -83,7 +83,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $overrides->coursefieldmapping = [];
         $overrides->coursecustomfieldmapping = [];
         $overrides->userprofilefieldmapping = [];
-        $post = $this->generatePostObject($overrides);
+        $post = $this->generatepostobject($overrides);
 
         $DB = $this->createMock(\moodle_database::class);
         $DB->expects($this->once())
@@ -118,7 +118,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
                 'accredibleattribute' => 'Moodle User Profile Field'
             ]
         ];
-        $post = $this->generatePostObject($overrides);
+        $post = $this->generatepostobject($overrides);
 
         $DB = $this->createMock(\moodle_database::class);
         $DB->expects($this->once())
@@ -209,7 +209,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
                 'accredibleattribute' => 'Moodle User Profile Field'
             ]
         ];
-        $post = $this->generatePostObject($overrides);
+        $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
         $accrediblerecord = $DB->get_record('accredible', ['id' => $accredibleid]);
 
@@ -225,7 +225,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
                 'accredibleattribute' => 'Moodle Course Field'
             ]
         ];
-        $post = $this->generatePostObject($overrides);
+        $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
         $accrediblerecord = $DB->get_record('accredible', ['id' => $accredibleid]);
 
@@ -243,7 +243,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
                 'accredibleattribute' => 'Moodle Course Field'
             ]
         ];
-        $post = $this->generatePostObject($overrides);
+        $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
         $accrediblerecord = $DB->get_record('accredible', ['id' => $accredibleid]);
 
@@ -261,7 +261,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
                 'accredibleattribute' => 'Moodle Course Custom Field'
             ]
         ];
-        $post = $this->generatePostObject($overrides);
+        $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
         $accrediblerecord = $DB->get_record('accredible', ['id' => $accredibleid]);
 
@@ -298,7 +298,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
                 'accredibleattribute' => 'Moodle Course Custom Field'
             ]
         ];
-        $post = $this->generatePostObject($overrides);
+        $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
         $accrediblerecord = $DB->get_record('accredible', ['id' => $accredibleid]);
 
@@ -316,7 +316,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
                 'accredibleattribute' => 'Moodle User Profile Field'
             ]
         ];
-        $post = $this->generatePostObject($overrides);
+        $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
         $accrediblerecord = $DB->get_record('accredible', ['id' => $accredibleid]);
 
@@ -354,7 +354,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
                 'accredibleattribute' => 'Moodle User Profile Field'
             ]
         ];
-        $post = $this->generatePostObject($overrides);
+        $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
         $accrediblerecord = $DB->get_record('accredible', ['id' => $accredibleid]);
 
@@ -384,7 +384,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
                 'accredibleattribute' => 'Moodle User Profile Field'
             ]
         ];
-        $post = $this->generatePostObject($overrides);
+        $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
         $accrediblerecord = $DB->get_record('accredible', ['id' => $accredibleid]);
 
@@ -410,6 +410,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
             'finalquiz' => 5,
             'passinggrade' => 70,
             'completionactivities' => null,
+            'finalgradetopass' => 0,
             'includegradeattribute' => 1,
             'gradeattributegradeitemid' => 10,
             'gradeattributekeyname' => 'Final Grade',
