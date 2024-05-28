@@ -51,25 +51,30 @@ function accredible_add_instance($post) {
     $usersclient = new users();
     $accredible = new accredible();
 
-    // Load grade attributes for users who will get a credential issued if need to be added.
-    $userids = array();
-    foreach ($post->users as $userid => $issuecertificate) {
-        if ($issuecertificate) {
-            $userids[] = $userid;
-        }
-    }
-    $gradeattributes = $usersclient->get_user_grades($post, $userids);
+    $recordid = $accredible->save_record($post);
 
     // Issue certs.
     if ( isset($post->users) ) {
+        $record = $DB->get_record('accredible', ['id' => $recordid], '*', MUST_EXIST);
+        // Load grade attributes for users who will get a credential issued if need to be added.
+        $userids = array();
+        foreach ($post->users as $userid => $issuecertificate) {
+            if ($issuecertificate) {
+                $userids[] = $userid;
+            }
+        }
+        $gradeattributes = $usersclient->get_user_grades($post, $userids);
+
         // Checklist array from the form comes in the format:
         // Int userid => boolean issuecertificate.
         foreach ($post->users as $userid => $issuecertificate) {
             if ($issuecertificate) {
                 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
 
-                $customattributes = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
-
+                // Later: refactor the attribute mapping generation into a class function.
+                $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
+                $additionalattributemapping = $accredible->load_credential_custom_attributes($record, $userid);
+                $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
                 $credential = $localcredentials->create_credential($user, $post->groupid, null, $customattributes);
 
                 if ($credential) {
@@ -95,7 +100,7 @@ function accredible_add_instance($post) {
         }
     }
 
-    return $accredible->save_record($post);
+    return $recordid;
 }
 
 /**
@@ -148,7 +153,10 @@ function accredible_update_instance($post) {
                 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
                 $completedtimestamp = accredible_manual_issue_completion_timestamp($existingrecord, $user);
                 $completeddate = date('Y-m-d', (int) $completedtimestamp);
-                $customattributes = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
+                // Later: refactor the attribute mapping generation into a class function.
+                $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
+                $additionalattributemapping = $accredible->load_credential_custom_attributes($existingrecord, $userid);
+                $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
                 if ($existingrecord->groupid) {
                     // Create the credential.
                     $credential = $localcredentials->create_credential($user, $groupid, $completeddate, $customattributes);
@@ -203,7 +211,10 @@ function accredible_update_instance($post) {
                 $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
                 $completedtimestamp = accredible_manual_issue_completion_timestamp($existingrecord, $user);
                 $completeddate = date('Y-m-d', (int) $completedtimestamp);
-                $customattributes = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
+                // Later: refactor the attribute mapping generation into a class function.
+                $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
+                $additionalattributemapping = $accredible->load_credential_custom_attributes($existingrecord, $userid);
+                $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
                 if ($existingrecord->achievementid) {
 
                     $courseurl = new moodle_url('/course/view.php', array('id' => $post->course));

@@ -32,6 +32,12 @@ class attributemapping {
     const VALID_COURSE_FIELDS = ["fullname", "shortname", "startdate", "enddate"];
 
     /**
+     * List of valid date fields for the 'course' table that can be used for mapping.
+     * @var string[]
+     */
+    const VALID_COURSE_DATE_FIELDS = ["startdate", "enddate"];
+
+    /**
      * The name of the table (must be one of 'course', 'user_info_field', 'customfield_field')
      * @var string table
      */

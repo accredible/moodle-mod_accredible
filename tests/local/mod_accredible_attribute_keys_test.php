@@ -139,5 +139,30 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
         $localattributekeys = new attribute_keys($api);
         $result = $localattributekeys->get_attribute_keys();
         $this->assertEquals($result, array());
+
+        // When apirest returns attribute keys for the given kind.
+        $mockclient4 = $this->getMockBuilder('client')
+            ->setMethods(['post'])
+            ->getMock();
+
+        $reqdata1 = json_encode(array('page' => 1, 'page_size' => 50, 'kind' => 'date'));
+        $reqdata2 = json_encode(array('page' => 2, 'page_size' => 50, 'kind' => 'date'));
+
+        $mockclient4->expects($this->exactly(2))
+            ->method('post')
+            ->withConsecutive([$this->equalTo($url), $this->equalTo($reqdata1)], [$this->equalTo($url), $this->equalTo($reqdata2)])
+            ->will($this->onConsecutiveCalls($resdata1, $resdata2));
+
+        // Expect to return attribute keys.
+        $api = new apirest($mockclient4);
+        $localattributekeys = new attribute_keys($api);
+        $result = $localattributekeys->get_attribute_keys('date');
+        $this->assertEquals($result, array(
+            'Custom Attribute Key 1' => 'Custom Attribute Key 1',
+            'Custom Attribute Key 2' => 'Custom Attribute Key 2',
+            'Custom Attribute Key 3' => 'Custom Attribute Key 3',
+            'Custom Attribute Key 4' => 'Custom Attribute Key 4'
+        ));
+
     }
 }
