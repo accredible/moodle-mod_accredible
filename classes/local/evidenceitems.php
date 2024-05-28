@@ -106,7 +106,7 @@ class evidenceitems {
                         $questionsoutput .= "<div id='main'>";
                         $questionsoutput .= "<h1>" . $quiz->name . "</h1>";
                         $questionsoutput .= "<h5>Time Taken: ".
-                            seconds_to_str( current($questions)->timefinish - current($questions)->timestart ) ."</h5>";
+                            $this->seconds_to_str( current($questions)->timefinish - current($questions)->timestart ) ."</h5>";
 
                         foreach ($questions as $questionattempt) {
                             $questionsoutput .= $questionattempt->question;
@@ -154,5 +154,33 @@ class evidenceitems {
                 $this->apirest->create_evidence_item_duration($enrolmenttimestamp, $completedtimestamp, $credentialid, true);
             }
         }
+    }
+
+    /**
+     * Convert number of seconds in a string
+     *
+     * @param int $seconds
+     * @return string
+     */
+    private function seconds_to_str($seconds) {
+        $hours = floor(($seconds %= 86400) / 3600);
+        if ($hours) {
+            return $hours . ' hour' . $this->number_ending($hours);
+        }
+        $minutes = floor(($seconds %= 3600) / 60);
+        if ($minutes) {
+            return $minutes . ' minute' . $this->number_ending($minutes);
+        }
+        return $seconds . ' second' . $this->number_ending($seconds);
+    }
+
+    /**
+     * Return 's' when number is bigger than 1
+     *
+     * @param int $number
+     * @return string
+     */
+    private function number_ending($number) {
+        return ($number > 1) ? 's' : '';
     }
 }

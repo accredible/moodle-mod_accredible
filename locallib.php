@@ -563,30 +563,3 @@ function accredible_manual_issue_completion_timestamp($accrediblerecord, $user) 
     return (int) $completedtimestamp;
 }
 
-/**
- * Return 's' when number is bigger than 1
- *
- * @param int $number
- * @return string
- */
-function number_ending ($number) {
-    return ($number > 1) ? 's' : '';
-}
-
-/**
- * Convert number of seconds in a string
- *
- * @param int $seconds
- * @return string
- */
-function seconds_to_str ($seconds) {
-    $hours = floor(($seconds %= 86400) / 3600);
-    if ($hours) {
-        return $hours . ' hour' . number_ending($hours);
-    }
-    $minutes = floor(($seconds %= 3600) / 60);
-    if ($minutes) {
-        return $minutes . ' minute' . number_ending($minutes);
-    }
-    return $seconds . ' second' . number_ending($seconds);
-}
