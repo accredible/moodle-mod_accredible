@@ -184,4 +184,43 @@ class users {
         }
         return $customattributes;
     }
+
+    /**
+     * Fetches the final course grade for a specific user.
+     *
+     * @param int $userid The ID of the user.
+     * @param int $courseid The ID of the course.
+     * @return stdClass|null The grade record if found, otherwise null.
+     */
+    public function get_course_grade($userid, $courseid) {
+        global $DB;
+
+        $coursegradeitem = $DB->get_record(
+            'grade_items',
+            array(
+                'courseid' => $courseid,
+                'itemtype' => 'course'
+            ),
+            'id',
+            IGNORE_MULTIPLE
+        );
+        if (!$coursegradeitem) {
+            return null;
+        }
+
+        $coursegrade = $DB->get_record(
+            'grade_grades',
+            array(
+                'itemid' => $coursegradeitem->id,
+                'userid' => $userid
+            ),
+            '*',
+            IGNORE_MULTIPLE
+        );
+        if (!$coursegrade) {
+            return null;
+        }
+
+        return $coursegrade;
+    }
 }

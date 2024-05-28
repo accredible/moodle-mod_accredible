@@ -323,6 +323,44 @@ class mod_accredible_users_test extends \advanced_testcase {
     }
 
     /**
+     * Test the get_course_grade method.
+     * @covers ::get_course_grade
+     */
+    public function test_get_course_grade() {
+        global $DB;
+
+        $userhelper = new users();
+        $user = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+
+        // Case: No grade item exists for the course.
+        $result = $userhelper->get_course_grade($user->id, $course->id);
+        $this->assertNull($result);
+
+        // Setup a grade item for the course.
+        $gradeitem = new \stdClass();
+        $gradeitem->courseid = $course->id;
+        $gradeitem->itemtype = 'course';
+        $gradeitem->id = $DB->insert_record('grade_items', $gradeitem);
+
+        // Case: No grade exists for the user.
+        $result = $userhelper->get_course_grade($user->id, $course->id);
+        $this->assertNull($result);
+
+        // Setup a grade for the user.
+        $grade = new \stdClass();
+        $grade->itemid = $gradeitem->id;
+        $grade->userid = $user->id;
+        $grade->finalgrade = 95;
+        $DB->insert_record('grade_grades', $grade);
+
+        // Case: Grade exists for the user.
+        $result = $userhelper->get_course_grade($user->id, $course->id);
+        $this->assertNotNull($result);
+        $this->assertEquals(95, $result->finalgrade);
+    }
+
+    /**
      * Create accredible activity.
      *
      * @param int $courseid
@@ -350,6 +388,8 @@ class mod_accredible_users_test extends \advanced_testcase {
 
         return $DB->insert_record('accredible', $dbrecord);
     }
+
+    
 
     /**
      * Create quiz module test
