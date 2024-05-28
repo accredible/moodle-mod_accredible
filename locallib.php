@@ -405,30 +405,39 @@ function accredible_course_completed_handler($event) {
     if ($accrediblecertificaterecords = $DB->get_records('accredible', array('course' => $event->courseid))) {
         foreach ($accrediblecertificaterecords as $record) {
             // Check for the existence of an activity instance and an auto-issue rule.
-            if ( $record && ($record->completionactivities && $record->completionactivities != 0) ) {
-                // Load user grade to attach in the credential.
-                $gradeattributes = $usersclient->get_user_grades($record, $user->id);
-                // Later: refactor the attribute mapping generation into a class function.
-                $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($record, $gradeattributes, $user->id);
-                $additionalattributemapping = $accredible->load_credential_custom_attributes($record, $user->id);
-                $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
+            if (!$record || empty($record->completionactivities)) {
+                continue;
+            }
 
-                // Check if we have a group mapping - if not use the old logic.
-                if ($record->groupid) {
-                    // Create the credential.
-                    $localcredentials->create_credential($user, $record->groupid, null, $customattributes);
-
-                } else {
-                    $apiresponse = accredible_issue_default_certificate( $user->id, $record->id,
-                        fullname($user), $user->email, null, null, null, $customattributes);
-                    $certificateevent = \mod_accredible\event\certificate_created::create(array(
-                      'objectid' => $apiresponse->credential->id,
-                      'context' => context_module::instance($event->contextinstanceid),
-                      'relateduserid' => $event->relateduserid
-                    ));
-                    $certificateevent->trigger();
+            // Check if the final grade to pass is met.
+            if ($record->finalgradetopass !== 0) {
+                $coursegrade = $usersclient->get_course_grade($user->id, $record->course);
+                if ($coursegrade === null || (float) $coursegrade->finalgrade < (float) $record->finalgradetopass) {
+                    continue;
                 }
+            }
 
+            // Load user grade to attach in the credential.
+            $gradeattributes = $usersclient->get_user_grades($record, $user->id);
+            // Later: refactor the attribute mapping generation into a class function.
+            $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($record, $gradeattributes, $user->id);
+            $additionalattributemapping = $accredible->load_credential_custom_attributes($record, $user->id);
+            $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
+
+            // Check if we have a group mapping - if not use the old logic.
+            if ($record->groupid) {
+                // Create the credential.
+                $localcredentials->create_credential($user, $record->groupid, null, $customattributes);
+
+            } else {
+                $apiresponse = accredible_issue_default_certificate( $user->id, $record->id,
+                    fullname($user), $user->email, null, null, null, $customattributes);
+                $certificateevent = \mod_accredible\event\certificate_created::create(array(
+                    'objectid' => $apiresponse->credential->id,
+                    'context' => context_module::instance($event->contextinstanceid),
+                    'relateduserid' => $event->relateduserid
+                ));
+                $certificateevent->trigger();
             }
         }
     }
