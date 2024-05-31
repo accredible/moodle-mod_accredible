@@ -187,5 +187,14 @@ function xmldb_accredible_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2024041600, 'accredible');
     }
 
+    if ($oldversion < 2024053100) {
+        $table = new xmldb_table('accredible');
+        $field = new xmldb_field('finalgradetopass', XMLDB_TYPE_INTEGER);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, 2024053100, 'accredible');
+    }
+
     return true;
 }
