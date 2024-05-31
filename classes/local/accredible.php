@@ -41,7 +41,6 @@ class accredible {
 
         $dbrecord = (object) [
             'completionactivities' => $post->completionactivities ?? null,
-            'finalgradetopass' => $post->finalgradetopass,
             'name' => $post->name,
             'finalquiz' => $post->finalquiz,
             'passinggrade' => $post->passinggrade,

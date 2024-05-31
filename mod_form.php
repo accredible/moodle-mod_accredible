@@ -290,10 +290,6 @@ class mod_accredible_mod_form extends moodleform_mod {
         if ($updatingcert && isset($accrediblecertificate->completionactivities)) {
             $mform->setDefault('completionactivities', 1);
         }
-        $mform->addElement('text', 'finalgradetopass', get_string('finalgradetopassinput', 'accredible'));
-        $mform->setType('finalgradetopass', PARAM_INT);
-        $mform->setDefault('finalgradetopass', 0);
-        $mform->disabledIf('finalgradetopass', 'completionactivities', 'notchecked');
 
         $attributemappingdefaultvalues =
             $formhelper->attributemapping_default_values(

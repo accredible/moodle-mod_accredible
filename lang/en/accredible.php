@@ -48,7 +48,6 @@ $string['chooseexam'] = 'Choose final quiz';
 $string['completionissueheader'] = 'Auto-issue criteria: by course completion';
 $string['completionissuecheckbox'] = 'Yes, issue upon course completion';
 $string['coursetotal'] = 'Course Total';
-$string['finalgradetopassinput'] = 'Course total to pass';
 $string['includegradeattributedescription'] = "Include Student's Grade in Credential";
 $string['includegradeattributecheckbox'] = "Yes, include grade in Credential.";
 $string['gradeattributegradeitemselect'] = "Choose Moodle grade to include:";

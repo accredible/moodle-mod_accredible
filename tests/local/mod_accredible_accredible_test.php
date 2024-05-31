@@ -410,7 +410,6 @@ class mod_accredible_accredible_test extends \advanced_testcase {
             'finalquiz' => 5,
             'passinggrade' => 70,
             'completionactivities' => null,
-            'finalgradetopass' => 0,
             'includegradeattribute' => 1,
             'gradeattributegradeitemid' => 10,
             'gradeattributekeyname' => 'Final Grade',
