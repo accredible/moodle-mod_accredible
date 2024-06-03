@@ -134,6 +134,50 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->save_record($post);
         $this->assertEquals(1, $result);
+
+        // When grade attribute mapping is enabled with mapping fields selected.
+        $overrides = new \stdClass();
+        $overrides->includegradeattribute = 1;
+        $overrides->gradeattributegradeitemid = 10;
+        $overrides->gradeattributekeyname = 'Final Grade';
+        $post = $this->generatepostobject($overrides);
+
+        $DB = $this->createMock(\moodle_database::class);
+        $DB->expects($this->once())
+            ->method('insert_record')
+            ->with(
+                'accredible',
+                $this->callback(function($subject) {
+                    return $subject->gradeattributegradeitemid === 10 &&
+                        $subject->gradeattributekeyname === 'Final Grade';
+                })
+            )
+            ->willReturn(1);
+
+        $result = $this->accredible->save_record($post);
+        $this->assertEquals(1, $result);
+
+        // When grade attribute mapping is disabled with mapping fields selected.
+        $overrides = new \stdClass();
+        $overrides->includegradeattribute = 0;
+        $overrides->gradeattributegradeitemid = 10;
+        $overrides->gradeattributekeyname = 'Final Grade';
+        $post = $this->generatepostobject($overrides);
+
+        $DB = $this->createMock(\moodle_database::class);
+        $DB->expects($this->once())
+            ->method('insert_record')
+            ->with(
+                'accredible',
+                $this->callback(function($subject) {
+                    return $subject->gradeattributegradeitemid === null &&
+                        $subject->gradeattributekeyname === null;
+                })
+            )
+            ->willReturn(1);
+
+        $result = $this->accredible->save_record($post);
+        $this->assertEquals(1, $result);
     }
 
 

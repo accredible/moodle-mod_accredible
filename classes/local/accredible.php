@@ -39,14 +39,16 @@ class accredible {
     public function save_record($post, $existingrecord = null) {
         global $DB;
 
+        $includegradeattribute = $post->includegradeattribute ?? 0;
+        $gradeattributechecked = $includegradeattribute !== 0;
         $dbrecord = (object) [
             'completionactivities' => $post->completionactivities ?? null,
             'name' => $post->name,
             'finalquiz' => $post->finalquiz,
             'passinggrade' => $post->passinggrade,
-            'includegradeattribute' => $post->includegradeattribute ?? 0,
-            'gradeattributegradeitemid' => $post->gradeattributegradeitemid,
-            'gradeattributekeyname' => $post->gradeattributekeyname,
+            'includegradeattribute' => $includegradeattribute,
+            'gradeattributegradeitemid' => $gradeattributechecked ? $post->gradeattributegradeitemid : null,
+            'gradeattributekeyname' => $gradeattributechecked ? $post->gradeattributekeyname : null,
             'groupid' => $post->groupid,
             'attributemapping' => $this->build_attribute_mapping_list($post),
             'timecreated' => time()
