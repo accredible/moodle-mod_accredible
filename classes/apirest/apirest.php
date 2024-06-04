@@ -128,10 +128,11 @@ class apirest {
      * Get attribute keys
      * @param int $pagesize
      * @param int $page
+     * @param string $kind - text, date, email, image
      * @return stdObject
      */
-    public function search_attribute_keys($pagesize = 50, $page = 1) {
-        $data = json_encode(array('page' => $page, 'page_size' => $pagesize, 'kind' => 'text'));
+    public function search_attribute_keys($pagesize = 50, $page = 1, $kind = 'text') {
+        $data = json_encode(array('page' => $page, 'page_size' => $pagesize, 'kind' => $kind));
         return $this->client->post("{$this->apiendpoint}attribute_keys/search", $data);
     }
 

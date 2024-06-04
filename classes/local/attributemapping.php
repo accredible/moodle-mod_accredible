@@ -25,6 +25,17 @@ namespace mod_accredible\local;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class attributemapping {
+    /**
+     * Valid fields for the 'course' table that can be mapped.
+     * @var string[] VALID_COURSE_FIELDS
+     */
+    const VALID_COURSE_FIELDS = ["fullname", "shortname", "startdate", "enddate"];
+
+    /**
+     * List of valid date fields for the 'course' table that can be used for mapping.
+     * @var string[]
+     */
+    const VALID_COURSE_DATE_FIELDS = ["startdate", "enddate"];
 
     /**
      * The name of the table (must be one of 'course', 'user_info_field', 'customfield_field')
@@ -100,10 +111,12 @@ class attributemapping {
      * @throws InvalidArgumentException If the field name is invalid
      */
     private function validate_field($table, $field) {
+        if (!$field) {
+            return;
+        }
+
         if ($table === "course") {
-            // Valid fields for the 'course' table.
-            $validfields = ["fullname", "shortname", "startdate", "enddate"];
-            if (!in_array($field, $validfields)) {
+            if (!in_array($field, self::VALID_COURSE_FIELDS)) {
                 throw new \InvalidArgumentException("Invalid field value for the 'course' table");
             }
         }
@@ -116,6 +129,10 @@ class attributemapping {
      * @throws InvalidArgumentException If the ID is invalid
      */
     private function validate_id($table, $id) {
+        if (!$id) {
+            return;
+        }
+
         if (($table === "user_info_field" || $table === "customfield_field") && $id === null) {
             throw new \InvalidArgumentException("Id is required for the '$table' table");
         }

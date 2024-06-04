@@ -34,6 +34,8 @@ use mod_accredible\local\credentials;
 use mod_accredible\local\groups;
 use mod_accredible\local\users;
 use mod_accredible\local\attribute_keys;
+use mod_accredible\local\formhelper;
+
 
 /**
  * Accredible settings form.
@@ -57,6 +59,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         $attributekeysclient = new attribute_keys();
         $groupsclient = new groups();
         $usersclient = new users();
+        $formhelper = new formhelper();
 
         $updatingcert = false;
         $alreadyexists = false;
@@ -120,16 +123,6 @@ class mod_accredible_mod_form extends moodleform_mod {
             }
         }
 
-        // Load course assigments.
-        $assigmentschoices = array('' => 'Select an Activity Grade');
-        $assigments = $DB->get_records_select('grade_items', 'courseid = :course_id AND itemtype = :item_type',
-            array('course_id' => $id, 'item_type' => 'mod'), '', 'id, itemname');
-        if ($assigments) {
-            foreach ($assigments as $assigment) {
-                $assigmentschoices[$assigment->id] = $assigment->itemname;
-            }
-        }
-
         $inputstyle = array('style' => 'width: 399px');
 
         // Form start.
@@ -171,9 +164,11 @@ class mod_accredible_mod_form extends moodleform_mod {
         }
 
         // Load Accredible attribute keys.
-        $attributekeys = $attributekeysclient->get_attribute_keys();
+        $textattributekeys = $attributekeysclient->get_attribute_keys('text');
+        $dateattributekeys = $attributekeysclient->get_attribute_keys('date');
+        $attributekeys = array_merge($textattributekeys, $dateattributekeys);
         if (isset($attributekeys)) {
-            $attributekeyschoices = array('' => 'Select a Custom Attribute') + $attributekeys;
+            $attributekeyschoices = array('' => get_string('accrediblecustomattributeselectprompt', 'accredible')) + $attributekeys;
             // Hidden element to check if we should disable the "gradeattributekeyname" select.
             $mform->addElement('hidden', 'attributekysnumber', 1);
         } else {
@@ -194,7 +189,7 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         $mform->addElement('html', $includegradewrapperhtml);
         $mform->addElement('select', 'gradeattributegradeitemid', get_string('gradeattributegradeitemselect', 'accredible'),
-            $assigmentschoices, $inputstyle);
+            $formhelper->load_grade_item_options($id), $inputstyle);
         $mform->addElement('select', 'gradeattributekeyname', get_string('gradeattributekeynameselect', 'accredible'),
             $attributekeyschoices, $inputstyle);
         $mform->disabledIf('gradeattributekeyname', 'attributekysnumber', 'eq', 0);
@@ -292,14 +287,94 @@ class mod_accredible_mod_form extends moodleform_mod {
         $mform->setDefault('passinggrade', 70);
 
         $mform->addElement('header', 'completionissue', get_string('completionissueheader', 'accredible'));
-        if ($updatingcert) {
-            $mform->addElement('checkbox', 'completionactivities', get_string('completionissuecheckbox', 'accredible'));
-            if (isset( $accrediblecertificate->completionactivities )) {
-                $mform->setDefault('completionactivities', 1);
-            }
-        } else {
-            $mform->addElement('checkbox', 'completionactivities', get_string('completionissuecheckbox', 'accredible'));
+        $mform->addElement('checkbox', 'completionactivities', get_string('completionissuecheckbox', 'accredible'));
+        if ($updatingcert && isset($accrediblecertificate->completionactivities)) {
+            $mform->setDefault('completionactivities', 1);
         }
+
+        $attributemappingdefaultvalues =
+            $formhelper->attributemapping_default_values(
+                $updatingcert ? $accrediblecertificate->attributemapping : null
+            );
+
+        // Attribute mapping: course fields.
+        $mform->addElement('header', 'attributemappingcoursefields', get_string('attributemappingcoursefields', 'accredible'));
+        $mform->addElement(
+            'select',
+            'coursefieldmapping[0][field]',
+            get_string('moodlecoursefield', 'accredible'),
+            $formhelper->load_course_field_options(),
+            $inputstyle
+        );
+        $this->set_mapping_field_default($mform, $attributemappingdefaultvalues, 'coursefieldmapping', 'field', 0);
+
+        $mform->addElement(
+            'select',
+            'coursefieldmapping[0][accredibleattribute]',
+            get_string('accrediblecustomattributename', 'accredible'),
+            $attributekeyschoices,
+            $inputstyle
+        );
+        $this->set_mapping_field_default($mform, $attributemappingdefaultvalues, 'coursefieldmapping', 'accredibleattribute', 0);
+
+        // Attribute mapping: course custom fields.
+        $mform->addElement(
+            'header',
+            'attributemappingcoursecustomfields',
+            get_string('attributemappingcoursecustomfields', 'accredible')
+        );
+        $mform->addElement(
+            'select',
+            'coursecustomfieldmapping[0][id]',
+            get_string('moodlecoursecustomfield', 'accredible'),
+            $formhelper->load_course_custom_field_options(),
+            $inputstyle
+        );
+        $this->set_mapping_field_default($mform, $attributemappingdefaultvalues, 'coursecustomfieldmapping', 'id', 0);
+
+        $mform->addElement(
+            'select',
+            'coursecustomfieldmapping[0][accredibleattribute]',
+            get_string('accrediblecustomattributename', 'accredible'),
+            $attributekeyschoices,
+            $inputstyle
+        );
+        $this->set_mapping_field_default(
+            $mform,
+            $attributemappingdefaultvalues,
+            'coursecustomfieldmapping',
+            'accredibleattribute',
+            0
+        );
+
+        // Attribute mapping: user profile fields.
+        $mform->addElement('header',
+            'attributemappinguserprofilefields',
+            get_string('attributemappinguserprofilefields', 'accredible')
+        );
+        $mform->addElement(
+            'select',
+            'userprofilefieldmapping[0][id]',
+            get_string('moodleuserprofilefield', 'accredible'),
+            $formhelper->load_user_profile_field_options(),
+            $inputstyle
+        );
+        $this->set_mapping_field_default($mform, $attributemappingdefaultvalues, 'userprofilefieldmapping', 'id', 0);
+
+        $mform->addElement(
+            'select',
+            'userprofilefieldmapping[0][accredibleattribute]',
+            get_string('accrediblecustomattributename', 'accredible'),
+            $attributekeyschoices,
+            $inputstyle
+        );
+        $this->set_mapping_field_default(
+            $mform,
+            $attributemappingdefaultvalues,
+            'userprofilefieldmapping',
+            'accredibleattribute',
+            0
+        );
 
         $mform->addElement('header', 'mytestsection', 'Test Section');
         $line1 = new stdClass();
@@ -321,5 +396,26 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
+    }
+
+
+    /**
+     * Sets the default value for a mapping field in the form.
+     *
+     * @param MoodleQuickForm $mform The form instance to modify.
+     * @param array $defaultvalues The default values for the form fields.
+     * @param string $mappingname The name of the mapping field.
+     * @param string $fieldname The specific field within the mapping to set.
+     * @param int $num The index of the field in case of multiple fields with the same name.
+     */
+    private function set_mapping_field_default($mform, $defaultvalues, $mappingname, $fieldname, $num = 0) {
+        $value = '';
+        if (isset($defaultvalues[$mappingname][$num][$fieldname])) {
+            $value = $defaultvalues[$mappingname][$num][$fieldname];
+        }
+        $mform->setDefault(
+            $mappingname . '[' . $num . '][' . $fieldname . ']',
+            $value
+        );
     }
 }

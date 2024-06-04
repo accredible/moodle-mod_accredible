@@ -48,10 +48,11 @@ class attribute_keys {
     }
 
     /**
-     * Get the attribute keys for the issuer
+     * Get the text attribute keys for the issuer
+     * @param string $kind - text, date, email, image
      * @return array[stdClass] $attributekeys
      */
-    public function get_attribute_keys() {
+    public function get_attribute_keys($kind = 'text') {
         $pagesize = 50;
         $page = 1;
 
@@ -59,7 +60,7 @@ class attribute_keys {
             $attributekeys = array();
             // Query the Accredible API and loop until it returns that there is no next page.
             for ($i = 0; $i <= 100; $i++) {
-                $response = $this->apirest->search_attribute_keys($pagesize, $page);
+                $response = $this->apirest->search_attribute_keys($pagesize, $page, $kind);
                 foreach ($response->attribute_keys as $attributekey) {
                     $attributekeys[$attributekey->name] = $attributekey->name;
                 }

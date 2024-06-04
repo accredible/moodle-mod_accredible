@@ -25,12 +25,17 @@
 
 $string['achievementid'] = 'Achievement id / cohort name (must be unique)';
 $string['activityname'] = 'Activity name';
+$string['accrediblecustomattributename'] = "Choose an Accredible design attribute:";
+$string['accrediblecustomattributeselectprompt'] = 'Select an Accredible custom attribute';
 $string['additionalactivitiesone'] = 'Warning: You are adding more than one activity to a course.<br/>Both activities are viewable by students, so be sure to give them different names.';
 $string['additionalactivitiestwo'] = 'Certificates/Badges will only be listed on the activity page if they were issued with this achievement id.';
 $string['additionalactivitiesthree'] = 'This is the name that will appear on the ceriticate.';
 $string['autoissueheader'] = 'Automatic issuing criteria';
 $string['apikeylabel'] = 'API key';
 $string['apikeyhelp'] = 'Enter your API key from accredible.com';
+$string['attributemappingcoursefields'] = "Attribute mapping: course fields";
+$string['attributemappingcoursecustomfields'] = "Attribute mapping: course custom fields";
+$string['attributemappinguserprofilefields'] = "Attribute mapping: user profile fields";
 $string['eulabel'] = 'EU (Frankfurt) Server';
 $string['euhelp'] = 'Select if you would like to host data in the EU (Frankfurt) instead of the USA';
 $string['accredible:addinstance'] = 'Add a certificate/badge instance';
@@ -42,6 +47,7 @@ $string['certificateurl'] = 'Certificate/Badge url';
 $string['chooseexam'] = 'Choose final quiz';
 $string['completionissueheader'] = 'Auto-issue criteria: by course completion';
 $string['completionissuecheckbox'] = 'Yes, issue upon course completion';
+$string['coursetotal'] = 'Course Total';
 $string['includegradeattributedescription'] = "Include Student's Grade in Credential";
 $string['includegradeattributecheckbox'] = "Yes, include grade in Credential.";
 $string['gradeattributegradeitemselect'] = "Choose Moodle grade to include:";
@@ -62,6 +68,11 @@ $string['modulename_help'] = 'The Accredible certificate & badge activity module
 Add the activity wherever you want your students see their certificate or badge.';
 $string['modulename_link'] = 'mod/accredible/view';
 $string['modulenameplural'] = 'Accredible certificates/badges';
+
+$string['moodlecoursefield'] = 'Choose Moodle course field to include';
+$string['moodlecoursecustomfield'] = 'Choose Moodle custom course field to include';
+$string['moodleuserprofilefield'] = 'Choose Moodle user profile field to include';
+
 $string['nocertificates'] = 'There are no certificates/badges';
 $string['passinggrade'] = 'Percentage grade needed to pass course (%)';
 $string['pluginadministration'] = 'Accredible certificates/badges administration';

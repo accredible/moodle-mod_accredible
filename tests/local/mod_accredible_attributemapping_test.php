@@ -86,6 +86,12 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
         // Expect $field value to be set.
         $attributemapping = new attributemapping($table, $accredibleattribute, $field);
         $this->assertEquals($field, $attributemapping->field);
+
+        // When $field is not selected.
+        $table = 'course';
+        $field = '';
+        $attributemapping = new attributemapping($table, $accredibleattribute, $field);
+        $this->assertEquals($field, $attributemapping->field);
     }
 
     /**
@@ -98,26 +104,26 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
         $field = 'age';
         $accredibleattribute = 'grade';
 
-        // Expect to raise an exception.
+        // Expect to not raise an exception.
         $foundexception = false;
         try {
             $attributemapping = new attributemapping($table, $accredibleattribute, $field);
         } catch (\InvalidArgumentException $error) {
             $foundexception = true;
         }
-        $this->assertTrue($foundexception);
+        $this->assertFalse($foundexception);
 
         // When $table is customfield_field and has no $id value.
         $table = 'customfield_field';
 
-        // Expect to raise an exception.
+        // Expect to not raise an exception.
         $foundexception = false;
         try {
             $attributemapping = new attributemapping($table, $accredibleattribute, $field);
         } catch (\InvalidArgumentException $error) {
             $foundexception = true;
         }
-        $this->assertTrue($foundexception);
+        $this->assertFalse($foundexception);
 
         // When $table is user_info_field and $id has value.
         $table = 'user_info_field';

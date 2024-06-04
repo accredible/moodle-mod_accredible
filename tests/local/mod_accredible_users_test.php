@@ -309,7 +309,7 @@ class mod_accredible_users_test extends \advanced_testcase {
 
         // When grades not provided.
         $result = $userhelper->load_user_grade_as_custom_attributes($accredibleinstance, array(), $this->user->id);
-        $this->assertEquals($result, null);
+        $this->assertEquals($result, []);
 
         // When there's a grade for the user.
         $grades = array(
