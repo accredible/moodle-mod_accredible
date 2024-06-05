@@ -299,23 +299,17 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         // Attribute mapping: course fields.
         $mform->addElement('header', 'attributemappingcoursefields', get_string('attributemappingcoursefields', 'accredible'));
-        $mform->addElement(
-            'select',
-            'coursefieldmapping[0][field]',
-            get_string('moodlecoursefield', 'accredible'),
-            $formhelper->load_course_field_options(),
-            $inputstyle
-        );
-        $this->set_mapping_field_default($mform, $attributemappingdefaultvalues, 'coursefieldmapping', 'field', 0);
 
-        $mform->addElement(
-            'select',
-            'coursefieldmapping[0][accredibleattribute]',
-            get_string('accrediblecustomattributename', 'accredible'),
-            $attributekeyschoices,
-            $inputstyle
-        );
-        $this->set_mapping_field_default($mform, $attributemappingdefaultvalues, 'coursefieldmapping', 'accredibleattribute', 0);
+        $coursefieldmappingcontent = [
+            'mappings' => array($line1, $line2),
+            'section' => 'coursefieldmapping',
+            'hasmappings' => true,
+            'hasid' => false,
+            'accredibleoptions' => $formhelper->map_select_options($attributekeyschoices),
+            'moodleoptions' => $formhelper->map_select_options($formhelper->load_course_field_options())
+        ];
+
+        $mform->addElement('html', $OUTPUT->render_from_template('mod_accredible/mappings', $coursefieldmappingcontent));
 
         // Attribute mapping: course custom fields.
         $mform->addElement(
@@ -375,24 +369,6 @@ class mod_accredible_mod_form extends moodleform_mod {
             'accredibleattribute',
             0
         );
-
-        $mform->addElement('header', 'mytestsection', 'Test Section');
-        $line1 = new stdClass();
-        $line1->index = 1;
-        $line1->field = 'moodle_course';
-        $line1->accredibleattribute = 'acc_course';
-
-        $line2 = new stdClass();
-        $line2->index = 2;
-        $line2->field = 'moodle_grade';
-        $line2->accredibleattribute = 'acc_grade';
-
-        $testcontent = [
-            'mappings' => array($line1, $line2),
-            'hasmappings' => true
-        ];
-
-        $mform->addElement('html', $OUTPUT->render_from_template('mod_accredible/mappings', $testcontent));
 
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
