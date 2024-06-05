@@ -374,6 +374,20 @@ class mod_accredible_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 
+    /**
+     * Called right before form submission.
+     * We use it to include missing form data from mustache templates.
+     * 
+     * @return void
+     */
+    public function data_postprocessing($data)
+    {
+        parent::data_postprocessing($data);
+        $submitteddata = $this->_form->getSubmitValues();
+        $data->coursefieldmapping = $submitteddata['coursefieldmapping'];
+        $data->coursecustomfieldmapping = $submitteddata['coursecustomfieldmapping'];
+        $data->userprofilefieldmapping = $submitteddata['userprofilefieldmapping'];
+    }
 
     /**
      * Sets the default value for a mapping field in the form.
