@@ -25,6 +25,8 @@
 define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
     var mappings = {
         init: function() {
+            mappings.setInitialValues();
+
             mappings.add = $('#id_add_new_line');
             mappings.add.on('click', mappings.addNewLine);
             
@@ -47,6 +49,14 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
 
         countLines: function() {
             return $('[id*="mapping_line_"]').length;
+        },
+
+        setInitialValues: function() {
+            $('#id_my_mappings select.form-control').each((_, element) => {
+                const selectEl = $(element);
+                const value = selectEl.attr('data-initial-value');
+                selectEl.val(value);
+            });
         },
 
         renderMappingLine: function(context, containerid) {
