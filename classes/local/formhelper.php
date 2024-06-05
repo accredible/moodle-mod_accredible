@@ -124,6 +124,29 @@ class formhelper {
         return $options;
     }
 
+    /**
+     * Maps an associative array to an array of select options.
+     *
+     * This function converts an associative array of options into an array
+     * of associative arrays with 'name' and 'value' keys, suitable for use
+     * in select elements in forms.
+     *
+     * @param array $options An associative array of options where the key is the option name and the value is the option value.
+     * @return array An array of associative arrays with 'name' and 'value' keys.
+     */
+    public function map_select_options($options) {
+        $selectoptions = array();
+        $keys = array_keys($options); 
+        foreach($keys as $key) {
+            $selectoptions[] = array(
+                'name' => $key,
+                'value' => $options[$key]
+            );
+        }
+
+        return $selectoptions;
+    }
+
 
     /**
      * Generate default values for attribute mapping based on a JSON string.
