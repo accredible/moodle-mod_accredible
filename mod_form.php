@@ -301,7 +301,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         $mform->addElement('header', 'attributemappingcoursefields', get_string('attributemappingcoursefields', 'accredible'));
 
         $coursefieldmappingcontent = [
-            'mappings' => array($line1, $line2),
+            'mappings' => array(),
             'section' => 'coursefieldmapping',
             'hasmappings' => true,
             'hasid' => false,
