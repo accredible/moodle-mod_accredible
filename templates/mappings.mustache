@@ -45,8 +45,8 @@
         "hasid": false
     }
 }}
-<div class="d-flex flex-column">
-    <div id="id_my_mappings">
+<div class="attribute_mapping d-flex flex-column">
+    <div id="{{section}}_content">
         {{#hasmappings}}
             {{#mappings}}
                 {{> mod_accredible/mapping_line}}
@@ -55,6 +55,6 @@
     </div>
 
     <div class="col-md-12">
-        <button type="button" id="id_add_new_line" class="mt-4 mb-4 btn btn-outline-primary btn-small">Add</button>
+        <button type="button" id="{{section}}_add_new_line" data-section="{{section}}" class="mt-4 mb-4 btn btn-outline-primary btn-small">Add</button>
     </div>
 </div>

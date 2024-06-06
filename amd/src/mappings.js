@@ -23,36 +23,49 @@
  */
 
 define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
-    var mappings = {
-        init: function() {
-            mappings.setInitialValues();
+    var options = {};
+    const optionsMap = {
+        coursefieldmapping: 'coursefieldoptions',
+        coursecustomfieldmapping: 'coursecustomfieldoptions',
+        userprofilefieldmapping: 'userprofilefieldoptions',
+    };
 
-            mappings.add = $('#id_add_new_line');
+    var mappings = {
+        init: function(data) {
+            options = data;
+            mappings.setSelectValues();
+
+            mappings.add = $('[id*="_add_new_line"]');
             mappings.add.on('click', mappings.addNewLine);
             
-            mappings.list = $('#id_my_mappings');
+            mappings.list = $('.attribute_mapping');
             mappings.list.on('click', '.remove-line', mappings.removeLine);
         },
 
         addNewLine: function() {
+            const section = $(this).attr('data-section');
             const data = {
-                index: mappings.countLines()+1,
+                index: mappings.countLines(section)+1,
+                section: section,
+                accredibleoptions: options.accredibleoptions,
+                moodleoptions: options[optionsMap[section]]
             };
-            mappings.renderMappingLine(data,'#id_my_mappings');
+            mappings.renderMappingLine(data,`#${section}_content`);
         },
 
         removeLine: function() {
             const index = $(this).attr("data-id");
-            const mappingLineId = '#mapping_line_'+index;
+            const section = $(this).attr("data-section");
+            const mappingLineId = `#${section}_mapping_line_${index}`;
             $(mappingLineId).remove();
         },
 
-        countLines: function() {
-            return $('[id*="mapping_line_"]').length;
+        countLines: function(section) {
+            return $(`[id*="${section}_mapping_line"]`).length;
         },
 
-        setInitialValues: function() {
-            $('#id_my_mappings select.form-control').each((_, element) => {
+        setSelectValues: function() {
+            $('.attribute_mapping select.form-control').each((_, element) => {
                 const selectEl = $(element);
                 const value = selectEl.attr('data-initial-value');
                 selectEl.val(value);
@@ -63,7 +76,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             Templates.renderForPromise('mod_accredible/mapping_line', context).then(function (_ref) {
               Templates.appendNodeContents(containerid, _ref.html, _ref.js);
             });
-        }
+        },
     };
     return mappings; 
 });

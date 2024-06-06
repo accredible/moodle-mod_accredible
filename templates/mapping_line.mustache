@@ -36,7 +36,7 @@
         "accredibleattribute": "acc_course"
     }
 }}
-<div class="d-flex flex-row justify-content-between mb-2" id="mapping_line_{{index}}">
+<div class="d-flex flex-row justify-content-between mb-2" id="{{section}}_mapping_line_{{index}}">
     {{#hasid}}
     <div class="d-flex flex-column col-md-5">
         <label for="id_{{section}}_{{index}}_id">Moodle Attribute</label>
@@ -69,7 +69,7 @@
     </div>
 
     <div class="d-flex flex-column justify-content-end col-md-1">
-        <button id="id_remove_line_{{index}}" type="button" data-id="{{index}}" class="remove-line btn btn-small">
+        <button type="button" data-id="{{index}}" data-section="{{section}}" class="remove-line btn btn-small">
             <i class="icon fa fa-trash text-danger fa-fw"></i>
         </button>
     </div>
