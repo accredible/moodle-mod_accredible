@@ -17,6 +17,7 @@
 namespace mod_accredible\local;
 
 use mod_accredible\local\attributemapping;
+use mod_accredible\local\attribute_keys;
 
 /**
  * Helper class for mod_form.php.
@@ -147,6 +148,16 @@ class formhelper {
         return $selectoptions;
     }
 
+    public function get_attributekeys_choices() {
+        $attributekeysclient = new attribute_keys();
+        $firstoption = array('' => get_string('accrediblecustomattributeselectprompt', 'accredible'));
+
+        $textattributekeys = $attributekeysclient->get_attribute_keys('text');
+        $dateattributekeys = $attributekeysclient->get_attribute_keys('date');
+        $attributekeys = array_merge($textattributekeys, $dateattributekeys);
+
+        return isset($attributekeys) ? $firstoption + $attributekeys : $attributekeys;
+    }
 
     /**
      * Generate default values for attribute mapping based on a JSON string.
