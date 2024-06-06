@@ -1,6 +1,6 @@
 services:
   mariadb:
-    image: docker.io/bitnami/mariadb:10.5
+    image: docker.io/bitnami/mariadb:10.6.7
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
       - MARIADB_USER=bn_moodle

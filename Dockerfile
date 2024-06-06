@@ -1,4 +1,4 @@
-FROM docker.io/bitnami/moodle:4.0.11
+FROM docker.io/bitnami/moodle:4.3.4
 
 # Install 'vim'
 RUN install_packages vim
