@@ -33,7 +33,6 @@ use mod_accredible\Html2Text\Html2Text;
 use mod_accredible\local\credentials;
 use mod_accredible\local\groups;
 use mod_accredible\local\users;
-use mod_accredible\local\attribute_keys;
 use mod_accredible\local\formhelper;
 
 
@@ -56,7 +55,6 @@ class mod_accredible_mod_form extends moodleform_mod {
         global $DB, $COURSE, $CFG, $PAGE, $OUTPUT;
 
         $credentialsclient = new credentials();
-        $attributekeysclient = new attribute_keys();
         $groupsclient = new groups();
         $usersclient = new users();
         $formhelper = new formhelper();
@@ -125,10 +123,26 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         $inputstyle = array('style' => 'width: 399px');
 
+        // Load template contexts.
+        $attributekeyschoices = $formhelper->get_attributekeys_choices();
+        $coursefieldoptions = $formhelper->load_course_field_options();
+        $coursecustomfieldoptions = $formhelper->load_course_custom_field_options();
+        $userprofilefieldoptions = $formhelper->load_user_profile_field_options();
+
+        $templatecontext = [
+            'options' => [
+                'accredibleoptions' => $formhelper->map_select_options($attributekeyschoices),
+                'coursefieldoptions' => $formhelper->map_select_options($coursefieldoptions),
+                'coursecustomfieldoptions' => $formhelper->map_select_options($coursecustomfieldoptions),
+                'userprofilefieldoptions' => $formhelper->map_select_options($userprofilefieldoptions),
+            ]
+        ];
+
         // Form start.
         $PAGE->requires->js_call_amd('mod_accredible/userlist_updater', 'init');
         $PAGE->requires->js_call_amd('mod_accredible/attribute_keys_displayer', 'init');
-        $PAGE->requires->js_call_amd('mod_accredible/mappings', 'init');
+        $PAGE->requires->js_call_amd('mod_accredible/mappings', 'init', $templatecontext);
+
         $mform =& $this->_form;
         $mform->addElement('hidden', 'course', $id);
         if ($updatingcert) {
@@ -163,12 +177,8 @@ class mod_accredible_mod_form extends moodleform_mod {
             $mform->addElement('static', 'additionalactivitiestwo', '', get_string('additionalactivitiestwo', 'accredible'));
         }
 
-        // Load Accredible attribute keys.
-        $textattributekeys = $attributekeysclient->get_attribute_keys('text');
-        $dateattributekeys = $attributekeysclient->get_attribute_keys('date');
-        $attributekeys = array_merge($textattributekeys, $dateattributekeys);
-        if (isset($attributekeys)) {
-            $attributekeyschoices = array('' => get_string('accrediblecustomattributeselectprompt', 'accredible')) + $attributekeys;
+        
+        if (isset($attributekeyschoices)) {
             // Hidden element to check if we should disable the "gradeattributekeyname" select.
             $mform->addElement('hidden', 'attributekysnumber', 1);
         } else {
