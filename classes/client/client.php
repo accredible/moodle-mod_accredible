@@ -60,15 +60,15 @@ class client {
         }
 
         $token = $CFG->accredible_api_key;
-        $this->curloptions = array(
+        $this->curloptions = [
             'CURLOPT_RETURNTRANSFER' => true,
             'CURLOPT_FAILONERROR'    => true,
-            'CURLOPT_HTTPHEADER'     => array(
+            'CURLOPT_HTTPHEADER'     => [
                 'Authorization: Token ' . $token,
                 'Content-Type: application/json; charset=utf-8',
-                'Accredible-Integration: Moodle'
-            )
-        );
+                'Accredible-Integration: Moodle',
+            ],
+        ];
 
         $error = null;
     }

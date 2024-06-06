@@ -32,7 +32,7 @@ class restore_accredible_activity_structure_step extends restore_activity_struct
      */
     protected function define_structure() {
 
-        $paths = array();
+        $paths = [];
 
         $paths[] = new restore_path_element('accredible', '/activity/accredible');
 

@@ -118,7 +118,7 @@ class credentials {
         try {
             $loop = true;
             $count = 0;
-            $credentials = array();
+            $credentials = [];
             // Query the Accredible API and loop until it returns that there is no next page.
             while ($loop === true) {
                 $credentialspage = $this->apirest->get_credentials($groupid, $email, $pagesize, $page);

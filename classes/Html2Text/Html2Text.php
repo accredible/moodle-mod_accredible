@@ -49,7 +49,7 @@ class Html2Text {
 
         if ($isofficedocument) {
             // Remove office namespace.
-            $html = str_replace(array("<o:p>", "</o:p>"), "", $html);
+            $html = str_replace(["<o:p>", "</o:p>"], "", $html);
         }
 
         $html = static::fix_new_lines($html);

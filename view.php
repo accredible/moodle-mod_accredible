@@ -30,8 +30,8 @@ use mod_accredible\local\credentials;
 $id = required_param('id', PARAM_INT); // Course Module ID.
 
 $cm = get_coursemodule_from_id('accredible', $id, 0, false, MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-$accrediblecertificate = $DB->get_record('accredible', array('id' => $cm->instance), '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+$accrediblecertificate = $DB->get_record('accredible', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course->id, false, $cm);
 $context = context_module::instance($cm->id);
@@ -39,7 +39,7 @@ require_capability('mod/accredible:view', $context);
 
 // Initialize $PAGE, compute blocks.
 $PAGE->set_pagelayout('incourse');
-$PAGE->set_url('/mod/accredible/view.php', array('id' => $cm->id));
+$PAGE->set_url('/mod/accredible/view.php', ['id' => $cm->id]);
 $PAGE->set_context($context);
 $PAGE->set_cm($cm);
 $PAGE->set_title(format_string($accrediblecertificate->name));
@@ -58,9 +58,12 @@ if (has_capability('mod/accredible:manage', $context)) {
     }
 
     $table = new html_table();
-    $table->head = array (get_string('id', 'accredible'),
-        get_string('recipient', 'accredible'), get_string('certificateurl', 'accredible'),
-        get_string('datecreated', 'accredible'));
+    $table->head = [
+        get_string('id', 'accredible'),
+        get_string('recipient', 'accredible'),
+        get_string('certificateurl', 'accredible'),
+        get_string('datecreated', 'accredible'),
+    ];
 
     foreach ($certificates as $certificate) {
         $issuedate = date_format( date_create($certificate->issued_on), "M d, Y" );
@@ -69,12 +72,12 @@ if (has_capability('mod/accredible:manage', $context)) {
         } else {
             $certificatelink = 'https://www.credential.net/'.$certificate->id;
         }
-          $table->data[] = array (
+          $table->data[] = [
               $certificate->id,
               $certificate->recipient->name,
               "<a href='$certificatelink' target='_blank'>$certificatelink</a>",
-              $issuedate
-          );
+              $issuedate,
+          ];
     }
 
     echo $OUTPUT->header();
@@ -132,16 +135,16 @@ if (has_capability('mod/accredible:manage', $context)) {
             if ($certificates && $certificates[0] && $certificates[0]->certificate->image->preview &&
                 strlen($certificates[0]->certificate->image->preview) > 0) {
                 $img = html_writer::img($certificates[0]->seo_image,
-                    get_string('viewimgcomplete', 'accredible'), array('width' => '90%') );
+                    get_string('viewimgcomplete', 'accredible'), ['width' => '90%'] );
             } else {
                 $img = html_writer::img($certificates[0]->seo_image,
-                    get_string('viewimgcomplete', 'accredible'), array('width' => '25%') );
+                    get_string('viewimgcomplete', 'accredible'), ['width' => '25%'] );
             }
         } else {
-            $img = html_writer::img($src, get_string('viewimgcomplete', 'accredible'), array('width' => '90%') );
+            $img = html_writer::img($src, get_string('viewimgcomplete', 'accredible'), ['width' => '90%'] );
         }
 
-        echo html_writer::link( $userscertificatelink, $img, array('target' => '_blank') );
+        echo html_writer::link( $userscertificatelink, $img, ['target' => '_blank'] );
         echo html_writer::end_div('text-center');
     } else {
         if (method_exists($PAGE->theme, 'image_url')) {
@@ -152,7 +155,7 @@ if (has_capability('mod/accredible:manage', $context)) {
 
         echo html_writer::start_div('text-center');
         echo html_writer::tag( 'br', null );
-        echo html_writer::img($src, get_string('viewimgincomplete', 'accredible'), array('width' => '90%') );
+        echo html_writer::img($src, get_string('viewimgincomplete', 'accredible'), ['width' => '90%'] );
         echo html_writer::end_div('text-center');
     }
 

@@ -43,7 +43,7 @@ class provider implements
      * @param  collection $collection The collection to add metadata to.
      * @return collection $collection The array of metadata.
      */
-    public static function get_metadata(collection $collection) : collection {
+    public static function get_metadata(collection $collection): collection {
 
         $collection->add_external_location_link('accredible', [
             'email' => 'privacy:metadata:accredible:email',
@@ -60,7 +60,7 @@ class provider implements
      * @param int $userid The user to search.
      * @return contextlist $contextlist The list of contexts used in this plugin.
      */
-    public static function get_contexts_for_userid(int $userid) : contextlist {
+    public static function get_contexts_for_userid(int $userid): contextlist {
         return new contextlist();
     }
 

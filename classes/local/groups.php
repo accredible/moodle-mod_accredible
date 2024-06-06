@@ -71,7 +71,7 @@ class groups {
         $page = 1;
 
         try {
-            $groups = array();
+            $groups = [];
             // Query the Accredible API and loop until it returns that there is no next page.
             for ($i = 0; $i <= 100; $i++) {
                 $response = $this->apirest->get_groups($pagesize, $page);
@@ -104,7 +104,7 @@ class groups {
         $page = 1;
 
         try {
-            $templates = array();
+            $templates = [];
             // Query the Accredible API and loop until it returns that there is no next page.
             for ($i = 0; $i <= 100; $i++) {
                 $response = $this->apirest->search_groups($pagesize, $page);

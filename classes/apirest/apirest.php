@@ -108,14 +108,14 @@ class apirest {
         if ($recipientemail) {
             $recipientemail = strtolower($recipientemail);
         }
-        $data = array(
+        $data = [
             "credential_id" => $credentialid,
             "recipient_id" => $recipientid,
             "recipient_email" => $recipientemail,
             "wallet_view" => $walletview,
             "group_id" => $groupid,
             "redirect_to" => $redirectto,
-        );
+        ];
 
         $data = $this->strip_empty_keys($data);
 
@@ -132,7 +132,7 @@ class apirest {
      * @return stdObject
      */
     public function search_attribute_keys($pagesize = 50, $page = 1, $kind = 'text') {
-        $data = json_encode(array('page' => $page, 'page_size' => $pagesize, 'kind' => $kind));
+        $data = json_encode(['page' => $page, 'page_size' => $pagesize, 'kind' => $kind]);
         return $this->client->post("{$this->apiendpoint}attribute_keys/search", $data);
     }
 
@@ -149,18 +149,18 @@ class apirest {
     public function create_credential($recipientname, $recipientemail, $courseid,
         $issuedon = null, $expiredon = null, $customattributes = null) {
 
-        $data = array(
-            "credential" => array(
+        $data = [
+            "credential" => [
                 "group_id" => $courseid,
-                "recipient" => array(
+                "recipient" => [
                     "name" => $recipientname,
-                    "email" => $recipientemail
-                ),
+                    "email" => $recipientemail,
+                ],
                 "issued_on" => $issuedon,
                 "expired_on" => $expiredon,
-                "custom_attributes" => $customattributes
-            )
-        );
+                "custom_attributes" => $customattributes,
+            ],
+        ];
 
         $data = json_encode($data);
 
@@ -195,23 +195,23 @@ class apirest {
      */
     public function create_evidence_item_duration($startdate, $enddate, $credentialid, $hidden = false) {
 
-        $durationinfo = array(
+        $durationinfo = [
             'start_date' => date("Y-m-d", $startdate),
             'end_date' => date("Y-m-d", $enddate),
-            'duration_in_days' => floor( ($enddate - $startdate) / 86400)
-        );
+            'duration_in_days' => floor( ($enddate - $startdate) / 86400),
+        ];
 
         // Multi day duration.
         if ($durationinfo['duration_in_days'] && $durationinfo['duration_in_days'] > 0) {
 
-            $evidenceitem = array(
-                "evidence_item" => array(
+            $evidenceitem = [
+                "evidence_item" => [
                     "description" => 'Completed in ' . $durationinfo['duration_in_days'] . ' days',
                     "category" => "course_duration",
                     "string_object" => json_encode($durationinfo),
-                    "hidden" => $hidden
-                )
-            );
+                    "hidden" => $hidden,
+                ],
+            ];
 
             $result = $this->create_evidence_item($evidenceitem, $credentialid);
 
@@ -220,14 +220,14 @@ class apirest {
         } else if ($durationinfo['end_date'] >= $durationinfo['start_date']) {
             $durationinfo['duration_in_days'] = 1;
 
-            $evidenceitem = array(
-                "evidence_item" => array(
+            $evidenceitem = [
+                "evidence_item" => [
                     "description" => 'Completed in 1 day',
                     "category" => "course_duration",
                     "string_object" => json_encode($durationinfo),
-                    "hidden" => $hidden
-                )
-            );
+                    "hidden" => $hidden,
+                ],
+            ];
 
             $result = $this->create_evidence_item($evidenceitem, $credentialid);
 
@@ -255,21 +255,21 @@ class apirest {
         $achievementname, $issuedon = null, $expiredon = null, $coursename = null,
         $coursedescription = null, $courselink = null, $customattributes = null) {
 
-        $data = array(
-            "credential" => array(
+        $data = [
+            "credential" => [
                 "group_name" => $achievementname,
-                "recipient" => array(
+                "recipient" => [
                     "name" => $recipientname,
-                    "email" => $recipientemail
-                ),
+                    "email" => $recipientemail,
+                ],
                 "issued_on" => $issuedon,
                 "expired_on" => $expiredon,
                 "custom_attributes" => $customattributes,
                 "name" => $coursename,
                 "description" => $coursedescription,
-                "course_link" => $courselink
-            )
-        );
+                "course_link" => $courselink,
+            ],
+        ];
 
         $data = json_encode($data);
 
@@ -302,7 +302,7 @@ class apirest {
      * @return stdObject
      */
     public function search_groups($pagesize = 50, $page = 1) {
-        $data = json_encode(array('page' => $page, 'page_size' => $pagesize));
+        $data = json_encode(['page' => $page, 'page_size' => $pagesize]);
         return $this->client->post("{$this->apiendpoint}issuer/groups/search", $data);
     }
 
@@ -318,14 +318,14 @@ class apirest {
 
         if (is_numeric($grade) && intval($grade) >= 0 && intval($grade) <= 100) {
 
-            $evidenceitem = array(
-                "evidence_item" => array(
+            $evidenceitem = [
+                "evidence_item" => [
                     "description" => $description,
                     "category" => "grade",
                     "string_object" => (string) $grade,
-                    "hidden" => $hidden
-                )
-            );
+                    "hidden" => $hidden,
+                ],
+            ];
 
             return $this->create_evidence_item($evidenceitem, $credentialid);
         } else {
@@ -342,7 +342,7 @@ class apirest {
      */
     public function update_evidence_item_grade($credentialid, $evidenceitemid, $grade) {
         if (is_numeric($grade) && intval($grade) >= 0 && intval($grade) <= 100) {
-            $evidenceitem = array('evidence_item' => array('string_object' => $grade));
+            $evidenceitem = ['evidence_item' => ['string_object' => $grade]];
             $data = json_encode($evidenceitem);
             $url = "{$this->apiendpoint}credentials/{$credentialid}/evidence_items/{$evidenceitemid}";
             return $this->client->put($url, $data);

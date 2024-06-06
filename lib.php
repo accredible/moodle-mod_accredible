@@ -57,7 +57,7 @@ function accredible_add_instance($post) {
     if ( isset($post->users) ) {
         $record = $DB->get_record('accredible', ['id' => $recordid], '*', MUST_EXIST);
         // Load grade attributes for users who will get a credential issued if need to be added.
-        $userids = array();
+        $userids = [];
         foreach ($post->users as $userid => $issuecertificate) {
             if ($issuecertificate) {
                 $userids[] = $userid;
@@ -69,7 +69,7 @@ function accredible_add_instance($post) {
         // Int userid => boolean issuecertificate.
         foreach ($post->users as $userid => $issuecertificate) {
             if ($issuecertificate) {
-                $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
+                $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
 
                 // Later: refactor the attribute mapping generation into a class function.
                 $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
@@ -81,10 +81,14 @@ function accredible_add_instance($post) {
                     // Evidence item posts.
                     $credentialid = $credential->id;
                     if ($post->finalquiz) {
-                        $quiz = $DB->get_record('quiz', array('id' => $post->finalquiz), '*', MUST_EXIST);
+                        $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
                         $usersgrade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-                        $gradeevidence = array('string_object' => (string) $usersgrade,
-                            'description' => $quiz->name, 'custom' => true, 'category' => 'grade');
+                        $gradeevidence = [
+                            'string_object' => (string) $usersgrade,
+                            'description' => $quiz->name,
+                            'custom' => true,
+                            'category' => 'grade',
+                        ];
                         if ($usersgrade < 50) {
                             $gradeevidence['hidden'] = true;
                         }
@@ -119,7 +123,7 @@ function accredible_update_instance($post) {
     $accredible = new accredible();
 
     // Load grade attributes for users if need to be added in the credential.
-    $userids = array();
+    $userids = [];
     if (isset($post->users)) {
         foreach ($post->users as $userid => $issuecertificate) {
             if ($issuecertificate) {
@@ -137,7 +141,7 @@ function accredible_update_instance($post) {
 
     $gradeattributes = $usersclient->get_user_grades($post, array_unique($userids));
 
-    $existingrecord = $DB->get_record('accredible', array('id' => $post->instance), '*', MUST_EXIST);
+    $existingrecord = $DB->get_record('accredible', ['id' => $post->instance], '*', MUST_EXIST);
 
     // Issue certs for unissued users.
     if (isset($post->unissuedusers)) {
@@ -150,7 +154,7 @@ function accredible_update_instance($post) {
         }
         foreach ($post->unissuedusers as $userid => $issuecertificate) {
             if ($issuecertificate) {
-                $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
+                $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
                 $completedtimestamp = accredible_manual_issue_completion_timestamp($existingrecord, $user);
                 $completeddate = date('Y-m-d', (int) $completedtimestamp);
                 // Later: refactor the attribute mapping generation into a class function.
@@ -164,10 +168,14 @@ function accredible_update_instance($post) {
                         $credentialid = $credential->id;
                         // Evidence item posts.
                         if ($post->finalquiz) {
-                            $quiz = $DB->get_record('quiz', array('id' => $post->finalquiz), '*', MUST_EXIST);
+                            $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
                             $usersgrade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-                            $gradeevidence = array('string_object' => (string) $usersgrade,
-                                'description' => $quiz->name, 'custom' => true, 'category' => 'grade');
+                            $gradeevidence = [
+                                'string_object' => (string) $usersgrade,
+                                'description' => $quiz->name,
+                                'custom' => true,
+                                'category' => 'grade',
+                            ];
                             if ($usersgrade < 50) {
                                 $gradeevidence['hidden'] = true;
                             }
@@ -181,7 +189,7 @@ function accredible_update_instance($post) {
                     }
                 } else if ($existingrecord->achievementid) {
                     if ($post->finalquiz) {
-                        $quiz = $DB->get_record('quiz', array('id' => $post->finalquiz), '*', MUST_EXIST);
+                        $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
                         $grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
                     }
                     // TODO: testing.
@@ -208,7 +216,7 @@ function accredible_update_instance($post) {
         // Int userid => boolean issuecertificate.
         foreach ($post->users as $userid => $issuecertificate) {
             if ($issuecertificate) {
-                $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
+                $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
                 $completedtimestamp = accredible_manual_issue_completion_timestamp($existingrecord, $user);
                 $completeddate = date('Y-m-d', (int) $completedtimestamp);
                 // Later: refactor the attribute mapping generation into a class function.
@@ -217,7 +225,7 @@ function accredible_update_instance($post) {
                 $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
                 if ($existingrecord->achievementid) {
 
-                    $courseurl = new moodle_url('/course/view.php', array('id' => $post->course));
+                    $courseurl = new moodle_url('/course/view.php', ['id' => $post->course]);
                     $courselink = $courseurl->__toString();
 
                     $credential = $localcredentials->create_credential_legacy($user, $post->achievementid,
@@ -230,10 +238,14 @@ function accredible_update_instance($post) {
                 if ($credential) {
                     $credentialid = $credential->id;
                     if ($post->finalquiz) {
-                        $quiz = $DB->get_record('quiz', array('id' => $post->finalquiz), '*', MUST_EXIST);
+                        $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
                         $usersgrade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-                        $gradeevidence = array('string_object' => (string) $usersgrade,
-                            'description' => $quiz->name, 'custom' => true, 'category' => 'grade');
+                        $gradeevidence = [
+                            'string_object' => (string) $usersgrade,
+                            'description' => $quiz->name,
+                            'custom' => true,
+                            'category' => 'grade',
+                        ];
                         if ($usersgrade < 50) {
                             $gradeevidence['hidden'] = true;
                         }
@@ -277,11 +289,11 @@ function accredible_delete_instance($id) {
     global $DB;
 
     // Ensure the certificate exists.
-    if (!$certificate = $DB->get_record('accredible', array('id' => $id))) {
+    if (!$certificate = $DB->get_record('accredible', ['id' => $id])) {
         return false;
     }
 
-    return $DB->delete_records('accredible', array('id' => $id));
+    return $DB->delete_records('accredible', ['id' => $id]);
 }
 
 /**

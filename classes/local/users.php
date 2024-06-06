@@ -62,14 +62,14 @@ class users {
      * @return array the list of users
      */
     public function get_users_with_credentials($enrolledusers, $groupid = null) {
-        $users = array();
-        $certificates = array();
+        $users = [];
+        $certificates = [];
 
         if (!$enrolledusers) {
             return $users;
         }
 
-        $certificatesmemo = array();
+        $certificatesmemo = [];
         if ($groupid) {
             try {
                 $credentialsclient = new credentials($this->apirest);
@@ -84,10 +84,10 @@ class users {
                 } else {
                     $credentialurl = 'https://www.credential.net/' . $certificate->id;
                 }
-                $certificatesmemo[$certificate->recipient->email] = array(
+                $certificatesmemo[$certificate->recipient->email] = [
                     'credentialid' => $certificate->id,
-                    'credentialurl' => $credentialurl
-                );
+                    'credentialurl' => $credentialurl,
+                ];
             }
         }
 
@@ -100,13 +100,13 @@ class users {
 
             $credentialurl = isset($certificate) ? $certificate['credentialurl'] : null;
             $credentialid = isset($certificate) ? $certificate['credentialid'] : null;
-            $user = array(
+            $user = [
                 'id'             => $user->id,
                 'email'          => $user->email,
                 'name'           => $user->firstname . ' ' . $user->lastname,
                 'credential_url' => $credentialurl,
-                'credential_id'  => $credentialid
-            );
+                'credential_id'  => $credentialid,
+            ];
             array_push($users, $user);
         }
         return $users;
@@ -122,10 +122,10 @@ class users {
      */
     public function get_unissued_users($users, $accredibleinstanceid = null) {
         global $DB;
-        $unissuedusers = array();
+        $unissuedusers = [];
 
         if ($accredibleinstanceid || $accredibleinstanceid != 0) {
-            $accrediblecertificate = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+            $accrediblecertificate = $DB->get_record('accredible', ['id' => $accredibleinstanceid], '*', MUST_EXIST);
 
             foreach ($users as $user) {
                 if (!$user['credential_id'] && accredible_check_if_cert_earned($accrediblecertificate, $user)) {
@@ -151,11 +151,11 @@ class users {
             return;
         }
 
-        $usergrades = array();
-        $gradeitemdb = $DB->get_record('grade_items', array('id' => $accredible->gradeattributegradeitemid), '*', MUST_EXIST);
+        $usergrades = [];
+        $gradeitemdb = $DB->get_record('grade_items', ['id' => $accredible->gradeattributegradeitemid], '*', MUST_EXIST);
         $gradeitem = new \grade_item($gradeitemdb);
 
-        $queryparams = array('gradeitem' => $gradeitem->id);
+        $queryparams = ['gradeitem' => $gradeitem->id];
         list($insql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
         $queryparams += $params;
         $grades = $DB->get_records_select('grade_grades', 'itemid = :gradeitem AND userid '.$insql, $queryparams);
@@ -178,7 +178,7 @@ class users {
      */
     public function load_user_grade_as_custom_attributes($accredible, $grades, $userid) {
         if (isset($grades) && isset($grades[$userid])) {
-            $customattributes = array($accredible->gradeattributekeyname => $grades[$userid]);
+            $customattributes = [$accredible->gradeattributekeyname => $grades[$userid]];
         } else {
             $customattributes = [];
         }

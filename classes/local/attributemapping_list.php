@@ -38,7 +38,7 @@ class attributemapping_list {
      * Array of attribute mapping objects.
      * @var $attributemapping[] attributemappings
      */
-    public $attributemappings = array();
+    public $attributemappings = [];
 
 
     /**
@@ -66,7 +66,7 @@ class attributemapping_list {
      * @return string stringified version of attributemappings array
      */
     public function get_text_content() {
-        $jsonarray = array();
+        $jsonarray = [];
         foreach ($this->attributemappings as $mapping) {
             $jsonarray[] = $mapping->get_db_object();
         }

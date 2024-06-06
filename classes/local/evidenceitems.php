@@ -55,7 +55,7 @@ class evidenceitems {
      * @param bool $throwerror
      */
     public function post_evidence($credentialid, $evidenceitem, $throwerror = false) {
-        $this->apirest->create_evidence_item(array('evidence_item' => $evidenceitem), $credentialid, $throwerror);
+        $this->apirest->create_evidence_item(['evidence_item' => $evidenceitem], $credentialid, $throwerror);
     }
 
     /**
@@ -69,12 +69,21 @@ class evidenceitems {
         global $DB;
 
         // Grab the course quizes.
-        if ($quizes = $DB->get_records_select('quiz', 'course = :course_id', array('course_id' => $courseid)) ) {
+        if ($quizes = $DB->get_records_select('quiz', 'course = :course_id', ['course_id' => $courseid]) ) {
             foreach ($quizes as $quiz) {
-                $evidenceitem = array('description' => $quiz->name);
+                $evidenceitem = ['description' => $quiz->name];
                 // Grab quiz attempts.
-                $quizattempt = $DB->get_records('quiz_attempts', array('quiz' => $quiz->id,
-                    'userid' => $userid), '-attempt', '*', 0, 1);
+                $quizattempt = $DB->get_records(
+                    'quiz_attempts',
+                    [
+                        'quiz' => $quiz->id,
+                        'userid' => $userid,
+                    ],
+                    '-attempt',
+                    '*',
+                    0,
+                    1
+                );
 
                 if ($quizattempt) {
                     $sql = "SELECT
@@ -96,7 +105,7 @@ class evidenceitems {
 
                             ORDER BY quiza.userid, quiza.attempt, qa.slot";
 
-                    if ( $questions = $DB->get_records_sql($sql, array(reset($quizattempt)->id, 'manualgraded')) ) {
+                    if ( $questions = $DB->get_records_sql($sql, [reset($quizattempt)->id, 'manualgraded']) ) {
                         $questionsoutput = "<style>#main {  max-width: 780px;margin-left: auto;";
                         $questionsoutput .= "margin-right: auto;margin-top: 50px;margin-bottom: 80px; font-family: Arial;} ";
                         $questionsoutput .= "h1, h5 {   text-align: center;} ";
@@ -140,7 +149,7 @@ class evidenceitems {
         $sql = "SELECT enrol.id, ue.timestart
                         FROM {enrol} enrol, {user_enrolments} ue
                         WHERE enrol.id = ue.enrolid AND ue.userid = ? AND enrol.courseid = ?";
-        $enrolment = $DB->get_record_sql($sql, array($userid, $courseid));
+        $enrolment = $DB->get_record_sql($sql, [$userid, $courseid]);
 
         if ($enrolment) {
             $enrolmenttimestamp = $enrolment->timestart;

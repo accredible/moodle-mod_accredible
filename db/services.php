@@ -25,23 +25,23 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$services = array (
-    'accredible_service' => array(
-        'functions' => array(
-            'mod_accredible_reload_users'
-        ),
+$services = [
+    'accredible_service' => [
+        'functions' => [
+            'mod_accredible_reload_users',
+        ],
         "restrictedusers" => 0,
         "enabled" => 1,
-    )
-);
+    ],
+];
 
-$functions = array (
-    'mod_accredible_reload_users' => array (
+$functions = [
+    'mod_accredible_reload_users' => [
         'classname' => 'mod_accredible\external\form_helper',
         'methodname' => 'reload_users',
         'classpath' => '',
         'description' => 'Use by form autocomplete for selecting a sharable question.',
         'type' => 'read',
         'ajax' => true,
-    )
-);
+    ],
+];

@@ -38,14 +38,14 @@ class formhelper {
     public function load_grade_item_options($courseid) {
         global $DB;
 
-        $options = array('' => 'Select an Activity Grade');
+        $options = ['' => 'Select an Activity Grade'];
 
         $coursegradeitem = $DB->get_record(
             'grade_items',
-            array(
+            [
                 'courseid' => $courseid,
-                'itemtype' => 'course'
-            ),
+                'itemtype' => 'course',
+            ],
             'id',
             IGNORE_MULTIPLE
         );
@@ -56,7 +56,10 @@ class formhelper {
         $modgradeitems = $DB->get_records_select(
             'grade_items',
             'courseid = :course_id AND itemtype = :item_type',
-            array('course_id' => $courseid, 'item_type' => 'mod'),
+            [
+                'course_id' => $courseid,
+                'item_type' => 'mod',
+            ],
             '',
             'id, itemname'
         );
@@ -78,7 +81,7 @@ class formhelper {
      * @return array Associative array of course field names suitable for form dropdown.
      */
     public function load_course_field_options() {
-        $options = array('' => 'Select a Moodle course field');
+        $options = ['' => 'Select a Moodle course field'];
         $fields = attributemapping::VALID_COURSE_FIELDS;
         foreach ($fields as $field) {
             $options[$field] = $field;
@@ -97,8 +100,8 @@ class formhelper {
     public function load_course_custom_field_options() {
         global $DB;
 
-        $options = array('' => 'Select a Moodle course custom field');
-        $customfields = $DB->get_records('customfield_field', array(), '', 'id, name');
+        $options = ['' => 'Select a Moodle course custom field'];
+        $customfields = $DB->get_records('customfield_field', [], '', 'id, name');
         foreach ($customfields as $field) {
             $options[$field->id] = $field->name;
         }
@@ -116,8 +119,8 @@ class formhelper {
     public function load_user_profile_field_options() {
         global $DB;
 
-        $options = array('' => 'Select a Moodle user profile field');
-        $profilefields = $DB->get_records('user_info_field', array(), '', 'id, name');
+        $options = ['' => 'Select a Moodle user profile field'];
+        $profilefields = $DB->get_records('user_info_field', [], '', 'id, name');
         foreach ($profilefields as $field) {
             $options[$field->id] = $field->name;
         }
@@ -139,7 +142,7 @@ class formhelper {
         $defaultvalues = [
             'coursefieldmapping' => [],
             'coursecustomfieldmapping' => [],
-            'userprofilefieldmapping' => []
+            'userprofilefieldmapping' => [],
         ];
         if (!$attributemapping) {
             return $defaultvalues;
@@ -151,19 +154,19 @@ class formhelper {
                 case 'course':
                     $defaultvalues['coursefieldmapping'][] = [
                         'field' => isset($mapping->field) ? $mapping->field : '',
-                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : ''
+                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : '',
                     ];
                     break;
                 case 'customfield_field':
                     $defaultvalues['coursecustomfieldmapping'][] = [
                         'id' => isset($mapping->id) ? $mapping->id : '',
-                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : ''
+                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : '',
                     ];
                     break;
                 case 'user_info_field':
                     $defaultvalues['userprofilefieldmapping'][] = [
                         'id' => isset($mapping->id) ? $mapping->id : '',
-                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : ''
+                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : '',
                     ];
                     break;
             }

@@ -71,7 +71,7 @@ class form_helper extends \external_api {
                     'credential_url' => new \external_value(PARAM_RAW, 'Credential URL.'),
                     'credential_id' => new \external_value(PARAM_RAW, 'Credential ID.'),
                 ])
-            )
+            ),
         ]);
     }
 
@@ -86,15 +86,15 @@ class form_helper extends \external_api {
      */
     public static function reload_users($courseid, $groupid, $instanceid = null) {
         $params = self::validate_parameters(self::reload_users_parameters(),
-            array('courseid' => $courseid, 'groupid' => $groupid, 'instanceid' => $instanceid));
+            ['courseid' => $courseid, 'groupid' => $groupid, 'instanceid' => $instanceid]);
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 
         $enrolledusers = get_enrolled_users($context, "mod/accredible:view", null, 'u.*', 'id');
-        $users = array(
-            'users' => array(),
-            'unissued_users' => array()
-        );
+        $users = [
+            'users' => [],
+            'unissued_users' => [],
+        ];
 
         $userhelper = new users();
         $users['users'] = $userhelper->get_users_with_credentials($enrolledusers, $groupid);

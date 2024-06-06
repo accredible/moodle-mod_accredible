@@ -93,13 +93,13 @@ class mod_accredible_mod_form extends moodleform_mod {
             $cmid = optional_param('update', '', PARAM_INT);
             $cm = get_coursemodule_from_id('accredible', $cmid, 0, false, MUST_EXIST);
             $id = $cm->course;
-            $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
-            $accrediblecertificate = $DB->get_record('accredible', array('id' => $cm->instance), '*', MUST_EXIST);
+            $course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
+            $accrediblecertificate = $DB->get_record('accredible', ['id' => $cm->instance], '*', MUST_EXIST);
         } else if (optional_param('course', '', PARAM_INT)) { // New form init.
             $id = optional_param('course', '', PARAM_INT);
-            $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
+            $course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
             // See if other accredible certificates already exist for this course.
-            $alreadyexists = $DB->record_exists('accredible', array('course' => $id));
+            $alreadyexists = $DB->record_exists('accredible', ['course' => $id]);
         }
 
         // Load user data.
@@ -116,14 +116,14 @@ class mod_accredible_mod_form extends moodleform_mod {
         }
 
         // Load final quiz choices.
-        $quizchoices = array('' => 'Select a Quiz');
-        if ($quizes = $DB->get_records_select('quiz', 'course = :course_id', array('course_id' => $id), '', 'id, name')) {
+        $quizchoices = ['' => 'Select a Quiz'];
+        if ($quizes = $DB->get_records_select('quiz', 'course = :course_id', ['course_id' => $id], '', 'id, name')) {
             foreach ($quizes as $quiz) {
                 $quizchoices[$quiz->id] = $quiz->name;
             }
         }
 
-        $inputstyle = array('style' => 'width: 399px');
+        $inputstyle = ['style' => 'width: 399px'];
 
         // Form start.
         $PAGE->requires->js_call_amd('mod_accredible/userlist_updater', 'init');
@@ -148,7 +148,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         }
 
         // Load available groups.
-        $templates = array('' => 'Select a Group') + $groupsclient->get_groups();
+        $templates = ['' => 'Select a Group'] + $groupsclient->get_groups();
         $mform->addElement('select', 'groupid', get_string('accrediblegroup', 'accredible'), $templates, $inputstyle);
         $mform->addRule('groupid', null, 'required', null, 'client');
         if ($updatingcert && $accrediblecertificate->groupid) {
@@ -167,7 +167,7 @@ class mod_accredible_mod_form extends moodleform_mod {
         $dateattributekeys = $attributekeysclient->get_attribute_keys('date');
         $attributekeys = array_merge($textattributekeys, $dateattributekeys);
         if (isset($attributekeys)) {
-            $attributekeyschoices = array('' => get_string('accrediblecustomattributeselectprompt', 'accredible')) + $attributekeys;
+            $attributekeyschoices = ['' => get_string('accrediblecustomattributeselectprompt', 'accredible')] + $attributekeys;
             // Hidden element to check if we should disable the "gradeattributekeyname" select.
             $mform->addElement('hidden', 'attributekysnumber', 1);
         } else {
@@ -209,14 +209,14 @@ class mod_accredible_mod_form extends moodleform_mod {
                     get_string('additionalactivitiesthree', 'accredible'));
             }
             $mform->addElement('text', 'certificatename',
-                get_string('certificatename', 'accredible'), array('style' => 'width: 399px'));
+                get_string('certificatename', 'accredible'), ['style' => 'width: 399px']);
             $mform->addRule('certificatename', null, 'required', null, 'client');
             $mform->setType('certificatename', PARAM_TEXT);
             $mform->setDefault('certificatename', $course->fullname);
 
             $mform->addElement('textarea', 'description',
                 get_string('description', 'accredible'),
-                array('cols' => '64', 'rows' => '10', 'wrap' => 'virtual', 'maxlength' => '1000'));
+                ['cols' => '64', 'rows' => '10', 'wrap' => 'virtual', 'maxlength' => '1000']);
             $mform->addRule('description', null, 'required', null, 'client');
             $mform->setType('description', PARAM_RAW);
             $mform->setDefault('description', $description);
@@ -241,7 +241,7 @@ class mod_accredible_mod_form extends moodleform_mod {
             foreach ($unissuedusers as $user) {
                 // No existing certificate, add this user to the unissued users list.
                 $mform->addElement('advcheckbox', 'unissuedusers['.$user['id'].']',
-                    $user['name'] . '    ' . $user['email'], null, array('group' => 2));
+                    $user['name'] . '    ' . $user['email'], null, ['group' => 2]);
             }
             $mform->addElement('html', '</div>');
         }
@@ -264,17 +264,17 @@ class mod_accredible_mod_form extends moodleform_mod {
                         'Certificate '. $user['credential_id'].' - <a href='.$user['credential_url'].' target="_blank">link</a>');
                     $mform->addElement('html', '<div class="hidden">');
                     $mform->addElement('advcheckbox', 'users['.$user['id'].']',
-                        $user['name'] . '    ' . $user['email'], null, array('group' => 1));
+                        $user['name'] . '    ' . $user['email'], null, ['group' => 1]);
                     $mform->addElement('html', '</div>');
                 } else { // Show a checkbox if they don't.
                     $mform->addElement('advcheckbox', 'users['.$user['id'].']',
-                        $user['name'] . '    ' . $user['email'], null, array('group' => 1));
+                        $user['name'] . '    ' . $user['email'], null, ['group' => 1]);
                 }
             }
         } else { // For new modules, just list all the users.
             foreach ($users as $user) {
                 $mform->addElement('advcheckbox', 'users['.$user->id.']',
-                    $user->firstname . ' ' . $user->lastname . '    ' . $user->email, null, array('group' => 1));
+                    $user->firstname . ' ' . $user->lastname . '    ' . $user->email, null, ['group' => 1]);
             }
         }
         $mform->addElement('html', '</div>');

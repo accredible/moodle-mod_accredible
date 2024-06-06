@@ -51,7 +51,7 @@ class accredible {
             'gradeattributekeyname' => $gradeattributechecked ? $post->gradeattributekeyname : null,
             'groupid' => $post->groupid,
             'attributemapping' => $this->build_attribute_mapping_list($post),
-            'timecreated' => time()
+            'timecreated' => time(),
         ];
 
         if ($existingrecord) {
@@ -132,7 +132,7 @@ class accredible {
 
         $course = $DB->get_record(
             'course',
-            array('id' => $courseid),
+            ['id' => $courseid],
             '*',
             IGNORE_MISSING
         );
@@ -163,10 +163,10 @@ class accredible {
 
         $customfielddata = $DB->get_record(
             'customfield_data',
-            array(
+            [
                 'fieldid' => $customfieldfieldid,
-                'instanceid' => $courseid
-            ),
+                'instanceid' => $courseid,
+            ],
             '*',
             IGNORE_MISSING
         );
@@ -181,7 +181,7 @@ class accredible {
 
         $customfield = $DB->get_record(
             'customfield_field',
-            array('id' => $customfieldfieldid),
+            ['id' => $customfieldfieldid],
             '*',
             MUST_EXIST
         );
@@ -211,10 +211,10 @@ class accredible {
 
         $userinfodata = $DB->get_record(
             'user_info_data',
-            array(
+            [
                 'fieldid' => $userinfofieldid,
-                'userid' => $userid
-            ),
+                'userid' => $userid,
+            ],
             '*',
             IGNORE_MISSING
         );
@@ -224,7 +224,7 @@ class accredible {
 
         $userinfofield = $DB->get_record(
             'user_info_field',
-            array('id' => $userinfofieldid),
+            ['id' => $userinfofieldid],
             '*',
             MUST_EXIST
         );
@@ -327,7 +327,7 @@ class accredible {
         foreach ($postedmapping as $mapping) {
             $entry = (object) [
                 'table' => $table,
-                'accredibleattribute' => $mapping['accredibleattribute']
+                'accredibleattribute' => $mapping['accredibleattribute'],
             ];
 
             if ($table === 'course') {

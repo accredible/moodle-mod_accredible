@@ -48,7 +48,7 @@ function accredible_check_if_cert_earned($record, $user) {
     if ( $record && ($record->finalquiz || $record->completionactivities) ) {
 
         if ($record->finalquiz) {
-            $quiz = $DB->get_record('quiz', array('id' => $record->finalquiz), '*', MUST_EXIST);
+            $quiz = $DB->get_record('quiz', ['id' => $record->finalquiz], '*', MUST_EXIST);
             // Create that credential if it doesn't exist.
             $usersgrade = min( ( quiz_get_best_grade($quiz, $user['id']) / $quiz->grade ) * 100, 100);
             $gradeishighenough = ($usersgrade >= $record->passinggrade);
@@ -66,7 +66,7 @@ function accredible_check_if_cert_earned($record, $user) {
             // If this quiz is in the completion activities.
             if ( isset($completionactivities[$quiz->id]) ) {
                 $completionactivities[$quiz->id] = true;
-                $quizattempts = $DB->get_records('quiz_attempts', array('userid' => $user['id'], 'state' => 'finished'));
+                $quizattempts = $DB->get_records('quiz_attempts', ['userid' => $user['id'], 'state' => 'finished']);
                 foreach ($quizattempts as $quizattempt) {
                     // If this quiz was already attempted, then we shouldn't be issuing a certificate.
                     if ( $quizattempt->quiz == $quiz->id && $quizattempt->attempt > 1 ) {
@@ -140,9 +140,9 @@ function accredible_issue_default_certificate($userid, $certificateid, $name, $e
     $issuedon = date('Y-m-d', (int) $completedtimestamp);
 
     // Issue certs.
-    $accrediblecertificate = $DB->get_record('accredible', array('id' => $certificateid));
+    $accrediblecertificate = $DB->get_record('accredible', ['id' => $certificateid]);
 
-    $courseurl = new moodle_url('/course/view.php', array('id' => $accrediblecertificate->course));
+    $courseurl = new moodle_url('/course/view.php', ['id' => $accrediblecertificate->course]);
     $courselink = $courseurl->__toString();
 
     $restapi = new apirest();
@@ -185,20 +185,20 @@ function accredible_log_creation($certificateid, $userid, $courseid, $cmid) {
     global $DB;
 
     // Get context.
-    $accrediblemod = $DB->get_record('modules', array('name' => 'accredible'), '*', MUST_EXIST);
+    $accrediblemod = $DB->get_record('modules', ['name' => 'accredible'], '*', MUST_EXIST);
     if ($cmid) {
-        $cm = $DB->get_record('course_modules', array('id' => (int) $cmid), '*');
+        $cm = $DB->get_record('course_modules', ['id' => (int) $cmid], '*');
     } else { // This is an activity add, so we have to use $courseid.
-        $coursemodules = $DB->get_records('course_modules', array('course' => $courseid, 'module' => $accrediblemod->id));
+        $coursemodules = $DB->get_records('course_modules', ['course' => $courseid, 'module' => $accrediblemod->id]);
         $cm = end($coursemodules);
     }
     $context = context_module::instance($cm->id);
 
-    return \mod_accredible\event\certificate_created::create(array(
+    return \mod_accredible\event\certificate_created::create([
         'objectid' => $certificateid,
         'context' => $context,
-        'relateduserid' => $userid
-    ));
+        'relateduserid' => $userid,
+    ]);
 }
 
 /**
@@ -218,8 +218,8 @@ function accredible_quiz_submission_handler($event) {
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
 
     $quiz = $event->get_record_snapshot('quiz', $attempt->quiz);
-    $user = $DB->get_record('user', array('id' => $event->relateduserid));
-    if ($accrediblecertificaterecords = $DB->get_records('accredible', array('course' => $event->courseid))) {
+    $user = $DB->get_record('user', ['id' => $event->relateduserid]);
+    if ($accrediblecertificaterecords = $DB->get_records('accredible', ['course' => $event->courseid])) {
         foreach ($accrediblecertificaterecords as $record) {
             // Check for the existence of an activity instance and an auto-issue rule.
             if ( $record && ($record->finalquiz || $record->completionactivities) ) {
@@ -267,7 +267,7 @@ function accredible_quiz_submission_handler($event) {
                     // If this quiz is in the completion activities.
                     if ( isset($completionactivities[$quiz->id]) ) {
                         $completionactivities[$quiz->id] = true;
-                        $quizattempts = $DB->get_records('quiz_attempts', array('userid' => $user->id, 'state' => 'finished'));
+                        $quizattempts = $DB->get_records('quiz_attempts', ['userid' => $user->id, 'state' => 'finished']);
                         foreach ($quizattempts as $quizattempt) {
                             // If this quiz was already attempted, then we shouldn't be issuing a certificate.
                             if ( $quizattempt->quiz == $quiz->id && $quizattempt->attempt > 1 ) {
@@ -314,11 +314,11 @@ function accredible_quiz_submission_handler($event) {
                                 // Issue a ceritificate.
                                 $apiresponse = accredible_issue_default_certificate( $user->id,
                                     $record->id, fullname($user), $user->email, $usersgrade, $quiz->name, null, $customattributes);
-                                $certificateevent = \mod_accredible\event\certificate_created::create(array(
+                                $certificateevent = \mod_accredible\event\certificate_created::create([
                                   'objectid' => $apiresponse->credential->id,
                                   'context' => context_module::instance($event->contextinstanceid),
-                                  'relateduserid' => $event->relateduserid
-                                ));
+                                  'relateduserid' => $event->relateduserid,
+                                ]);
                                 $certificateevent->trigger();
                             }
                         } else {
@@ -341,7 +341,7 @@ function accredible_quiz_submission_handler($event) {
                     // If this quiz is in the completion activities.
                     if ( isset($completionactivities[$quiz->id]) ) {
                         $completionactivities[$quiz->id] = true;
-                        $quizattempts = $DB->get_records('quiz_attempts', array('userid' => $user->id, 'state' => 'finished'));
+                        $quizattempts = $DB->get_records('quiz_attempts', ['userid' => $user->id, 'state' => 'finished']);
                         foreach ($quizattempts as $quizattempt) {
                             // If this quiz was already attempted, then we shouldn't be issuing a certificate.
                             if ( $quizattempt->quiz == $quiz->id && $quizattempt->attempt > 1 ) {
@@ -370,11 +370,11 @@ function accredible_quiz_submission_handler($event) {
                                 // And issue a ceritificate.
                                 $apiresponse = accredible_issue_default_certificate( $user->id,
                                     $record->id, fullname($user), $user->email, null, null, null, $customattributes);
-                                $certificateevent = \mod_accredible\event\certificate_created::create(array(
+                                $certificateevent = \mod_accredible\event\certificate_created::create([
                                   'objectid' => $apiresponse->credential->id,
                                   'context' => context_module::instance($event->contextinstanceid),
-                                  'relateduserid' => $event->relateduserid
-                                ));
+                                  'relateduserid' => $event->relateduserid,
+                                ]);
                                 $certificateevent->trigger();
                             }
                         }
@@ -399,10 +399,10 @@ function accredible_course_completed_handler($event) {
     $usersclient = new users();
     $accredible = new accredible();
 
-    $user = $DB->get_record('user', array('id' => $event->relateduserid));
+    $user = $DB->get_record('user', ['id' => $event->relateduserid]);
 
     // Check we have a course record.
-    if ($accrediblecertificaterecords = $DB->get_records('accredible', array('course' => $event->courseid))) {
+    if ($accrediblecertificaterecords = $DB->get_records('accredible', ['course' => $event->courseid])) {
         foreach ($accrediblecertificaterecords as $record) {
             // Check for the existence of an activity instance and an auto-issue rule.
             if ( $record && ($record->completionactivities && $record->completionactivities != 0) ) {
@@ -421,11 +421,11 @@ function accredible_course_completed_handler($event) {
                 } else {
                     $apiresponse = accredible_issue_default_certificate( $user->id, $record->id,
                         fullname($user), $user->email, null, null, null, $customattributes);
-                    $certificateevent = \mod_accredible\event\certificate_created::create(array(
+                    $certificateevent = \mod_accredible\event\certificate_created::create([
                       'objectid' => $apiresponse->credential->id,
                       'context' => context_module::instance($event->contextinstanceid),
-                      'relateduserid' => $event->relateduserid
-                    ));
+                      'relateduserid' => $event->relateduserid,
+                    ]);
                     $certificateevent->trigger();
                 }
 
@@ -448,8 +448,8 @@ function accredible_get_transcript($courseid, $userid, $finalquizid) {
     $totalitems = 0;
     $totalscore = 0;
     $itemscompleted = 0;
-    $transcriptitems = array();
-    $quizes = $DB->get_records_select('quiz', 'course = :course_id', array('course_id' => $courseid), 'id ASC');
+    $transcriptitems = [];
+    $quizes = $DB->get_records_select('quiz', 'course = :course_id', ['course_id' => $courseid], 'id ASC');
 
     // Grab the grades for all quizes.
     foreach ($quizes as $quiz) {
@@ -457,10 +457,10 @@ function accredible_get_transcript($courseid, $userid, $finalquizid) {
             $highestgrade = quiz_get_best_grade($quiz, $userid);
             if ($highestgrade) {
                 $itemscompleted += 1;
-                array_push($transcriptitems, array(
+                array_push($transcriptitems, [
                     'category' => $quiz->name,
-                    'percent' => min( ( $highestgrade / $quiz->grade ) * 100, 100 )
-                ));
+                    'percent' => min( ( $highestgrade / $quiz->grade ) * 100, 100 ),
+                ]);
                 $totalscore += min( ( $highestgrade / $quiz->grade ) * 100, 100);
             }
             $totalitems += 1;
@@ -471,13 +471,13 @@ function accredible_get_transcript($courseid, $userid, $finalquizid) {
     // and have a passing average, make a transcript.
     if ( $totalitems !== 0 && $itemscompleted !== 0 && $itemscompleted / $totalitems >= 0.66 &&
         $totalscore / $itemscompleted > 50 ) {
-        return array(
-                'description' => 'Course Transcript',
-                'string_object' => json_encode($transcriptitems),
-                'category' => 'transcript',
-                'custom' => true,
-                'hidden' => true
-            );
+        return [
+            'description' => 'Course Transcript',
+            'string_object' => json_encode($transcriptitems),
+            'category' => 'transcript',
+            'custom' => true,
+            'hidden' => true,
+        ];
     } else {
         return false;
     }
@@ -519,12 +519,15 @@ function accredible_manual_issue_completion_timestamp($accrediblerecord, $user) 
     if ($accrediblerecord->finalquiz) {
         // If there is a finalquiz set, that governs when the course is complete.
 
-        $quiz = $DB->get_record('quiz', array('id' => $accrediblerecord->finalquiz), '*', MUST_EXIST);
+        $quiz = $DB->get_record('quiz', ['id' => $accrediblerecord->finalquiz], '*', MUST_EXIST);
         $totalrawscore = $quiz->sumgrades;
         $highestattempt = null;
 
-        $quizattempts = $DB->get_records('quiz_attempts', array('userid' => $user->id,
-            'state' => 'finished', 'quiz' => $accrediblerecord->finalquiz));
+        $quizattempts = $DB->get_records('quiz_attempts', [
+            'userid' => $user->id,
+            'state' => 'finished',
+            'quiz' => $accrediblerecord->finalquiz,
+        ]);
         foreach ($quizattempts as $quizattempt) {
             if (!isset($highestattempt)) {
                 // First attempt in the loop, so currently the highest.

@@ -25,9 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$logs = array(
-    array('module' => 'accredible', 'action' => 'view', 'mtable' => 'accredible', 'field' => 'name'),
-    array('module' => 'accredible', 'action' => 'add', 'mtable' => 'accredible', 'field' => 'name'),
-    array('module' => 'accredible', 'action' => 'update', 'mtable' => 'accredible', 'field' => 'name'),
-    array('module' => 'accredible', 'action' => 'received', 'mtable' => 'accredible', 'field' => 'name'),
-);
+$logs = [
+    ['module' => 'accredible', 'action' => 'view', 'mtable' => 'accredible', 'field' => 'name'],
+    ['module' => 'accredible', 'action' => 'add', 'mtable' => 'accredible', 'field' => 'name'],
+    ['module' => 'accredible', 'action' => 'update', 'mtable' => 'accredible', 'field' => 'name'],
+    ['module' => 'accredible', 'action' => 'received', 'mtable' => 'accredible', 'field' => 'name'],
+];
