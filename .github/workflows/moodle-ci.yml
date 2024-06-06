@@ -122,3 +122,7 @@ jobs:
       # - name: Behat features
       #   if: ${{ always() }}
       #   run: moodle-plugin-ci behat --profile chrome
+
+      - name: Mark cancelled jobs as failed.
+        if: ${{ cancelled() }}
+        run: exit 1
