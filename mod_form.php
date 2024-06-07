@@ -125,16 +125,19 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         // Load template contexts.
         $attributekeyschoices = $formhelper->get_attributekeys_choices();
-        $coursefieldoptions = $formhelper->load_course_field_options();
-        $coursecustomfieldoptions = $formhelper->load_course_custom_field_options();
-        $userprofilefieldoptions = $formhelper->load_user_profile_field_options();
+
+        $accredibleoptions = $formhelper->map_select_options($attributekeyschoices);
+        $coursefieldoptions = $formhelper->map_select_options($formhelper->load_course_field_options());
+        $coursecustomfieldoptions = $formhelper->map_select_options($formhelper->load_course_custom_field_options());
+        $userprofilefieldoptions = $formhelper->map_select_options($formhelper->load_user_profile_field_options());
 
         $templatecontext = [
             'options' => [
-                'accredibleoptions' => $formhelper->map_select_options($attributekeyschoices),
-                'coursefieldoptions' => $formhelper->map_select_options($coursefieldoptions),
-                'coursecustomfieldoptions' => $formhelper->map_select_options($coursecustomfieldoptions),
-                'userprofilefieldoptions' => $formhelper->map_select_options($userprofilefieldoptions),
+                'accredibleoptions' => $accredibleoptions,
+                'coursefieldoptions' => $coursefieldoptions,
+                'coursecustomfieldoptions' => $coursecustomfieldoptions,
+                'userprofilefieldoptions' => $userprofilefieldoptions,
+                'test' => $accrediblecertificate->attributemapping,
             ]
         ];
 
@@ -310,13 +313,13 @@ class mod_accredible_mod_form extends moodleform_mod {
         // Attribute mapping: course fields.
         $mform->addElement('header', 'attributemappingcoursefields', get_string('attributemappingcoursefields', 'accredible'));
 
+        $coursefieldmappings = $attributemappingdefaultvalues['coursefieldmapping'];
         $coursefieldmappingcontent = [
-            'mappings' => array(),
+            'mappings' => $coursefieldmappings,
             'section' => 'coursefieldmapping',
-            'hasmappings' => true,
-            'hasid' => false,
-            'accredibleoptions' => $formhelper->map_select_options($attributekeyschoices),
-            'moodleoptions' => $formhelper->map_select_options($formhelper->load_course_field_options())
+            'hasmappings' => isset($coursefieldmappings),
+            'accredibleoptions' => $accredibleoptions,
+            'moodleoptions' => $coursefieldoptions,
         ];
 
         $mform->addElement('html', $OUTPUT->render_from_template('mod_accredible/mappings', $coursefieldmappingcontent));
@@ -327,29 +330,18 @@ class mod_accredible_mod_form extends moodleform_mod {
             'attributemappingcoursecustomfields',
             get_string('attributemappingcoursecustomfields', 'accredible')
         );
-        $mform->addElement(
-            'select',
-            'coursecustomfieldmapping[0][id]',
-            get_string('moodlecoursecustomfield', 'accredible'),
-            $formhelper->load_course_custom_field_options(),
-            $inputstyle
-        );
-        $this->set_mapping_field_default($mform, $attributemappingdefaultvalues, 'coursecustomfieldmapping', 'id', 0);
 
-        $mform->addElement(
-            'select',
-            'coursecustomfieldmapping[0][accredibleattribute]',
-            get_string('accrediblecustomattributename', 'accredible'),
-            $attributekeyschoices,
-            $inputstyle
-        );
-        $this->set_mapping_field_default(
-            $mform,
-            $attributemappingdefaultvalues,
-            'coursecustomfieldmapping',
-            'accredibleattribute',
-            0
-        );
+        $coursecustomfieldmappings = $attributemappingdefaultvalues['coursecustomfieldmapping'];
+        $coursecustomfieldmappingcontent = [
+            'mappings' => $coursecustomfieldmappings,
+            'section' => 'coursecustomfieldmapping',
+            'hasmappings' => isset($coursecustomfieldmappings),
+            'accredibleoptions' => $accredibleoptions,
+            'moodleoptions' => $coursecustomfieldoptions,
+            'hasid' => true,
+        ];
+
+        $mform->addElement('html', $OUTPUT->render_from_template('mod_accredible/mappings', $coursecustomfieldmappingcontent));
 
         // Attribute mapping: user profile fields.
         $mform->addElement('header',
