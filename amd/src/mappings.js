@@ -37,7 +37,12 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
 
             mappings.add = $('[id*="_add_new_line"]');
             mappings.add.on('click', mappings.addNewLine);
-            
+
+            mappings.add.each((_,element) => {
+                const section = $(element).attr("data-section");
+                mappings.toggleAddButton(section);
+            });
+
             mappings.list = $('.attribute_mapping');
             mappings.list.on('click', '.remove-line', mappings.removeLine);
         },
@@ -51,6 +56,10 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                 moodleoptions: options[optionsMap[section]]
             };
             mappings.renderMappingLine(data,`#${section}_content`);
+            // Wait for line to be rendered then show/hide the button.
+            setTimeout(() => {
+                mappings.toggleAddButton(section);
+            }, 100);
         },
 
         removeLine: function() {
@@ -58,6 +67,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             const section = $(this).attr("data-section");
             const mappingLineId = `#${section}_mapping_line_${index}`;
             $(mappingLineId).remove();
+            mappings.toggleAddButton(section);
         },
 
         countLines: function(section) {
@@ -70,6 +80,14 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                 const value = selectEl.attr('data-initial-value');
                 selectEl.val(value);
             });
+        },
+
+        toggleAddButton: function(section) {
+           const addBtn = $(`#${section}_add_new_line`);
+           const currentLines = mappings.countLines(section);
+           const maxLines = options[optionsMap[section]].length - 1; // Excludes blank option.
+
+           addBtn.prop("disabled", currentLines == maxLines);
         },
 
         renderMappingLine: function(context, containerid) {
