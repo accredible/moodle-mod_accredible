@@ -137,7 +137,6 @@ class mod_accredible_mod_form extends moodleform_mod {
                 'coursefieldoptions' => $coursefieldoptions,
                 'coursecustomfieldoptions' => $coursecustomfieldoptions,
                 'userprofilefieldoptions' => $userprofilefieldoptions,
-                'test' => $accrediblecertificate->attributemapping,
             ]
         ];
 
@@ -335,10 +334,10 @@ class mod_accredible_mod_form extends moodleform_mod {
         $coursecustomfieldmappingcontent = [
             'mappings' => $coursecustomfieldmappings,
             'section' => 'coursecustomfieldmapping',
+            'hasid' => true,
             'hasmappings' => isset($coursecustomfieldmappings),
             'accredibleoptions' => $accredibleoptions,
             'moodleoptions' => $coursecustomfieldoptions,
-            'hasid' => true,
         ];
 
         $mform->addElement('html', $OUTPUT->render_from_template('mod_accredible/mappings', $coursecustomfieldmappingcontent));
@@ -348,29 +347,18 @@ class mod_accredible_mod_form extends moodleform_mod {
             'attributemappinguserprofilefields',
             get_string('attributemappinguserprofilefields', 'accredible')
         );
-        $mform->addElement(
-            'select',
-            'userprofilefieldmapping[0][id]',
-            get_string('moodleuserprofilefield', 'accredible'),
-            $formhelper->load_user_profile_field_options(),
-            $inputstyle
-        );
-        $this->set_mapping_field_default($mform, $attributemappingdefaultvalues, 'userprofilefieldmapping', 'id', 0);
 
-        $mform->addElement(
-            'select',
-            'userprofilefieldmapping[0][accredibleattribute]',
-            get_string('accrediblecustomattributename', 'accredible'),
-            $attributekeyschoices,
-            $inputstyle
-        );
-        $this->set_mapping_field_default(
-            $mform,
-            $attributemappingdefaultvalues,
-            'userprofilefieldmapping',
-            'accredibleattribute',
-            0
-        );
+        $userprofilefieldmappings = $attributemappingdefaultvalues['userprofilefieldmapping'];
+        $userprofilefieldmappingcontent = [
+            'mappings' => $userprofilefieldmappings,
+            'section' => 'userprofilefieldmapping',
+            'hasid' => true,
+            'hasmappings' => isset($userprofilefieldmappings),
+            'accredibleoptions' => $accredibleoptions,
+            'moodleoptions' => $userprofilefieldoptions,
+        ];
+
+        $mform->addElement('html', $OUTPUT->render_from_template('mod_accredible/mappings', $userprofilefieldmappingcontent));
 
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
