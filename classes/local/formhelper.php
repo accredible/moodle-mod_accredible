@@ -137,12 +137,12 @@ class formhelper {
      */
     public function map_select_options($options) {
         $selectoptions = array();
-        $keys = array_keys($options); 
+        $keys = array_keys($options);
         foreach($keys as $key) {
-            $selectoptions[] = array(
-                'name' => $key,
-                'value' => $options[$key]
-            );
+            $selectoptions[] = [
+                'name' => $options[$key],
+                'value' => $key,
+            ];
         }
 
         return $selectoptions;
@@ -178,27 +178,36 @@ class formhelper {
         if (!$attributemapping) {
             return $defaultvalues;
         }
+        $coursefieldmappingindex = 0;
+        $coursecustomfieldmappingindex = 0;
+        $userprofilefieldmappingindex = 0;
 
         $decodedmapping = json_decode($attributemapping);
         foreach ($decodedmapping as $mapping) {
             switch ($mapping->table) {
                 case 'course':
                     $defaultvalues['coursefieldmapping'][] = [
+                        'index' => $coursefieldmappingindex,
                         'field' => isset($mapping->field) ? $mapping->field : '',
-                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : ''
+                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : '',
                     ];
+                    $coursefieldmappingindex++;
                     break;
                 case 'customfield_field':
                     $defaultvalues['coursecustomfieldmapping'][] = [
+                        'index' => $coursecustomfieldmappingindex,
                         'id' => isset($mapping->id) ? $mapping->id : '',
-                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : ''
+                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : '',
                     ];
+                    $coursecustomfieldmappingindex++;
                     break;
                 case 'user_info_field':
                     $defaultvalues['userprofilefieldmapping'][] = [
+                        'index' => $userprofilefieldmappingindex,
                         'id' => isset($mapping->id) ? $mapping->id : '',
-                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : ''
+                        'accredibleattribute' => isset($mapping->accredibleattribute) ? $mapping->accredibleattribute : '',
                     ];
+                    $userprofilefieldmappingindex++;
                     break;
             }
         }
