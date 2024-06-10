@@ -217,7 +217,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * @covers ::get_attributekeys_choices
      */
     public function test_get_attributekeys_choices() {
-        // Mock attribute_keys class and 1 method
+        // Mock attribute_keys class and 1 method.
         $attributekeysmock = $this->getMockBuilder(attribute_keys::class)
             ->onlyMethods(['get_attribute_keys'])
             ->getMock();
@@ -240,7 +240,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $result = $formhelper->get_attributekeys_choices();
         $this->assertEquals($expected, $result);
 
-        // Mock attribute_keys class and 1 method
+        // Mock attribute_keys class and 1 method.
         $attributekeysmock = $this->getMockBuilder(attribute_keys::class)
             ->onlyMethods(['get_attribute_keys'])
             ->getMock();
@@ -384,20 +384,20 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
 
     /**
      * Helper method to create an instance of formhelper with a mock attribute_keys class.
-     * 
+     *
      * @param $attributekeysmock The mock instance of the attribute_keys class.
      */
     private function create_formhelper_with_mock($attributekeysmock) {
         // Use an anonymous class to extend formhelper and inject the mock.
         return new class($attributekeysmock) extends formhelper {
-            public $mock_client;
+            public $mockclient;
 
-            public function __construct($mock_client) {
-                $this->mock_client = $mock_client;
+            public function __construct($mockclient) {
+                $this->mockclient = $mockclient;
             }
 
             public function get_attribute_keys_client() {
-                return $this->mock_client;
+                return $this->mockclient;
             }
         };
     }

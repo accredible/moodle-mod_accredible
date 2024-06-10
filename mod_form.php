@@ -179,7 +179,6 @@ class mod_accredible_mod_form extends moodleform_mod {
             $mform->addElement('static', 'additionalactivitiestwo', '', get_string('additionalactivitiestwo', 'accredible'));
         }
 
-        
         if (isset($attributekeyschoices)) {
             // Hidden element to check if we should disable the "gradeattributekeyname" select.
             $mform->addElement('hidden', 'attributekysnumber', 1);
@@ -367,11 +366,10 @@ class mod_accredible_mod_form extends moodleform_mod {
     /**
      * Called right before form submission.
      * We use it to include missing form data from mustache templates.
-     * 
+     *
      * @return void
      */
-    public function data_postprocessing($data)
-    {
+    public function data_postprocessing($data) {
         parent::data_postprocessing($data);
         $submitteddata = $this->_form->getSubmitValues();
         $data->coursefieldmapping = $submitteddata['coursefieldmapping'];

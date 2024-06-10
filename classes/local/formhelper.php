@@ -165,7 +165,7 @@ class formhelper {
             return $selectoptions;
         }
         $keys = array_keys($options);
-        foreach($keys as $key) {
+        foreach ($keys as $key) {
             $selectoptions[] = [
                 'name' => $options[$key],
                 'value' => $key,
@@ -252,7 +252,7 @@ class formhelper {
 
     /**
      * Retrieves an instance of attribute_keys.
-     * 
+     *
      * @return attribute_keys An instance of the attribute_keys client.
      */
     public function get_attribute_keys_client() {
