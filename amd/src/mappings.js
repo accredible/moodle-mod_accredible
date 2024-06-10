@@ -23,8 +23,12 @@
  */
 
 define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
-    var options = {};
-    const acrredibleSelect = '[id*="_accredibleattribute"]';
+    let options = {};
+    const element = {
+        acrredibleSelect: '[id*="_accredibleattribute"]',
+        addButton: '[id*="_add_new_line"]',
+        list: '.attribute_mapping',
+    };
     const optionsMap = {
         coursefieldmapping: 'coursefieldoptions',
         coursecustomfieldmapping: 'coursecustomfieldoptions',
@@ -35,33 +39,39 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
         init: function(data) {
             options = data;
             mappings.setSelectValues();
-
-            mappings.add = $('[id*="_add_new_line"]');
-            mappings.add.on('click', mappings.addNewLine);
-
-            mappings.add.each((_,element) => {
-                const section = $(element).attr("data-section");
-                mappings.toggleAddButton(section);
-            });
-
-            mappings.list = $('.attribute_mapping');
-            mappings.list.on('click', '.remove-line', mappings.removeLine);
-            
+            mappings.listenToAddAction();            
+            mappings.listenToDeleteAction();
             mappings.listenToSelectChanges();
         },
 
-        listenToSelectChanges() {
-            mappings.list.on('change', acrredibleSelect, (event) => {
+        listenToAddAction: function() {
+            const addButton = $(element.addButton);
+            addButton.on('click', mappings.addNewLine);
+            // enable/disable add button after max attributes added
+            addButton.each((_,element) => {
+                const section = $(element).attr("data-section");
+                mappings.toggleAddButton(section);
+            });
+        },
+
+        listenToDeleteAction: function() {
+            $(element.list).on('click', '.remove-line', mappings.removeLine);
+        },
+
+        listenToSelectChanges: function() {
+            $(element.list).on('change', element.acrredibleSelect, (event) => {
                 mappings.checkForDuplicates();
             });
         },
 
         getAttributeValuesCount: function() {
             const valuesCount = new Map();
-            $(acrredibleSelect).each((_,select) => {
+            $(element.acrredibleSelect).each((_,select) => {
                 const value = $(select).val();
+                if (!value) {
+                    return;
+                }
                 let occurrences = valuesCount.get(value) ?? 0;
-
                 occurrences++;
                 valuesCount.set(value, occurrences);
             });
@@ -71,7 +81,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
         checkForDuplicates: function() {
             const duplicateCount = mappings.getAttributeValuesCount();
 
-            $(acrredibleSelect).each((_,select) => {
+            $(element.acrredibleSelect).each((_,select) => {
                 const id = $(select).attr('id');
                 const sectionId = id.split('_accredibleattribute')[0];
                 const delSection = $(`#${sectionId}_delete_action`);
