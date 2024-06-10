@@ -160,7 +160,7 @@ class formhelper {
      * @return array An array of associative arrays with 'name' and 'value' keys.
      */
     public function map_select_options($options) {
-        $selectoptions = array();
+        $selectoptions = [];
         $keys = array_keys($options);
         foreach($keys as $key) {
             $selectoptions[] = [
@@ -174,7 +174,7 @@ class formhelper {
 
     public function get_attributekeys_choices() {
         $attributekeysclient = new attribute_keys();
-        $firstoption = array('' => get_string('accrediblecustomattributeselectprompt', 'accredible'));
+        $firstoption = ['' => get_string('accrediblecustomattributeselectprompt', 'accredible')];
 
         $textattributekeys = $attributekeysclient->get_attribute_keys('text');
         $dateattributekeys = $attributekeysclient->get_attribute_keys('date');
