@@ -184,10 +184,9 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * @covers ::map_select_options
      */
     public function test_map_select_options() {
-        global $DB;
         $formhelper = new formhelper();
 
-        // When the options array has values
+        // When the options array has values.
         $options = [
             'key1' => 'Option 1',
             'key2' => 'Option 2',
@@ -201,15 +200,64 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $result = $formhelper->map_select_options($options);
         $this->assertEquals($expected, $result);
 
-        // When the options array is null
+        // When the options array is null.
         $options = null;
         $expected = [];
         $result = $formhelper->map_select_options($options);
         $this->assertEquals($expected, $result);
 
-        // When the options array is empty
+        // When the options array is empty.
         $options = [];
         $result = $formhelper->map_select_options($options);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Test the get_attributekeys_choices method.
+     * @covers ::get_attributekeys_choices
+     */
+    public function test_get_attributekeys_choices() {
+        // Mock attribute_keys class and 1 method
+        $attributekeysmock = $this->getMockBuilder(attribute_keys::class)
+            ->onlyMethods(['get_attribute_keys'])
+            ->getMock();
+
+        // When get_attribute_keys(mocked) method returns values for 'text' and 'date'.
+        $attributekeysmock->expects($this->any())
+            ->method('get_attribute_keys')
+            ->will($this->returnValueMap([
+                ['text', ['key1' => 'Text Attribute 1', 'key2' => 'Text Attribute 2']],
+                ['date', ['key3' => 'Date Attribute 1']]
+            ]));
+        $formhelper = $this->create_formhelper_with_mock($attributekeysmock);
+
+        $expected = [
+            '' => get_string('accrediblecustomattributeselectprompt', 'accredible'),
+            'key1' => 'Text Attribute 1',
+            'key2' => 'Text Attribute 2',
+            'key3' => 'Date Attribute 1'
+        ];
+        $result = $formhelper->get_attributekeys_choices();
+        $this->assertEquals($expected, $result);
+
+        // Mock attribute_keys class and 1 method
+        $attributekeysmock = $this->getMockBuilder(attribute_keys::class)
+            ->onlyMethods(['get_attribute_keys'])
+            ->getMock();
+
+        // When get_attribute_keys(mocked) method returns empty for 'text' and 'date'.
+        $attributekeysmock->expects($this->any())
+            ->method('get_attribute_keys')
+            ->will($this->returnValueMap([
+                ['text', []],
+                ['date', []]
+            ]));
+        $formhelper = $this->create_formhelper_with_mock($attributekeysmock);
+
+        $expected = [
+            '' => get_string('accrediblecustomattributeselectprompt', 'accredible'),
+        ];
+        $result = $formhelper->get_attributekeys_choices();
         $this->assertEquals($expected, $result);
     }
 
@@ -332,5 +380,25 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
             "itemnumber" => 0
         );
         return $DB->insert_record('grade_items', $gradeitem);
+    }
+
+    /**
+     * Helper method to create an instance of formhelper with a mock attribute_keys class.
+     * 
+     * @param $attributekeysmock The mock instance of the attribute_keys class.
+     */
+    private function create_formhelper_with_mock($attributekeysmock) {
+        // Use an anonymous class to extend formhelper and inject the mock.
+        return new class($attributekeysmock) extends formhelper {
+            public $mock_client;
+
+            public function __construct($mock_client) {
+                $this->mock_client = $mock_client;
+            }
+
+            public function get_attribute_keys_client() {
+                return $this->mock_client;
+            }
+        };
     }
 }

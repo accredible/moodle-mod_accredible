@@ -185,7 +185,7 @@ class formhelper {
      * @return array An associative array of attribute key choices for a select input.
      */
     public function get_attributekeys_choices() {
-        $attributekeysclient = new attribute_keys();
+        $attributekeysclient = $this->get_attribute_keys_client();
         $firstoption = ['' => get_string('accrediblecustomattributeselectprompt', 'accredible')];
 
         $textattributekeys = $attributekeysclient->get_attribute_keys('text');
@@ -248,5 +248,14 @@ class formhelper {
             }
         }
         return $defaultvalues;
+    }
+
+    /**
+     * Retrieves an instance of attribute_keys.
+     * 
+     * @return attribute_keys An instance of the attribute_keys client.
+     */
+    public function get_attribute_keys_client() {
+        return  new attribute_keys();
     }
 }
