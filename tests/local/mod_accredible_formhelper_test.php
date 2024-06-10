@@ -180,6 +180,40 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
     }
 
     /**
+     * Test the map_select_options method.
+     * @covers ::map_select_options
+     */
+    public function test_map_select_options() {
+        global $DB;
+        $formhelper = new formhelper();
+
+        // When the options array has values
+        $options = [
+            'key1' => 'Option 1',
+            'key2' => 'Option 2',
+            'key3' => 'Option 3'
+        ];
+        $expected = [
+            ['name' => 'Option 1', 'value' => 'key1'],
+            ['name' => 'Option 2', 'value' => 'key2'],
+            ['name' => 'Option 3', 'value' => 'key3']
+        ];
+        $result = $formhelper->map_select_options($options);
+        $this->assertEquals($expected, $result);
+
+        // When the options array is null
+        $options = null;
+        $expected = [];
+        $result = $formhelper->map_select_options($options);
+        $this->assertEquals($expected, $result);
+
+        // When the options array is empty
+        $options = [];
+        $result = $formhelper->map_select_options($options);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * Test the attributemapping_default_values method.
      * @covers ::attributemapping_default_values
      */

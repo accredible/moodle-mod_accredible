@@ -161,6 +161,9 @@ class formhelper {
      */
     public function map_select_options($options) {
         $selectoptions = [];
+        if (!isset($options)) {
+            return $selectoptions;
+        }
         $keys = array_keys($options);
         foreach($keys as $key) {
             $selectoptions[] = [
