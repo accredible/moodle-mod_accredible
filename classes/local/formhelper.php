@@ -79,10 +79,18 @@ class formhelper {
      * @return array Associative array of course field names suitable for form dropdown.
      */
     public function load_course_field_options() {
-        $options = array('' => 'Select a Moodle course field');
+        $options = [
+            [
+                'value' => '',
+                'name' => 'Select a Moodle course field',
+            ]
+        ];
         $fields = attributemapping::VALID_COURSE_FIELDS;
         foreach ($fields as $field) {
-            $options[$field] = $field;
+            $options[] = [
+                'name' => $field,
+                'value' => $field,
+            ];
         }
         return $options;
     }
@@ -98,10 +106,18 @@ class formhelper {
     public function load_course_custom_field_options() {
         global $DB;
 
-        $options = array('' => 'Select a Moodle course custom field');
+        $options = [
+            [
+                'value' => '',
+                'name' => 'Select a Moodle course custom field',
+            ]
+        ];
         $customfields = $DB->get_records('customfield_field', array(), '', 'id, name');
         foreach ($customfields as $field) {
-            $options[$field->id] = $field->name;
+            $options[] = [
+                'name' => $field->name,
+                'value' => $field->id,
+            ];
         }
         return $options;
     }
@@ -117,10 +133,18 @@ class formhelper {
     public function load_user_profile_field_options() {
         global $DB;
 
-        $options = array('' => 'Select a Moodle user profile field');
+        $options = [
+            [
+                'value' => '',
+                'name' => 'Select a Moodle user profile field',
+            ]
+        ];
         $profilefields = $DB->get_records('user_info_field', array(), '', 'id, name');
         foreach ($profilefields as $field) {
-            $options[$field->id] = $field->name;
+            $options[] = [
+                'name' => $field->name,
+                'value' => $field->id,
+            ];
         }
         return $options;
     }

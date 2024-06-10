@@ -127,9 +127,9 @@ class mod_accredible_mod_form extends moodleform_mod {
         $attributekeyschoices = $formhelper->get_attributekeys_choices();
 
         $accredibleoptions = $formhelper->map_select_options($attributekeyschoices);
-        $coursefieldoptions = $formhelper->map_select_options($formhelper->load_course_field_options());
-        $coursecustomfieldoptions = $formhelper->map_select_options($formhelper->load_course_custom_field_options());
-        $userprofilefieldoptions = $formhelper->map_select_options($formhelper->load_user_profile_field_options());
+        $coursefieldoptions = $formhelper->load_course_field_options();
+        $coursecustomfieldoptions = $formhelper->load_course_custom_field_options();
+        $userprofilefieldoptions = $formhelper->load_user_profile_field_options();
 
         $templatecontext = [
             'options' => [
