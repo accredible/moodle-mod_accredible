@@ -88,13 +88,13 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
 
         $formhelper = new formhelper();
 
-        $expected = array(
-            '' => 'Select a Moodle course field',
-            'fullname' => 'fullname',
-            'shortname' => 'shortname',
-            'startdate' => 'startdate',
-            'enddate' => 'enddate'
-        );
+        $expected = [
+            ['value' => '', 'name' => 'Select a Moodle course field'],
+            ['value' => 'fullname', 'name' => 'fullname'],
+            ['value' => 'shortname', 'name' => 'shortname'],
+            ['value' => 'startdate', 'name' => 'startdate'],
+            ['value' => 'enddate', 'name' => 'enddate'],
+        ];
         $result = $formhelper->load_course_field_options();
         $this->assertEquals($expected, $result);
     }
@@ -109,7 +109,9 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $formhelper = new formhelper();
 
         // When there are no custom fields.
-        $expected = array('' => 'Select a Moodle course custom field');
+        $expected = [
+            ['value' => '', 'name' => 'Select a Moodle course custom field']
+        ];
         $result = $formhelper->load_course_custom_field_options();
         $this->assertEquals($expected, $result);
 
@@ -130,11 +132,11 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         );
         $customfield2id = $DB->insert_record('customfield_field', $customfield2);
 
-        $expected = array(
-          '' => 'Select a Moodle course custom field',
-          $customfield1id => 'Custom Field 1',
-          $customfield2id => 'Custom Field 2'
-        );
+        $expected = [
+            ['value' => '', 'name' => 'Select a Moodle course custom field'],
+            ['value' => $customfield1id, 'name' => 'Custom Field 1'],
+            ['value' => $customfield2id, 'name' => 'Custom Field 2'],
+        ];
         $result = $formhelper->load_course_custom_field_options();
         $this->assertEquals($expected, $result);
     }
@@ -149,7 +151,9 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $formhelper = new formhelper();
 
         // When there are no user_info_field records.
-        $expected = array('' => 'Select a Moodle user profile field');
+        $expected = [
+            ['value' => '', 'name' => 'Select a Moodle user profile field']
+        ];
         $result = $formhelper->load_user_profile_field_options();
         $this->assertEquals($expected, $result);
 
@@ -166,11 +170,11 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         );
         $userinfofield2id = $DB->insert_record('user_info_field', $userinfofield2);
 
-        $expected = array(
-            '' => 'Select a Moodle user profile field',
-            $userinfofield1id => 'User Info 1',
-            $userinfofield2id => 'User Info 2'
-        );
+        $expected = [
+            ['value' => '', 'name' => 'Select a Moodle user profile field'],
+            ['value' => $userinfofield1id, 'name' => 'User Info 1'],
+            ['value' => $userinfofield2id, 'name' => 'User Info 2'],
+        ];
         $result = $formhelper->load_user_profile_field_options();
         $this->assertEquals($expected, $result);
     }
@@ -213,18 +217,21 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $expected = [
             'coursefieldmapping' => [
                 [
+                    'index' => 0,
                     'field' => 'startdate',
                     'accredibleattribute' => 'Moodle Course Start Date'
                 ]
             ],
             'coursecustomfieldmapping' => [
                 [
+                    'index' => 0,
                     'id' => 321,
                     'accredibleattribute' => 'Moodle Typology'
                 ]
             ],
             'userprofilefieldmapping' => [
                 [
+                    'index' => 0,
                     'id' => 123,
                     'accredibleattribute' => 'Moodle User Birthday'
                 ]

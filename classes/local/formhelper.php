@@ -88,8 +88,8 @@ class formhelper {
         $fields = attributemapping::VALID_COURSE_FIELDS;
         foreach ($fields as $field) {
             $options[] = [
-                'name' => $field,
                 'value' => $field,
+                'name' => $field,
             ];
         }
         return $options;
@@ -115,8 +115,8 @@ class formhelper {
         $customfields = $DB->get_records('customfield_field', array(), '', 'id, name');
         foreach ($customfields as $field) {
             $options[] = [
-                'name' => $field->name,
                 'value' => $field->id,
+                'name' => $field->name,
             ];
         }
         return $options;
@@ -142,8 +142,8 @@ class formhelper {
         $profilefields = $DB->get_records('user_info_field', array(), '', 'id, name');
         foreach ($profilefields as $field) {
             $options[] = [
-                'name' => $field->name,
                 'value' => $field->id,
+                'name' => $field->name,
             ];
         }
         return $options;
@@ -172,6 +172,15 @@ class formhelper {
         return $selectoptions;
     }
 
+    /**
+     * Retrieves attribute keys choices for a select input.
+     *
+     * This function fetches attribute keys of type 'text' and 'date' using the
+     * attribute_keys client, merges them, and returns them as choices for a select input.
+     * It includes a prompt option as the first element in the choices array.
+     *
+     * @return array An associative array of attribute key choices for a select input.
+     */
     public function get_attributekeys_choices() {
         $attributekeysclient = new attribute_keys();
         $firstoption = ['' => get_string('accrediblecustomattributeselectprompt', 'accredible')];
