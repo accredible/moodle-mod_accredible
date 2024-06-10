@@ -72,11 +72,17 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             const duplicateCount = mappings.getAttributeValuesCount();
 
             $(acrredibleSelect).each((_,select) => {
+                const id = $(select).attr('id');
+                const sectionId = id.split('_accredibleattribute')[0];
+                const delSection = $(`#${sectionId}_delete_action`);
+
                 $(select).removeClass('is-invalid');
+                delSection.removeClass('pb-xl-4');
 
                 const value = $(select).val();
                 if (duplicateCount.get(value) > 1) {
                     $(select).addClass('is-invalid');
+                    delSection.addClass('pb-xl-4');
                 }
             });
         },
