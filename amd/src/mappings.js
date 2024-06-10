@@ -24,6 +24,7 @@
 
 define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
     var options = {};
+    const acrredibleSelect = '[id*="_accredibleattribute"]';
     const optionsMap = {
         coursefieldmapping: 'coursefieldoptions',
         coursecustomfieldmapping: 'coursecustomfieldoptions',
@@ -45,6 +46,39 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
 
             mappings.list = $('.attribute_mapping');
             mappings.list.on('click', '.remove-line', mappings.removeLine);
+            
+            mappings.listenToSelectChanges();
+        },
+
+        listenToSelectChanges() {
+            mappings.list.on('change', acrredibleSelect, (event) => {
+                mappings.checkForDuplicates();
+            });
+        },
+
+        getAttributeValuesCount: function() {
+            const valuesCount = new Map();
+            $(acrredibleSelect).each((_,select) => {
+                const value = $(select).val();
+                let occurrences = valuesCount.get(value) ?? 0;
+
+                occurrences++;
+                valuesCount.set(value, occurrences);
+            });
+            return valuesCount;
+        },
+
+        checkForDuplicates: function() {
+            const duplicateCount = mappings.getAttributeValuesCount();
+
+            $(acrredibleSelect).each((_,select) => {
+                $(select).removeClass('is-invalid');
+
+                const value = $(select).val();
+                if (duplicateCount.get(value) > 1) {
+                    $(select).addClass('is-invalid');
+                }
+            });
         },
 
         addNewLine: function() {
@@ -68,6 +102,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             const mappingLineId = `#${section}_mapping_line_${index}`;
             $(mappingLineId).remove();
             mappings.toggleAddButton(section);
+            mappings.checkForDuplicates();
         },
 
         countLines: function(section) {
