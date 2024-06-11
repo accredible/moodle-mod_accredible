@@ -337,6 +337,7 @@ class mod_accredible_mod_form extends moodleform_mod {
             'hasmappings' => isset($coursecustomfieldmappings),
             'accredibleoptions' => $accredibleoptions,
             'moodleoptions' => $coursecustomfieldoptions,
+            'nocoursecustomoptions' => count($coursecustomfieldoptions) == 1,
         ];
 
         $mform->addElement('html', $OUTPUT->render_from_template('mod_accredible/mappings', $coursecustomfieldmappingcontent));
@@ -355,6 +356,7 @@ class mod_accredible_mod_form extends moodleform_mod {
             'hasmappings' => isset($userprofilefieldmappings),
             'accredibleoptions' => $accredibleoptions,
             'moodleoptions' => $userprofilefieldoptions,
+            'noprofileoptions' => count($userprofilefieldoptions) == 1,
         ];
 
         $mform->addElement('html', $OUTPUT->render_from_template('mod_accredible/mappings', $userprofilefieldmappingcontent));

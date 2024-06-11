@@ -35,13 +35,15 @@
         "mappings": [
             { "index": 1, "id": 2, "field": "moodle_course", "accredibleattribute": "acc_course" }
         ],
-        "accredibleoptions": [ 
+        "accredibleoptions": [
             { "name": "Course Duration", "value": "course_duration" }
         ],
-        "moodleoptions": [ 
+        "moodleoptions": [
             { "name": "Moodle Course Duration", "value": "moodle_course_duration" }
         ],
-        "hasid": false
+        "hasid": false,
+        "noprofileoptions": false,
+        "nocoursecustomoptions": false
     }
 }}
 <div class="attribute_mapping d-flex flex-column">
@@ -51,6 +53,19 @@
                 {{> mod_accredible/mapping_line}}
             {{/mappings}}
         {{/hasmappings}}
+    </div>
+
+    <div class="col-md-12">
+        {{#nocoursecustomoptions}}
+        <div class="alert alert-warning">
+            <div>Add Course custom fields to be able to map them.</div>
+        </div>
+        {{/nocoursecustomoptions}}
+        {{#noprofileoptions}}
+        <div class="alert alert-warning">
+            <div>Add User profile fields to be able to map them.</div>
+        </div>
+        {{/noprofileoptions}}
     </div>
 
     <div class="col-md-12">

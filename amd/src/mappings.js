@@ -134,11 +134,15 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
         },
 
         toggleAddButton: function(section) {
-           const addBtn = $(`#${section}_add_new_line`);
-           const currentLines = mappings.countLines(section);
-           const maxLines = options[optionsMap[section]].length - 1; // Excludes blank option.
+            const addBtn = $(`#${section}_add_new_line`);
+            const currentLines = mappings.countLines(section);
+            const maxLines = options[optionsMap[section]].length - 1; // Excludes blank option.
 
-           addBtn.prop("disabled", currentLines == maxLines);
+            if (currentLines == maxLines) {
+                addBtn.addClass('hidden');
+            } else {
+                addBtn.removeClass('hidden');
+            }
         },
 
         renderMappingLine: function(context, containerid) {
