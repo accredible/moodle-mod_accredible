@@ -386,16 +386,30 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * Helper method to create an instance of formhelper with a mock attribute_keys class.
      *
      * @param $attributekeysmock The mock instance of the attribute_keys class.
+     * @return formhelper The formhelper class instance extended with a mock attribute_keys client.
      */
     private function create_formhelper_with_mock($attributekeysmock) {
         // Use an anonymous class to extend formhelper and inject the mock.
         return new class($attributekeysmock) extends formhelper {
+            // Mock instance of the attribute_keys client.
             public $mockclient;
 
+            /**
+             * Constructor
+             *
+             * Initializes the anonymous class with the mock client.
+             *
+             * @param $mockclient The mock instance of the attribute_keys client.
+             */
             public function __construct($mockclient) {
                 $this->mockclient = $mockclient;
             }
 
+            /**
+             * Overrides the get_attribute_keys_client method to return the mock client.
+             *
+             * @return $mockclient The mock instance of the attribute_keys client.
+             */
             public function get_attribute_keys_client() {
                 return $this->mockclient;
             }

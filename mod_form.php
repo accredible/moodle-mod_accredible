@@ -367,6 +367,7 @@ class mod_accredible_mod_form extends moodleform_mod {
      * Called right before form submission.
      * We use it to include missing form data from mustache templates.
      *
+     * @param stdClass $data passed by reference
      * @return void
      */
     public function data_postprocessing($data) {
