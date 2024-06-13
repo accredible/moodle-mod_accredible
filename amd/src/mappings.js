@@ -35,7 +35,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
         userprofilefieldmapping: 'userprofilefieldoptions',
     };
 
-    var mappings = {
+    const mappings = {
         init: function(data) {
             options = data;
             mappings.setSelectValues();
