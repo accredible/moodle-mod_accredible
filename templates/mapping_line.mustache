@@ -40,7 +40,7 @@
     {{#hasid}}
     <div class="d-flex flex-column col-md-5">
         <label for="id_{{section}}_{{index}}_id">Moodle Attribute</label>
-        <select class="form-control" name="{{section}}[{{index}}][id]" id="id_{{section}}_{{index}}_id" data-initial-value="{{id}}">
+        <select class="form-control" name="{{section}}[{{index}}][id]" id="id_{{section}}_{{index}}_id" data-initial-value="{{id}}" required>
             {{#moodleoptions}}
                 <option value="{{value}}">{{name}}</option>
             {{/moodleoptions}}
@@ -51,7 +51,7 @@
     {{^hasid}}
     <div class="d-flex flex-column col-md-5">
         <label for="id_{{section}}_{{index}}_field">Moodle Attribute</label>
-        <select class="form-control" name="{{section}}[{{index}}][field]" id="id_{{section}}_{{index}}_field" data-initial-value="{{field}}">
+        <select class="form-control" name="{{section}}[{{index}}][field]" id="id_{{section}}_{{index}}_field" data-initial-value="{{field}}" required>
             {{#moodleoptions}}
                 <option value="{{value}}">{{name}}</option>
             {{/moodleoptions}}
@@ -61,7 +61,7 @@
 
     <div class="d-flex flex-column col-md-6">
         <label for="id_{{section}}_{{index}}_accredibleattribute">Accredible Attribute</label>
-        <select class="form-control" name="{{section}}[{{index}}][accredibleattribute]" id="id_{{section}}_{{index}}_accredibleattribute" data-initial-value="{{accredibleattribute}}">
+        <select class="form-control" name="{{section}}[{{index}}][accredibleattribute]" id="id_{{section}}_{{index}}_accredibleattribute" data-initial-value="{{accredibleattribute}}" required>
             {{#accredibleoptions}}
                 <option value="{{value}}">{{name}}</option>
             {{/accredibleoptions}}
