@@ -375,9 +375,9 @@ class mod_accredible_mod_form extends moodleform_mod {
     public function data_postprocessing($data) {
         parent::data_postprocessing($data);
         $submitteddata = $this->_form->getSubmitValues();
-        $data->coursefieldmapping = $submitteddata['coursefieldmapping'];
-        $data->coursecustomfieldmapping = $submitteddata['coursecustomfieldmapping'];
-        $data->userprofilefieldmapping = $submitteddata['userprofilefieldmapping'];
+        $data->coursefieldmapping = isset($submitteddata['coursefieldmapping']) ? $submitteddata['coursefieldmapping'] : [];
+        $data->coursecustomfieldmapping = isset($submitteddata['coursecustomfieldmapping']) ? $submitteddata['coursecustomfieldmapping'] : [];
+        $data->userprofilefieldmapping = isset($submitteddata['userprofilefieldmapping']) ? $submitteddata['userprofilefieldmapping'] : [];
     }
 
     /**
