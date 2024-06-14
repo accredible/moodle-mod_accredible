@@ -88,11 +88,13 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
 
                 $(select).removeClass('is-invalid');
                 delSection.removeClass('pb-xl-4');
+                mappings.disableSubmit(false);
 
                 const value = $(select).val();
                 if (duplicateCount.get(value) > 1) {
                     $(select).addClass('is-invalid');
                     delSection.addClass('pb-xl-4');
+                    mappings.disableSubmit(true);
                 }
             });
         },
@@ -143,6 +145,12 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             } else {
                 addBtn.removeClass('hidden');
             }
+        },
+
+        disableSubmit: function(isFormInvalid) {
+            $('input:submit[id*="id_submitbutton"]').each((_, button) => {
+                $(button).attr('disabled', isFormInvalid);
+            });
         },
 
         renderMappingLine: function(context, containerid) {
