@@ -259,7 +259,6 @@ class formhelper {
         return  new attribute_keys();
     }
 
-    
     /**
      * Reindex an associative array to have sequential numeric keys starting from 0.
      *
@@ -273,10 +272,10 @@ class formhelper {
         if (!isset($array)) {
             return [];
         }
-        $reindexedArray = [];
+        $reindexarray = [];
         foreach ($array as $value) {
-            $reindexedArray[] = $value;
+            $reindexarray[] = $value;
         }
-        return $reindexedArray;
+        return $reindexarray;
     }    
 }
