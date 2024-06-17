@@ -131,19 +131,10 @@ class mod_accredible_mod_form extends moodleform_mod {
         $coursecustomfieldoptions = $formhelper->load_course_custom_field_options();
         $userprofilefieldoptions = $formhelper->load_user_profile_field_options();
 
-        $templatecontext = [
-            'options' => [
-                'accredibleoptions' => $accredibleoptions,
-                'coursefieldoptions' => $coursefieldoptions,
-                'coursecustomfieldoptions' => $coursecustomfieldoptions,
-                'userprofilefieldoptions' => $userprofilefieldoptions,
-            ]
-        ];
-
         // Form start.
         $PAGE->requires->js_call_amd('mod_accredible/userlist_updater', 'init');
         $PAGE->requires->js_call_amd('mod_accredible/attribute_keys_displayer', 'init');
-        $PAGE->requires->js_call_amd('mod_accredible/mappings', 'init', $templatecontext);
+        $PAGE->requires->js_call_amd('mod_accredible/mappings', 'init');
 
         $mform =& $this->_form;
         $mform->addElement('hidden', 'course', $id);

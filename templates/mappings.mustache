@@ -36,9 +36,11 @@
             { "index": 1, "id": 2, "field": "moodle_course", "accredibleattribute": "acc_course" }
         ],
         "accredibleoptions": [
+            { "name": "Select Accredible attribute", "value": "" },
             { "name": "Course Duration", "value": "course_duration" }
         ],
         "moodleoptions": [
+            { "name": "Select Moodle attribute", "value": "" },
             { "name": "Moodle Course Duration", "value": "moodle_course_duration" }
         ],
         "hasid": false,
@@ -71,4 +73,18 @@
     <div class="col-md-12">
         <button type="button" id="{{section}}_add_new_line" data-section="{{section}}" class="mt-4 mb-4 btn btn-outline-primary btn-small">Add</button>
     </div>
+
+    <template id="template_{{section}}">
+        <select name="accredibleoptions_select" id="accredibleoptions_select">
+            {{#accredibleoptions}}
+            <option value="{{value}}">{{name}}</option>
+            {{/accredibleoptions}}
+        </select>
+
+        <select name="moodleoptions_select" id="moodleoptions_select">
+            {{#moodleoptions}}
+            <option value="{{value}}">{{name}}</option>
+            {{/moodleoptions}}
+        </select>
+    </template>
 </div>
