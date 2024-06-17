@@ -28,6 +28,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
         addButton: '[id*="_add_new_line"]',
         list: '.attribute_mapping',
     };
+    const requiresId = ['coursecustomfieldmapping', 'userprofilefieldmapping'];
 
     const mappings = {
         init: function() {
@@ -99,7 +100,8 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                 index: mappings.countLines(section)+1,
                 section: section,
                 accredibleoptions: options.accredibleoptions,
-                moodleoptions: options.moodleoptions
+                moodleoptions: options.moodleoptions,
+                hasid: requiresId.includes(section)
             };
             mappings.renderMappingLine(data,`#${section}_content`);
             // Wait for line to be rendered then show/hide the button.
