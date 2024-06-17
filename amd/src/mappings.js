@@ -28,11 +28,6 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
         addButton: '[id*="_add_new_line"]',
         list: '.attribute_mapping',
     };
-    const optionsMap = {
-        coursefieldmapping: 'coursefieldoptions',
-        coursecustomfieldmapping: 'coursecustomfieldoptions',
-        userprofilefieldmapping: 'userprofilefieldoptions',
-    };
 
     const mappings = {
         init: function() {
