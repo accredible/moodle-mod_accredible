@@ -323,6 +323,31 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
     }
 
     /**
+     * Test the reindexarray method.
+     * @covers ::reindexarray
+     */
+    public function test_reindexarray() {
+        $formhelper = new formhelper();
+
+        // When the associative array is not passed.
+        $result = $formhelper->reindexarray(null);
+        $expected = [];
+        $this->assertEquals($expected, $result);
+
+        // When the associative array is provided.
+        $given = [
+            "2" => ["field" => "1", "attribute" => "moodle_course_grade"],
+            "3" => ["field" => "3", "attribute" => "moodle_year"]
+        ];
+        $result = $formhelper->reindexarray($given);
+        $expected = [
+            "0" => ["field" => "1", "attribute" => "moodle_course_grade"],
+            "1" => ["field" => "3", "attribute" => "moodle_year"]
+        ];
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * fetch course grate item record
      *
      * @param int $courseid
