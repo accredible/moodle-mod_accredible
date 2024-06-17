@@ -277,5 +277,5 @@ class formhelper {
             $reindexarray[] = $value;
         }
         return $reindexarray;
-    }    
+    }
 }
