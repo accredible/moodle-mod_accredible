@@ -88,13 +88,13 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
 
         $formhelper = new formhelper();
 
-        $expected = array(
-            '' => 'Select a Moodle course field',
-            'fullname' => 'fullname',
-            'shortname' => 'shortname',
-            'startdate' => 'startdate',
-            'enddate' => 'enddate'
-        );
+        $expected = [
+            ['value' => '', 'name' => 'Select a Moodle course field'],
+            ['value' => 'fullname', 'name' => 'fullname'],
+            ['value' => 'shortname', 'name' => 'shortname'],
+            ['value' => 'startdate', 'name' => 'startdate'],
+            ['value' => 'enddate', 'name' => 'enddate'],
+        ];
         $result = $formhelper->load_course_field_options();
         $this->assertEquals($expected, $result);
     }
@@ -109,7 +109,9 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $formhelper = new formhelper();
 
         // When there are no custom fields.
-        $expected = array('' => 'Select a Moodle course custom field');
+        $expected = [
+            ['value' => '', 'name' => 'Select a Moodle course custom field']
+        ];
         $result = $formhelper->load_course_custom_field_options();
         $this->assertEquals($expected, $result);
 
@@ -130,11 +132,11 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         );
         $customfield2id = $DB->insert_record('customfield_field', $customfield2);
 
-        $expected = array(
-          '' => 'Select a Moodle course custom field',
-          $customfield1id => 'Custom Field 1',
-          $customfield2id => 'Custom Field 2'
-        );
+        $expected = [
+            ['value' => '', 'name' => 'Select a Moodle course custom field'],
+            ['value' => $customfield1id, 'name' => 'Custom Field 1'],
+            ['value' => $customfield2id, 'name' => 'Custom Field 2'],
+        ];
         $result = $formhelper->load_course_custom_field_options();
         $this->assertEquals($expected, $result);
     }
@@ -149,7 +151,9 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $formhelper = new formhelper();
 
         // When there are no user_info_field records.
-        $expected = array('' => 'Select a Moodle user profile field');
+        $expected = [
+            ['value' => '', 'name' => 'Select a Moodle user profile field']
+        ];
         $result = $formhelper->load_user_profile_field_options();
         $this->assertEquals($expected, $result);
 
@@ -166,12 +170,94 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         );
         $userinfofield2id = $DB->insert_record('user_info_field', $userinfofield2);
 
-        $expected = array(
-            '' => 'Select a Moodle user profile field',
-            $userinfofield1id => 'User Info 1',
-            $userinfofield2id => 'User Info 2'
-        );
+        $expected = [
+            ['value' => '', 'name' => 'Select a Moodle user profile field'],
+            ['value' => $userinfofield1id, 'name' => 'User Info 1'],
+            ['value' => $userinfofield2id, 'name' => 'User Info 2'],
+        ];
         $result = $formhelper->load_user_profile_field_options();
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Test the map_select_options method.
+     * @covers ::map_select_options
+     */
+    public function test_map_select_options() {
+        $formhelper = new formhelper();
+
+        // When the options array has values.
+        $options = [
+            'key1' => 'Option 1',
+            'key2' => 'Option 2',
+            'key3' => 'Option 3'
+        ];
+        $expected = [
+            ['name' => 'Option 1', 'value' => 'key1'],
+            ['name' => 'Option 2', 'value' => 'key2'],
+            ['name' => 'Option 3', 'value' => 'key3']
+        ];
+        $result = $formhelper->map_select_options($options);
+        $this->assertEquals($expected, $result);
+
+        // When the options array is null.
+        $options = null;
+        $expected = [];
+        $result = $formhelper->map_select_options($options);
+        $this->assertEquals($expected, $result);
+
+        // When the options array is empty.
+        $options = [];
+        $result = $formhelper->map_select_options($options);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Test the get_attributekeys_choices method.
+     * @covers ::get_attributekeys_choices
+     */
+    public function test_get_attributekeys_choices() {
+        // Mock attribute_keys class and 1 method.
+        $attributekeysmock = $this->getMockBuilder(attribute_keys::class)
+            ->onlyMethods(['get_attribute_keys'])
+            ->getMock();
+
+        // When get_attribute_keys(mocked) method returns values for 'text' and 'date'.
+        $attributekeysmock->expects($this->any())
+            ->method('get_attribute_keys')
+            ->will($this->returnValueMap([
+                ['text', ['key1' => 'Text Attribute 1', 'key2' => 'Text Attribute 2']],
+                ['date', ['key3' => 'Date Attribute 1']]
+            ]));
+        $formhelper = $this->create_formhelper_with_mock($attributekeysmock);
+
+        $expected = [
+            '' => get_string('accrediblecustomattributeselectprompt', 'accredible'),
+            'key1' => 'Text Attribute 1',
+            'key2' => 'Text Attribute 2',
+            'key3' => 'Date Attribute 1'
+        ];
+        $result = $formhelper->get_attributekeys_choices();
+        $this->assertEquals($expected, $result);
+
+        // Mock attribute_keys class and 1 method.
+        $attributekeysmock = $this->getMockBuilder(attribute_keys::class)
+            ->onlyMethods(['get_attribute_keys'])
+            ->getMock();
+
+        // When get_attribute_keys(mocked) method returns empty for 'text' and 'date'.
+        $attributekeysmock->expects($this->any())
+            ->method('get_attribute_keys')
+            ->will($this->returnValueMap([
+                ['text', []],
+                ['date', []]
+            ]));
+        $formhelper = $this->create_formhelper_with_mock($attributekeysmock);
+
+        $expected = [
+            '' => get_string('accrediblecustomattributeselectprompt', 'accredible'),
+        ];
+        $result = $formhelper->get_attributekeys_choices();
         $this->assertEquals($expected, $result);
     }
 
@@ -213,22 +299,50 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $expected = [
             'coursefieldmapping' => [
                 [
+                    'index' => 0,
                     'field' => 'startdate',
                     'accredibleattribute' => 'Moodle Course Start Date'
                 ]
             ],
             'coursecustomfieldmapping' => [
                 [
+                    'index' => 0,
                     'id' => 321,
                     'accredibleattribute' => 'Moodle Typology'
                 ]
             ],
             'userprofilefieldmapping' => [
                 [
+                    'index' => 0,
                     'id' => 123,
                     'accredibleattribute' => 'Moodle User Birthday'
                 ]
             ]
+        ];
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Test the reindexarray method.
+     * @covers ::reindexarray
+     */
+    public function test_reindexarray() {
+        $formhelper = new formhelper();
+
+        // When the associative array is not passed.
+        $result = $formhelper->reindexarray(null);
+        $expected = [];
+        $this->assertEquals($expected, $result);
+
+        // When the associative array is provided.
+        $given = [
+            "2" => ["field" => "1", "attribute" => "moodle_course_grade"],
+            "3" => ["field" => "3", "attribute" => "moodle_year"]
+        ];
+        $result = $formhelper->reindexarray($given);
+        $expected = [
+            "0" => ["field" => "1", "attribute" => "moodle_course_grade"],
+            "1" => ["field" => "3", "attribute" => "moodle_year"]
         ];
         $this->assertEquals($expected, $result);
     }
@@ -291,5 +405,39 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
             "itemnumber" => 0
         );
         return $DB->insert_record('grade_items', $gradeitem);
+    }
+
+    /**
+     * Helper method to create an instance of formhelper with a mock attribute_keys class.
+     *
+     * @param mixed $attributekeysmock The mock instance of the attribute_keys class.
+     * @return formhelper The formhelper class instance extended with a mock attribute_keys client.
+     */
+    private function create_formhelper_with_mock($attributekeysmock) {
+        // Use an anonymous class to extend formhelper and inject the mock.
+        return new class($attributekeysmock) extends formhelper {
+            // Mock instance of the attribute_keys client.
+            public $mockclient;
+
+            /**
+             * Constructor
+             *
+             * Initializes the anonymous class with the mock client.
+             *
+             * @param mixed $mockclient The mock instance of the attribute_keys client.
+             */
+            public function __construct($mockclient) {
+                $this->mockclient = $mockclient;
+            }
+
+            /**
+             * Overrides the get_attribute_keys_client method to return the mock client.
+             *
+             * @return $mockclient The mock instance of the attribute_keys client.
+             */
+            public function get_attribute_keys_client() {
+                return $this->mockclient;
+            }
+        };
     }
 }

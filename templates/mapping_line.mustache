@@ -1,0 +1,85 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_accredible/mapping_line
+
+    Template purpose and description.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * none
+
+    Example context (json):
+    {
+        "index": 1,
+        "id": 1,
+        "field": "moodle_course",
+        "accredibleattribute": "acc_course",
+        "accredibleoptions": [
+            { "name": "Select Accredible attribute", "value": "" },
+            { "name": "Course Duration", "value": "course_duration" }
+        ],
+        "moodleoptions": [
+            { "name": "Select Moodle attribute", "value": "" },
+            { "name": "Moodle Course Duration", "value": "moodle_course_duration" }
+        ]
+    }
+}}
+<div class="d-flex flex-row justify-content-between mb-2" id="{{section}}_mapping_line_{{index}}">
+    {{#hasid}}
+    <div class="d-flex flex-column col-md-5">
+        <label for="id_{{section}}_{{index}}_id">Moodle Attribute</label>
+        <select class="form-control" name="{{section}}[{{index}}][id]" id="id_{{section}}_{{index}}_id" data-initial-value="{{id}}" required>
+            {{#moodleoptions}}
+                <option value="{{value}}">{{name}}</option>
+            {{/moodleoptions}}
+        </select>
+    </div>
+    {{/hasid}}
+
+    {{^hasid}}
+    <div class="d-flex flex-column col-md-5">
+        <label for="id_{{section}}_{{index}}_field">Moodle Attribute</label>
+        <select class="form-control" name="{{section}}[{{index}}][field]" id="id_{{section}}_{{index}}_field" data-initial-value="{{field}}" required>
+            {{#moodleoptions}}
+                <option value="{{value}}">{{name}}</option>
+            {{/moodleoptions}}
+        </select>
+    </div>
+    {{/hasid}}
+
+    <div class="d-flex flex-column col-md-6">
+        <label for="id_{{section}}_{{index}}_accredibleattribute">Accredible Attribute</label>
+        <select class="form-control" name="{{section}}[{{index}}][accredibleattribute]" id="id_{{section}}_{{index}}_accredibleattribute" data-initial-value="{{accredibleattribute}}" required>
+            {{#accredibleoptions}}
+                <option value="{{value}}">{{name}}</option>
+            {{/accredibleoptions}}
+        </select>
+        <div class="form-control-feedback invalid-feedback">Duplicate attribute</div>
+    </div>
+
+    <div class="d-flex flex-column justify-content-end col-md-1" id="id_{{section}}_{{index}}_delete_action">
+        <button type="button" data-id="{{index}}" data-section="{{section}}" class="remove-line btn btn-small">
+            <i class="icon fa fa-trash text-danger fa-fw"></i>
+        </button>
+    </div>
+</div>
