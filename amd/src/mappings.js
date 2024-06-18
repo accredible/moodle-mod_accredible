@@ -24,6 +24,7 @@
 
 define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
     const element = {
+        moodleSelect: '[id*="_moodleattribute"]',
         acrredibleSelect: '[id*="_accredibleattribute"]',
         addButton: '[id*="_add_new_line"]',
         list: '.attribute_mapping',
@@ -74,6 +75,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
 
         checkForDuplicates: function() {
             const duplicateCount = mappings.getAttributeValuesCount();
+            let hasDuplicate = false;
 
             $(element.acrredibleSelect).each((_,select) => {
                 const id = $(select).attr('id');
@@ -82,14 +84,15 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
 
                 $(select).removeClass('is-invalid');
                 delSection.removeClass('pb-xl-4');
-                mappings.disableSubmit(false);
 
                 const value = $(select).val();
                 if (duplicateCount.get(value) > 1) {
                     $(select).addClass('is-invalid');
                     delSection.addClass('pb-xl-4');
-                    mappings.disableSubmit(true);
+                    hasDuplicate = true;
                 }
+
+                mappings.disableSubmit(hasDuplicate);
             });
         },
 
