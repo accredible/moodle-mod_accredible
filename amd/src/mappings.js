@@ -74,21 +74,25 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
 
         checkForDuplicates: function() {
             const duplicateCount = mappings.getAttributeValuesCount();
+            const rowHasError = {};
             let hasDuplicate = false;
 
             $(element.mappingSelects).each((_,select) => {
                 const id = $(select).attr('id');
-                const sectionId = new RegExp(/id_(\w+)_\d_\w+/g).exec(id)[1];
-                const delSection = $(`#${sectionId}_delete_action`);
-
-                $(select).removeClass('is-invalid');
-                delSection.removeClass('pb-xl-4');
+                const rowId = new RegExp(/(id_\w+_\d)_\w+/g).exec(id)[1];
+                const deleteIconWrapper = $(`#${rowId}_delete_action`);
 
                 const value = $(select).val();
                 if (duplicateCount.get(value) > 1) {
                     $(select).addClass('is-invalid');
-                    delSection.addClass('pb-xl-4');
+                    deleteIconWrapper.addClass('pb-xl-4');  // Applies padding to align delete icon.
                     hasDuplicate = true;
+                    rowHasError[rowId] = true;
+                }
+
+                if (!rowHasError[rowId]) {
+                    $(select).removeClass('is-invalid');
+                    deleteIconWrapper.removeClass('pb-xl-4');
                 }
 
                 mappings.disableSubmit(hasDuplicate);
