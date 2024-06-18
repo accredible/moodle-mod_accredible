@@ -82,6 +82,8 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                 const rowId = new RegExp(/(id_\w+_\d)_\w+/g).exec(id)[1]; // Get "id_{{section}}_{{index}}" part.
                 const deleteIconWrapper = $(`#${rowId}_delete_action`);
 
+                $(select).removeClass('is-invalid');
+
                 const value = $(select).val();
                 if (duplicateCount.get(value) > 1) {
                     $(select).addClass('is-invalid');
@@ -91,7 +93,6 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                 }
 
                 if (!rowHasError[rowId]) {
-                    $(select).removeClass('is-invalid');
                     deleteIconWrapper.removeClass('pb-xl-4');
                 }
 
