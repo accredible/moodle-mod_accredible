@@ -65,9 +65,11 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                 if (!value) {
                     return;
                 }
-                let occurrences = valuesCount.get(value) ?? 0;
+                const name = mappings.getOptionNameFromSelect(select);
+                const key = `${name}_${value}`;
+                let occurrences = valuesCount.get(key) ?? 0;
                 occurrences++;
-                valuesCount.set(value, occurrences);
+                valuesCount.set(key, occurrences);
             });
             return valuesCount;
         },
@@ -85,7 +87,10 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                 $(select).removeClass('is-invalid');
 
                 const value = $(select).val();
-                if (duplicateCount.get(value) > 1) {
+                const name = mappings.getOptionNameFromSelect(select);
+                const key = `${name}_${value}`;
+
+                if (duplicateCount.get(key) > 1) {
                     $(select).addClass('is-invalid');
                     deleteIconWrapper.addClass('pb-xl-4');  // Applies padding to align delete icon.
                     hasDuplicate = true;
@@ -148,6 +153,13 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             } else {
                 addBtn.removeClass('hidden');
             }
+        },
+
+        getOptionNameFromSelect(select) {
+            const value = $(select).val();
+            const name = $(select).find(`option[value="${value}"]`)[0].innerHTML;
+
+            return name.replaceAll(/\W+/g, '_'); // Replace all special chars to underscore.
         },
 
         getOptionsFromTemplate: function(section) {
