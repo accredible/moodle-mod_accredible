@@ -24,8 +24,7 @@
 
 define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
     const element = {
-        moodleSelect: '[id*="_moodleattribute"]',
-        acrredibleSelect: '[id*="_accredibleattribute"]',
+        mappingSelects: '[id*="mapping_line"] select',
         addButton: '[id*="_add_new_line"]',
         list: '.attribute_mapping',
     };
@@ -54,14 +53,14 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
         },
 
         listenToSelectChanges: function() {
-            $(element.list).on('change', element.acrredibleSelect, (event) => {
+            $(element.list).on('change', element.mappingSelects, (event) => {
                 mappings.checkForDuplicates();
             });
         },
 
         getAttributeValuesCount: function() {
             const valuesCount = new Map();
-            $(element.acrredibleSelect).each((_,select) => {
+            $(element.mappingSelects).each((_,select) => {
                 const value = $(select).val();
                 if (!value) {
                     return;
@@ -77,9 +76,9 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             const duplicateCount = mappings.getAttributeValuesCount();
             let hasDuplicate = false;
 
-            $(element.acrredibleSelect).each((_,select) => {
+            $(element.mappingSelects).each((_,select) => {
                 const id = $(select).attr('id');
-                const sectionId = id.split('_accredibleattribute')[0];
+                const sectionId = new RegExp(/id_(\w+)_\d_\w+/g).exec(id)[1];
                 const delSection = $(`#${sectionId}_delete_action`);
 
                 $(select).removeClass('is-invalid');
