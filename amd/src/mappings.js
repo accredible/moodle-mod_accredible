@@ -79,7 +79,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
 
             $(element.mappingSelects).each((_,select) => {
                 const id = $(select).attr('id');
-                const rowId = new RegExp(/(id_\w+_\d)_\w+/g).exec(id)[1];
+                const rowId = new RegExp(/(id_\w+_\d)_\w+/g).exec(id)[1]; // Get "id_{{section}}_{{index}}" part.
                 const deleteIconWrapper = $(`#${rowId}_delete_action`);
 
                 const value = $(select).val();
