@@ -118,7 +118,6 @@ class client {
             debugging('<div style="padding-top: 70px; font-size: 0.9rem;"><b>ACCREDIBLE API ERROR</b> ' .
                 $curl->error . '<br />' . $method . ' ' . $url . '</div>', DEBUG_DEVELOPER);
         };
-
-        return json_decode($response);
+        return $response ? json_decode($response) : null;
     }
 }
