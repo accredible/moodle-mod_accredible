@@ -109,6 +109,10 @@ function accredible_get_recipient_sso_linik($groupid, $email) {
     try {
         $response = $apirest->recipient_sso_link(null, null, $email, null, $groupid, null);
 
+        if ($response === null) {
+            return null;
+        }
+
         return $response->link;
 
     } catch (Exception $e) {
