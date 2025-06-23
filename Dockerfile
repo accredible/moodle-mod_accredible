@@ -1,5 +1,5 @@
 # Use the base image for Moodle
-FROM docker.io/bitnami/moodle:4.3.5
+FROM docker.io/bitnami/moodle:4.5.4
 
 # Install dependencies for PHP 8.0
 RUN apt-get update && apt-get install -y software-properties-common wget lsb-release gnupg2
