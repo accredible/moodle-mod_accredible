@@ -1,5 +1,5 @@
 # Use the base image for Moodle
-FROM docker.io/bitnami/moodle:4.5.4
+FROM docker.io/moodlehq/moodleapp:4.5.0
 
 # Install development tools
 RUN install_packages vim
