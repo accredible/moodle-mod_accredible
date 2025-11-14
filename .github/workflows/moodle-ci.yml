@@ -6,6 +6,39 @@ on:
       - master
   pull_request:
   workflow_dispatch:
+    inputs:
+      php_version:
+        description: 'PHP version (e.g., 7.4, 8.0, 8.1)'
+        required: false
+        type: choice
+        options:
+          - '7.4'
+          - '8.0'
+          - '8.1'
+        default: '8.0'
+      custom_php_version:
+        description: 'Custom PHP version (overrides php_version if provided, e.g., 8.2, 8.3)'
+        required: false
+        type: string
+      moodle_branch:
+        description: 'Moodle branch (e.g., MOODLE_401_STABLE)'
+        required: false
+        type: choice
+        options:
+          - 'MOODLE_311_STABLE'
+          - 'MOODLE_401_STABLE'
+          - 'MOODLE_403_STABLE'
+          - 'MOODLE_404_STABLE'
+          - 'MOODLE_405_STABLE'
+        default: 'MOODLE_401_STABLE'
+      database:
+        description: 'Database type'
+        required: false
+        type: choice
+        options:
+          - 'pgsql'
+          - 'mariadb'
+        default: 'pgsql'
 
 jobs:
   test:
@@ -32,9 +65,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['8.0']
-        moodle-branch: ['MOODLE_401_STABLE', 'MOODLE_403_STABLE']
-        database: [pgsql, mariadb]
+        php: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.custom_php_version != '' && fromJson(format('["{0}"]', github.event.inputs.custom_php_version)) || fromJson(format('["{0}"]', github.event.inputs.php_version))) || fromJson('["8.0"]') }}
+        moodle-branch: ${{ github.event_name == 'workflow_dispatch' && fromJson(format('["{0}"]', github.event.inputs.moodle_branch)) || fromJson('["MOODLE_401_STABLE", "MOODLE_403_STABLE"]') }}
+        database: ${{ github.event_name == 'workflow_dispatch' && fromJson(format('["{0}"]', github.event.inputs.database)) || fromJson('["pgsql", "mariadb"]') }}
         include:
           - php: '7.4'
             moodle-branch: 'MOODLE_311_STABLE'
