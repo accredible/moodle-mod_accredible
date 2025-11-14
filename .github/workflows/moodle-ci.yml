@@ -68,25 +68,15 @@ jobs:
         php: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.custom_php_version != '' && fromJson(format('["{0}"]', github.event.inputs.custom_php_version)) || fromJson(format('["{0}"]', github.event.inputs.php_version))) || fromJson('["8.0"]') }}
         moodle-branch: ${{ github.event_name == 'workflow_dispatch' && fromJson(format('["{0}"]', github.event.inputs.moodle_branch)) || fromJson('["MOODLE_401_STABLE", "MOODLE_403_STABLE"]') }}
         database: ${{ github.event_name == 'workflow_dispatch' && fromJson(format('["{0}"]', github.event.inputs.database)) || fromJson('["pgsql", "mariadb"]') }}
-        include:
-          - php: '7.4'
-            moodle-branch: 'MOODLE_311_STABLE'
-            database: pgsql
-          - php: '7.4'
-            moodle-branch: 'MOODLE_311_STABLE'
-            database: mariadb
-          - php: '8.1'
-            moodle-branch: 'MOODLE_404_STABLE'
-            database: pgsql
-          - php: '8.1'
-            moodle-branch: 'MOODLE_404_STABLE'
-            database: mariadb
-          - php: '8.1'
-            moodle-branch: 'MOODLE_405_STABLE'
-            database: pgsql
-          - php: '8.1'
-            moodle-branch: 'MOODLE_405_STABLE'
-            database: mariadb
+        include: >-
+          ${{ github.event_name == 'workflow_dispatch' && fromJson('[]') || fromJson('[
+            {"php":"7.4","moodle-branch":"MOODLE_311_STABLE","database":"pgsql"},
+            {"php":"7.4","moodle-branch":"MOODLE_311_STABLE","database":"mariadb"},
+            {"php":"8.1","moodle-branch":"MOODLE_404_STABLE","database":"pgsql"},
+            {"php":"8.1","moodle-branch":"MOODLE_404_STABLE","database":"mariadb"},
+            {"php":"8.1","moodle-branch":"MOODLE_405_STABLE","database":"pgsql"},
+            {"php":"8.1","moodle-branch":"MOODLE_405_STABLE","database":"mariadb"}
+          ]') }}
 
     steps:
       - name: Check out repository code
