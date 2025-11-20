@@ -31,6 +31,11 @@ use mod_accredible\local\credentials;
  */
 class mod_accredible_credentials_test extends \advanced_testcase {
     /**
+     * Mock API response data.
+     * @var class $mockapi
+     */
+    protected $mockapi;
+    /**
      * Setup before every test.
      */
     public function setUp(): void {
