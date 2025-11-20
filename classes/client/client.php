@@ -119,6 +119,10 @@ class client {
                 $curl->error . '<br />' . $method . ' ' . $url . '</div>', DEBUG_DEVELOPER);
         };
 
+        if ($response === null || $response === '') {
+            return new \stdClass();
+        }
+
         return json_decode($response);
     }
 }
