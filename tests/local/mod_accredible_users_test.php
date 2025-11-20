@@ -144,7 +144,6 @@ class mod_accredible_users_test extends \advanced_testcase {
             ->getMock();
 
         // Mock API response data.
-        $mockclient2->error = 'The requested URL returned error: 401 Unauthorized';
         $resdata = $this->mockapi->resdata('unauthorized_error.json');
 
         // Expect to call the endpoint once with page and page_size.
