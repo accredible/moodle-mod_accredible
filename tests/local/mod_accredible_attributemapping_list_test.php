@@ -46,7 +46,7 @@ class mod_accredible_attributemapping_list_test extends \advanced_testcase {
         // Expect to raise an exception.
         $foundexception = false;
         try {
-            $attributemappinglist = new attributemapping_list(array($mapping1, $mapping2));
+            $attributemappinglist = new attributemapping_list([$mapping1, $mapping2]);
         } catch (\InvalidArgumentException $error) {
             $foundexception = true;
         }
@@ -56,14 +56,14 @@ class mod_accredible_attributemapping_list_test extends \advanced_testcase {
         $mapping2->accredibleattribute = 'user_id';
 
         // Expect attribute mappings to be set.
-        $attributemappinglist = new attributemapping_list(array($mapping1, $mapping2));
+        $attributemappinglist = new attributemapping_list([$mapping1, $mapping2]);
         $this->assertEquals($mapping1, $attributemappinglist->attributemappings[0]);
         $this->assertEquals($mapping2, $attributemappinglist->attributemappings[1]);
 
         // When $accredibleattribute has multiple non-selected values.
         $mapping1->accredibleattribute = '';
         $mapping2->accredibleattribute = '';
-        $attributemappinglist = new attributemapping_list(array($mapping1, $mapping2));
+        $attributemappinglist = new attributemapping_list([$mapping1, $mapping2]);
         $this->assertEquals($mapping1, $attributemappinglist->attributemappings[0]);
         $this->assertEquals($mapping2, $attributemappinglist->attributemappings[1]);
     }
@@ -97,7 +97,7 @@ class mod_accredible_attributemapping_list_test extends \advanced_testcase {
         $result = "[$mapping1string,$mapping2string]";
 
         // Expect strings to match.
-        $attributemappinglist = new attributemapping_list(array($mapping1, $mapping2));
+        $attributemappinglist = new attributemapping_list([$mapping1, $mapping2]);
         $this->assertEquals($result, $attributemappinglist->get_text_content());
     }
 }

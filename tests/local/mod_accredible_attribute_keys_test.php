@@ -73,8 +73,8 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
         // Expect to call the endpoint once with page and page_size.
         $url = 'https://api.accredible.com/v1/attribute_keys/search';
 
-        $reqdata1 = json_encode(array('page' => 1, 'page_size' => 50, 'kind' => 'text'));
-        $reqdata2 = json_encode(array('page' => 2, 'page_size' => 50, 'kind' => 'text'));
+        $reqdata1 = json_encode(['page' => 1, 'page_size' => 50, 'kind' => 'text']);
+        $reqdata2 = json_encode(['page' => 2, 'page_size' => 50, 'kind' => 'text']);
 
         $mockclient1->expects($this->exactly(2))
             ->method('post')
@@ -85,12 +85,12 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
         $api = new apirest($mockclient1);
         $localattributekeys = new attribute_keys($api);
         $result = $localattributekeys->get_attribute_keys();
-        $this->assertEquals($result, array(
+        $this->assertEquals($result, [
             'Custom Attribute Key 1' => 'Custom Attribute Key 1',
             'Custom Attribute Key 2' => 'Custom Attribute Key 2',
             'Custom Attribute Key 3' => 'Custom Attribute Key 3',
-            'Custom Attribute Key 4' => 'Custom Attribute Key 4'
-        ));
+            'Custom Attribute Key 4' => 'Custom Attribute Key 4',
+        ]);
 
         // When the apirest returns an error response.
         $mockclient2 = $this->getMockBuilder('client')
@@ -138,15 +138,15 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
         $api = new apirest($mockclient3);
         $localattributekeys = new attribute_keys($api);
         $result = $localattributekeys->get_attribute_keys();
-        $this->assertEquals($result, array());
+        $this->assertEquals($result, []);
 
         // When apirest returns attribute keys for the given kind.
         $mockclient4 = $this->getMockBuilder('client')
             ->setMethods(['post'])
             ->getMock();
 
-        $reqdata1 = json_encode(array('page' => 1, 'page_size' => 50, 'kind' => 'date'));
-        $reqdata2 = json_encode(array('page' => 2, 'page_size' => 50, 'kind' => 'date'));
+        $reqdata1 = json_encode(['page' => 1, 'page_size' => 50, 'kind' => 'date']);
+        $reqdata2 = json_encode(['page' => 2, 'page_size' => 50, 'kind' => 'date']);
 
         $mockclient4->expects($this->exactly(2))
             ->method('post')
@@ -157,12 +157,12 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
         $api = new apirest($mockclient4);
         $localattributekeys = new attribute_keys($api);
         $result = $localattributekeys->get_attribute_keys('date');
-        $this->assertEquals($result, array(
+        $this->assertEquals($result, [
             'Custom Attribute Key 1' => 'Custom Attribute Key 1',
             'Custom Attribute Key 2' => 'Custom Attribute Key 2',
             'Custom Attribute Key 3' => 'Custom Attribute Key 3',
-            'Custom Attribute Key 4' => 'Custom Attribute Key 4'
-        ));
+            'Custom Attribute Key 4' => 'Custom Attribute Key 4',
+        ]);
 
     }
 }

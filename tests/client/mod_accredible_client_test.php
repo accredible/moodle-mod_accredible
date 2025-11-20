@@ -45,15 +45,15 @@ class mod_accredible_client_test extends \advanced_testcase {
      */
     public function test_get() {
         $url = 'https://api.accredible.com/v1/all_credentials';
-        $options = array(
+        $options = [
             'CURLOPT_RETURNTRANSFER' => true,
             'CURLOPT_FAILONERROR'    => true,
-            'CURLOPT_HTTPHEADER'     => array(
+            'CURLOPT_HTTPHEADER'     => [
                 'Authorization: Token sometestapikey',
                 'Content-Type: application/json; charset=utf-8',
-                'Accredible-Integration: Moodle'
-            )
-        );
+                'Accredible-Integration: Moodle',
+            ],
+        ];
 
         // Mock curl.
         $mockcurl = $this->getMockBuilder('curl')
@@ -77,15 +77,15 @@ class mod_accredible_client_test extends \advanced_testcase {
      */
     public function test_post() {
         $url = 'https://api.accredible.com/v1/all_credentials';
-        $options = array(
+        $options = [
             'CURLOPT_RETURNTRANSFER' => true,
             'CURLOPT_FAILONERROR'    => true,
-            'CURLOPT_HTTPHEADER'     => array(
+            'CURLOPT_HTTPHEADER'     => [
                 'Authorization: Token sometestapikey',
                 'Content-Type: application/json; charset=utf-8',
-                'Accredible-Integration: Moodle'
-            )
-        );
+                'Accredible-Integration: Moodle',
+            ],
+        ];
 
         // Mock curl.
         $mockcurl = $this->getMockBuilder('curl')
@@ -110,15 +110,15 @@ class mod_accredible_client_test extends \advanced_testcase {
      */
     public function test_put() {
         $url = 'https://api.accredible.com/v1/all_credentials';
-        $options = array(
+        $options = [
             'CURLOPT_RETURNTRANSFER' => true,
             'CURLOPT_FAILONERROR'    => true,
-            'CURLOPT_HTTPHEADER'     => array(
+            'CURLOPT_HTTPHEADER'     => [
                 'Authorization: Token sometestapikey',
                 'Content-Type: application/json; charset=utf-8',
-                'Accredible-Integration: Moodle'
-            )
-        );
+                'Accredible-Integration: Moodle',
+            ],
+        ];
 
         // Mock curl.
         $mockcurl = $this->getMockBuilder('curl')
@@ -143,15 +143,15 @@ class mod_accredible_client_test extends \advanced_testcase {
      */
     public function test_error() {
         $url = 'https://api.accredible.com/v1/all_credentials';
-        $options = array(
+        $options = [
             'CURLOPT_RETURNTRANSFER' => true,
             'CURLOPT_FAILONERROR'    => true,
-            'CURLOPT_HTTPHEADER'     => array(
+            'CURLOPT_HTTPHEADER'     => [
                 'Authorization: Token sometestapikey',
                 'Content-Type: application/json; charset=utf-8',
-                'Accredible-Integration: Moodle'
-            )
-        );
+                'Accredible-Integration: Moodle',
+            ],
+        ];
 
         // Mock curl.
         $mockcurl = $this->getMockBuilder('curl')

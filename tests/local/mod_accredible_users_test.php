@@ -57,7 +57,7 @@ class mod_accredible_users_test extends \advanced_testcase {
             }
         };
 
-        $this->user = $this->getDataGenerator()->create_user(array('email' => 'person1@example.com'));
+        $this->user = $this->getDataGenerator()->create_user(['email' => 'person1@example.com']);
         $this->course = $this->getDataGenerator()->create_course();
         $this->context = \context_course::instance($this->course->id);
     }
@@ -70,31 +70,31 @@ class mod_accredible_users_test extends \advanced_testcase {
         $userhelper = new users();
 
         // When there are not users.
-        $result = $userhelper->get_users_with_credentials(array());
-        $this->assertEquals($result, array());
+        $result = $userhelper->get_users_with_credentials([]);
+        $this->assertEquals($result, []);
 
         // When there are users but not groupid.
         $this->getDataGenerator()->enrol_user($this->user->id, $this->course->id);
 
-        $userrespone = array('id'             => $this->user->id,
+        $userrespone = ['id'             => $this->user->id,
                              'email'          => $this->user->email,
                              'name'           => $this->user->firstname . ' ' . $this->user->lastname,
                              'credential_url' => null,
-                             'credential_id'  => null);
-        $expectedresponse = array('0' => $userrespone);
+                             'credential_id'  => null];
+        $expectedresponse = ['0' => $userrespone];
         $enrolledusers = get_enrolled_users($this->context, "mod/accredible:view", null, 'u.*', 'id');
         $result = $userhelper->get_users_with_credentials($enrolledusers);
         $this->assertEquals($result, $expectedresponse);
 
         // When there users and groupid.
-        $user2 = $this->getDataGenerator()->create_user(array('email' => 'person2@example.com'));
+        $user2 = $this->getDataGenerator()->create_user(['email' => 'person2@example.com']);
         $this->getDataGenerator()->enrol_user($user2->id, $this->course->id);
-        $user2respone = array('id'             => $user2->id,
+        $user2respone = ['id'             => $user2->id,
                               'email'          => $user2->email,
                               'name'           => $user2->firstname . ' ' . $user2->lastname,
                               'credential_url' => 'https://www.credential.net/10250012',
-                              'credential_id'  => 10250012);
-        $expectedresponse = array('0' => $userrespone, '1' => $user2respone);
+                              'credential_id'  => 10250012];
+        $expectedresponse = ['0' => $userrespone, '1' => $user2respone];
 
         $mockclient1 = $this->getMockBuilder('client')
             ->setMethods(['get'])
@@ -138,7 +138,7 @@ class mod_accredible_users_test extends \advanced_testcase {
         $api = new apirest($mockclient2);
         $userhelper = new users($api);
         $result = $userhelper->get_users_with_credentials($enrolledusers, 123);
-        $this->assertEquals($result, array());
+        $this->assertEquals($result, []);
     }
 
     /**
@@ -149,51 +149,51 @@ class mod_accredible_users_test extends \advanced_testcase {
         $userhelper = new users();
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id);
 
-        $generateduser2 = $this->getDataGenerator()->create_user(array('email' => 'person3@example.com'));
+        $generateduser2 = $this->getDataGenerator()->create_user(['email' => 'person3@example.com']);
         $this->getDataGenerator()->enrol_user($this->user->id, $this->course->id);
         $this->getDataGenerator()->enrol_user($generateduser2->id, $this->course->id);
 
-        $user1 = array('id'             => $this->user->id,
+        $user1 = ['id'             => $this->user->id,
                        'email'          => $this->user->email,
                        'name'           => $this->user->firstname . ' ' . $this->user->lastname,
                        'credential_url' => null,
-                       'credential_id'  => null);
-        $user2 = array('id'             => $generateduser2->id,
+                       'credential_id'  => null];
+        $user2 = ['id'             => $generateduser2->id,
                        'email'          => $generateduser2->email,
                        'name'           => $generateduser2->firstname . ' ' . $generateduser2->lastname,
                        'credential_url' => 'https://www.credential.net/10250012',
-                       'credential_id'  => 10250012);
+                       'credential_id'  => 10250012];
 
-        $users = array($user1, $user2);
+        $users = [$user1, $user2];
 
         // When there are not users.
-        $result = $userhelper->get_unissued_users(array(), $accredibleinstanceid);
-        $this->assertEquals($result, array());
+        $result = $userhelper->get_unissued_users([], $accredibleinstanceid);
+        $this->assertEquals($result, []);
 
         // When accredible instance id not provided.
         $result = $userhelper->get_unissued_users($users);
-        $this->assertEquals($result, array());
+        $this->assertEquals($result, []);
 
         // When the Accredible module don't have any requirement.
         $result = $userhelper->get_unissued_users($users, $accredibleinstanceid);
-        $this->assertEquals($result, array());
+        $this->assertEquals($result, []);
 
         // When there are not users who pass the requirements.
         $quiz = $this->create_quiz_module($this->course->id);
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id, $quiz->id);
 
         $result = $userhelper->get_unissued_users($users, $accredibleinstanceid);
-        $this->assertEquals($result, array());
+        $this->assertEquals($result, []);
 
         // When there is a user who pass the requirements but have a credential.
         $this->create_quiz_grades($quiz->id, $generateduser2->id, 8);
         $result = $userhelper->get_unissued_users($users, $accredibleinstanceid);
-        $this->assertEquals($result, array());
+        $this->assertEquals($result, []);
 
         // When there is a user who pass the requirements and not have a credential.
         $this->create_quiz_grades($quiz->id, $this->user->id, 9);
         $result = $userhelper->get_unissued_users($users, $accredibleinstanceid);
-        $expectedresponse = array($user1);
+        $expectedresponse = [$user1];
         $this->assertEquals($result, $expectedresponse);
     }
 
@@ -205,14 +205,14 @@ class mod_accredible_users_test extends \advanced_testcase {
         global $DB;
         $userhelper = new users();
 
-        $generateduser2 = $this->getDataGenerator()->create_user(array('email' => 'person3@example.com'));
+        $generateduser2 = $this->getDataGenerator()->create_user(['email' => 'person3@example.com']);
         $this->getDataGenerator()->enrol_user($this->user->id, $this->course->id);
         $this->getDataGenerator()->enrol_user($generateduser2->id, $this->course->id);
 
-        $users = array(
+        $users = [
             $this->user->id     => $this->user->id,
-            $generateduser2->id => $generateduser2->id
-        );
+            $generateduser2->id => $generateduser2->id,
+        ];
 
         // When accredible instance not provided.
         $result = $userhelper->get_user_grades(null, $users);
@@ -220,31 +220,31 @@ class mod_accredible_users_test extends \advanced_testcase {
 
         // When includegradeattribute is false.
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id);
-        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $accredibleinstance = $DB->get_record('accredible', ['id' => $accredibleinstanceid], '*', MUST_EXIST);
         $result = $userhelper->get_user_grades($accredibleinstance, $users);
         $this->assertEquals($result, null);
 
         // When gradeattributegradeitemid is null.
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1);
-        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $accredibleinstance = $DB->get_record('accredible', ['id' => $accredibleinstanceid], '*', MUST_EXIST);
         $result = $userhelper->get_user_grades($accredibleinstance, $users);
         $this->assertEquals($result, null);
 
         // When gradeattributegradeitemid is false.
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, 0);
-        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $accredibleinstance = $DB->get_record('accredible', ['id' => $accredibleinstanceid], '*', MUST_EXIST);
         $result = $userhelper->get_user_grades($accredibleinstance, $users);
         $this->assertEquals($result, null);
 
         // When gradeattributekeyname is null.
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, 1);
-        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $accredibleinstance = $DB->get_record('accredible', ['id' => $accredibleinstanceid], '*', MUST_EXIST);
         $result = $userhelper->get_user_grades($accredibleinstance, $users);
         $this->assertEquals($result, null);
 
         // When gradeattributekeyname is empty.
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, 1, "");
-        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $accredibleinstance = $DB->get_record('accredible', ['id' => $accredibleinstanceid], '*', MUST_EXIST);
         $result = $userhelper->get_user_grades($accredibleinstance, $users);
         $this->assertEquals($result, null);
 
@@ -252,37 +252,37 @@ class mod_accredible_users_test extends \advanced_testcase {
         $quiz = $this->create_quiz_module($this->course->id);
         $gradeitemid = $this->create_grade_item($this->course->id, $quiz->name, 'quiz', $quiz->id);
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, $gradeitemid, "Custom Attribute");
-        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $accredibleinstance = $DB->get_record('accredible', ['id' => $accredibleinstanceid], '*', MUST_EXIST);
         $result = $userhelper->get_user_grades($accredibleinstance, $users);
 
-        $this->assertEquals($result, array());
+        $this->assertEquals($result, []);
 
         // When a user has a grade.
-        $expectedresponse = array(
-            $generateduser2->id => "80.00"
-        );
+        $expectedresponse = [
+            $generateduser2->id => "80.00",
+        ];
 
         $this->create_grade_grades($gradeitemid, $generateduser2->id, 80);
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, $gradeitemid, "Custom Attribute");
-        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $accredibleinstance = $DB->get_record('accredible', ['id' => $accredibleinstanceid], '*', MUST_EXIST);
         $result = $userhelper->get_user_grades($accredibleinstance, $users);
 
         $this->assertEquals($result, $expectedresponse);
 
         // When multiple users have a grade.
         $this->create_grade_grades($gradeitemid, $this->user->id, 60);
-        $expectedresponse = array(
+        $expectedresponse = [
             $this->user->id => "60.00",
-            $generateduser2->id => "80.00"
-        );
-        $result = $userhelper->get_user_grades($accredibleinstance, array($generateduser2->id, $this->user->id));
+            $generateduser2->id => "80.00",
+        ];
+        $result = $userhelper->get_user_grades($accredibleinstance, [$generateduser2->id, $this->user->id]);
 
         $this->assertEquals($result, $expectedresponse);
 
         // When multiple users have a grade but only a user ID is sent.
-        $expectedresponse = array(
-            $generateduser2->id => "80.00"
-        );
+        $expectedresponse = [
+            $generateduser2->id => "80.00",
+        ];
 
         $result = $userhelper->get_user_grades($accredibleinstance, $generateduser2->id);
 
@@ -305,18 +305,18 @@ class mod_accredible_users_test extends \advanced_testcase {
         $this->getDataGenerator()->enrol_user($this->user->id, $this->course->id);
 
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id, 0, 1, 1, "Custom Attribute");
-        $accredibleinstance = $DB->get_record('accredible', array('id' => $accredibleinstanceid), '*', MUST_EXIST);
+        $accredibleinstance = $DB->get_record('accredible', ['id' => $accredibleinstanceid], '*', MUST_EXIST);
 
         // When grades not provided.
-        $result = $userhelper->load_user_grade_as_custom_attributes($accredibleinstance, array(), $this->user->id);
+        $result = $userhelper->load_user_grade_as_custom_attributes($accredibleinstance, [], $this->user->id);
         $this->assertEquals($result, []);
 
         // When there's a grade for the user.
-        $grades = array(
-            $this->user->id => "80.00"
-        );
+        $grades = [
+            $this->user->id => "80.00",
+        ];
 
-        $expectedresponse = array("Custom Attribute" => "80.00");
+        $expectedresponse = ["Custom Attribute" => "80.00"];
 
         $result = $userhelper->load_user_grade_as_custom_attributes($accredibleinstance, $grades, $this->user->id);
         $this->assertEquals($result, $expectedresponse);
@@ -335,7 +335,7 @@ class mod_accredible_users_test extends \advanced_testcase {
         $gradeattributegradeitemid = null, $gradeattributekeyname = null) {
 
         global $DB;
-        $dbrecord = array(
+        $dbrecord = [
             "name"                      => 'Accredible Test',
             "course"                    => $courseid,
             "finalquiz"                 => $finalquizid,
@@ -346,7 +346,7 @@ class mod_accredible_users_test extends \advanced_testcase {
             "includegradeattribute"     => $includegradeattribute,
             "gradeattributegradeitemid" => $gradeattributegradeitemid,
             "gradeattributekeyname"     => $gradeattributekeyname,
-        );
+        ];
 
         return $DB->insert_record('accredible', $dbrecord);
     }
@@ -361,14 +361,14 @@ class mod_accredible_users_test extends \advanced_testcase {
      */
     private function create_grade_item($courseid, $itemname, $itemmodule, $iteminstance) {
         global $DB;
-        $gradeitem = array(
+        $gradeitem = [
             "courseid" => $courseid,
             "itemname" => $itemname,
             "itemtype" => 'mod',
             "itemmodule" => $itemmodule,
             "iteminstance" => $iteminstance,
-            "itemnumber" => 0
-        );
+            "itemnumber" => 0,
+        ];
         return $DB->insert_record('grade_items', $gradeitem);
     }
 
@@ -378,7 +378,7 @@ class mod_accredible_users_test extends \advanced_testcase {
      * @param int $courseid
      */
     private function create_quiz_module($courseid) {
-        $quiz = array("course" => $courseid, "grade" => 10);
+        $quiz = ["course" => $courseid, "grade" => 10];
         return $this->getDataGenerator()->create_module('quiz', $quiz);
     }
 
@@ -391,7 +391,7 @@ class mod_accredible_users_test extends \advanced_testcase {
      */
     private function create_quiz_grades($quizid, $userid, $grade) {
         global $DB;
-        $quizgrade = array("quiz" => $quizid, "userid" => $userid, "grade" => $grade);
+        $quizgrade = ["quiz" => $quizid, "userid" => $userid, "grade" => $grade];
         $DB->insert_record('quiz_grades', $quizgrade);
     }
 
@@ -404,12 +404,12 @@ class mod_accredible_users_test extends \advanced_testcase {
      */
     private function create_grade_grades($gradeitemid, $userid, $grade) {
         global $DB;
-        $quizgrade = array(
+        $quizgrade = [
             "itemid" => $gradeitemid,
             "rawgrade" => $grade,
             "userid" => $userid,
-            "finalgrade" => $grade
-        );
+            "finalgrade" => $grade,
+        ];
         $DB->insert_record('grade_grades', $quizgrade);
     }
 }

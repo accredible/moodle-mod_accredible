@@ -232,10 +232,10 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // Expect to call the endpoint once.
         $url = "https://api.accredible.com/v1/sso/generate_link";
 
-        $reqdata = json_encode(array(
+        $reqdata = json_encode([
             "recipient_email" => "person@example.com",
             "group_id" => 45,
-        ));
+        ]);
 
         $mockclient1->expects($this->once())
             ->method('post')
@@ -259,10 +259,10 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // Expect to call the endpoint once.
         $url = "https://api.accredible.com/v1/sso/generate_link";
 
-        $reqdata = json_encode(array(
+        $reqdata = json_encode([
             "recipient_email" => "person@example.com",
-            "group_id" => 45
-        ));
+            "group_id" => 45,
+        ]);
 
         $mockclient2->expects($this->once())
             ->method('post')
@@ -291,18 +291,18 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // Expect to call the endpoint once.
         $url = "https://api.accredible.com/v1/credentials";
 
-        $reqdata = json_encode(array(
-            "credential" => array(
+        $reqdata = json_encode([
+            "credential" => [
                 "group_id" => 1,
-                "recipient" => array(
+                "recipient" => [
                     "name" => "Jordan Smith",
-                    "email" => "person2@example.com"
-                ),
+                    "email" => "person2@example.com",
+                ],
                 "issued_on" => null,
                 "expired_on" => null,
-                "custom_attributes" => null
-            )
-        ));
+                "custom_attributes" => null,
+            ],
+        ]);
 
         $mockclient1->expects($this->once())
             ->method('post')
@@ -325,18 +325,18 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // Expect to call the endpoint once.
         $url = "https://api.accredible.com/v1/credentials";
-        $reqdata = json_encode(array(
-            "credential" => array(
+        $reqdata = json_encode([
+            "credential" => [
                 "group_id" => 1,
-                "recipient" => array(
+                "recipient" => [
                     "name" => "Jordan Smith",
-                    "email" => "person2@example.com"
-                ),
+                    "email" => "person2@example.com",
+                ],
                 "issued_on" => null,
                 "expired_on" => null,
-                "custom_attributes" => null
-            )
-        ));
+                "custom_attributes" => null,
+            ],
+        ]);
 
         $mockclient2->expects($this->once())
             ->method('post')
@@ -365,21 +365,21 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // Expect to call the endpoint once.
         $url = "https://api.accredible.com/v1/credentials";
 
-        $reqdata = json_encode(array(
-            "credential" => array(
+        $reqdata = json_encode([
+            "credential" => [
                 "group_name" => "Example Certificate Design",
-                "recipient" => array(
+                "recipient" => [
                     "name" => "Jordan Smith",
-                    "email" => "person2@example.com"
-                ),
+                    "email" => "person2@example.com",
+                ],
                 "issued_on" => null,
                 "expired_on" => null,
                 "custom_attributes" => null,
                 "name" => null,
                 "description" => null,
-                "course_link" => null
-            )
-        ));
+                "course_link" => null,
+            ],
+        ]);
 
         $mockclient1->expects($this->once())
             ->method('post')
@@ -427,7 +427,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // Mock API response data.
         $resdata = $this->mockapi->resdata('groups/search_success.json');
 
-        $reqdata = json_encode(array('page' => 1, 'page_size' => 10000));
+        $reqdata = json_encode(['page' => 1, 'page_size' => 10000]);
 
         // Expect to call the endpoint once with page and page_size.
         $url = 'https://api.accredible.com/v1/issuer/groups/search';
@@ -450,7 +450,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // Mock API response data.
         $resdata = $this->mockapi->resdata('groups/search_success.json');
 
-        $reqdata = json_encode(array('page' => 1, 'page_size' => 50));
+        $reqdata = json_encode(['page' => 1, 'page_size' => 50]);
 
         // Expect to call the endpoint once with default page and page_size.
         $url = 'https://api.accredible.com/v1/issuer/groups/search';
@@ -474,7 +474,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // Mock API response data.
         $resdata = $this->mockapi->resdata('unauthorized_error.json');
 
-        $reqdata = json_encode(array('page' => 1, 'page_size' => 10000));
+        $reqdata = json_encode(['page' => 1, 'page_size' => 10000]);
 
         // Expect to call the endpoint once with page and page_size.
         $url = 'https://api.accredible.com/v1/issuer/groups/search';
@@ -506,14 +506,14 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // Expect to call the endpoint once with url and reqdata.
         $url = 'https://api.accredible.com/v1/credentials/1/evidence_items';
-        $evidenceitem = array(
-            'evidence_item' => array(
+        $evidenceitem = [
+            'evidence_item' => [
                 "string_object" => "100",
                 "description" => "Quiz",
                 "custom" => true,
-                "category" => "grade"
-            )
-        );
+                "category" => "grade",
+            ],
+        ];
         $reqdata = json_encode($evidenceitem);
 
         $mockclient1->expects($this->once())
@@ -591,19 +591,19 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // Expect to call the endpoint once with url and reqdata.
         $url = 'https://api.accredible.com/v1/credentials/1/evidence_items';
-        $stringobject = array(
+        $stringobject = [
             "start_date"       => "2022-04-15",
             "end_date"         => "2022-04-15",
-            "duration_in_days" => 1
-        );
-        $evidenceitem = array(
-            "evidence_item" => array(
+            "duration_in_days" => 1,
+        ];
+        $evidenceitem = [
+            "evidence_item" => [
                 "description"   => 'Completed in 1 day',
                 "category"      => 'course_duration',
                 "string_object" => json_encode($stringobject),
-                "hidden"        => false
-            )
-        );
+                "hidden"        => false,
+            ],
+        ];
         $reqdata = json_encode($evidenceitem);
 
         $mockclient1->expects($this->once())
@@ -626,19 +626,19 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // Expect to call the endpoint once with url and reqdata.
         $url = 'https://api.accredible.com/v1/credentials/1/evidence_items';
-        $stringobject = array(
+        $stringobject = [
             "start_date"       => "2022-04-15",
             "end_date"         => "2022-04-17",
-            "duration_in_days" => 2
-        );
-        $evidenceitem = array(
-            "evidence_item" => array(
+            "duration_in_days" => 2,
+        ];
+        $evidenceitem = [
+            "evidence_item" => [
                 "description"   => 'Completed in 2 days',
                 "category"      => 'course_duration',
                 "string_object" => json_encode($stringobject),
-                "hidden"        => false
-            )
-        );
+                "hidden"        => false,
+            ],
+        ];
         $reqdata = json_encode($evidenceitem);
 
         $mockclient2->expects($this->once())
@@ -899,7 +899,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // Mock API response data.
         $resdata = $this->mockapi->resdata('attribute_keys/search_success.json');
 
-        $reqdata = json_encode(array('page' => 1, 'page_size' => 20, 'kind' => 'text'));
+        $reqdata = json_encode(['page' => 1, 'page_size' => 20, 'kind' => 'text']);
 
         // Expect to call the endpoint once with page and page_size.
         $mockclient1->expects($this->once())
@@ -921,7 +921,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // Mock API response data.
         $resdata = $this->mockapi->resdata('attribute_keys/search_success.json');
 
-        $reqdata = json_encode(array('page' => 1, 'page_size' => 50, 'kind' => 'text'));
+        $reqdata = json_encode(['page' => 1, 'page_size' => 50, 'kind' => 'text']);
 
         // Expect to call the endpoint once with default page and page_size.
         $mockclient2->expects($this->once())
@@ -944,7 +944,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // Mock API response data.
         $resdata = $this->mockapi->resdata('unauthorized_error.json');
 
-        $reqdata = json_encode(array('page' => 1, 'page_size' => 10, 'kind' => 'date'));
+        $reqdata = json_encode(['page' => 1, 'page_size' => 10, 'kind' => 'date']);
 
         // Expect to call the endpoint once with page and page_size.
         $mockclient3->expects($this->once())

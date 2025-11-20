@@ -86,12 +86,12 @@ class mod_accredible_groups_test extends \advanced_testcase {
         $api = new apirest($mockclient1);
         $localgroups = new groups($api);
         $result = $localgroups->get_groups();
-        $this->assertEquals($result, array(
+        $this->assertEquals($result, [
             '12473' => 'new group1',
             '12472' => 'new group2',
             '12474' => 'new group3',
             '12475' => 'new group4',
-        ));
+        ]);
 
         // When the apirest returns an error response.
         $mockclient2 = $this->getMockBuilder('client')
@@ -139,7 +139,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
         $api = new apirest($mockclient3);
         $localgroups = new groups($api);
         $result = $localgroups->get_groups();
-        $this->assertEquals($result, array());
+        $this->assertEquals($result, []);
     }
 
     /**
@@ -156,8 +156,8 @@ class mod_accredible_groups_test extends \advanced_testcase {
         $resdata1 = $this->mockapi->resdata('groups/search_success_page1.json');
         $resdata2 = $this->mockapi->resdata('groups/search_success_page2.json');
 
-        $reqdata1 = json_encode(array('page' => 1, 'page_size' => 50));
-        $reqdata2 = json_encode(array('page' => 2, 'page_size' => 50));
+        $reqdata1 = json_encode(['page' => 1, 'page_size' => 50]);
+        $reqdata2 = json_encode(['page' => 2, 'page_size' => 50]);
 
         // Expect to call the endpoint once with page and page_size.
         $url = 'https://api.accredible.com/v1/issuer/groups/search';
@@ -171,12 +171,12 @@ class mod_accredible_groups_test extends \advanced_testcase {
         $api = new apirest($mockclient1);
         $localgroups = new groups($api);
         $result = $localgroups->get_templates();
-        $this->assertEquals($result, array(
+        $this->assertEquals($result, [
             'new group1' => 'new group1',
             'new group2' => 'new group2',
             'new group3' => 'new group3',
-            'new group4' => 'new group4'
-        ));
+            'new group4' => 'new group4',
+        ]);
 
         // When the apirest returns an error response.
         $mockclient2 = $this->getMockBuilder('client')
@@ -187,7 +187,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
         $mockclient2->error = 'The requested URL returned error: 401 Unauthorized';
         $resdata = $this->mockapi->resdata('unauthorized_error.json');
 
-        $reqdata = json_encode(array('page' => 1, 'page_size' => 50));
+        $reqdata = json_encode(['page' => 1, 'page_size' => 50]);
 
         // Expect to call the endpoint once with page and page_size.
         $url = 'https://api.accredible.com/v1/issuer/groups/search';
@@ -215,7 +215,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
         // Mock API response data.
         $resdata = $this->mockapi->resdata('groups/search_success_empty.json');
 
-        $reqdata = json_encode(array('page' => 1, 'page_size' => 50));
+        $reqdata = json_encode(['page' => 1, 'page_size' => 50]);
 
         // Expect to call the endpoint once with page and page_size.
         $url = 'https://api.accredible.com/v1/issuer/groups/search';
@@ -228,6 +228,6 @@ class mod_accredible_groups_test extends \advanced_testcase {
         $api = new apirest($mockclient3);
         $localgroups = new groups($api);
         $result = $localgroups->get_templates();
-        $this->assertEquals($result, array());
+        $this->assertEquals($result, []);
     }
 }
