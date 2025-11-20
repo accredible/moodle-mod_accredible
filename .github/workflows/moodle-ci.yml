@@ -8,20 +8,20 @@ on:
   workflow_dispatch:
     inputs:
       php_version:
-        description: 'PHP version (e.g., 7.4, 8.0, 8.1)'
+        description: 'PHP version'
         required: false
         type: choice
         options:
           - '7.4'
           - '8.0'
           - '8.1'
-        default: '8.0'
+        default: '8.1'
       custom_php_version:
-        description: 'Custom PHP version (overrides php_version if provided, e.g., 8.2, 8.3)'
+        description: 'Custom PHP version (overrides php_version)'
         required: false
         type: string
       moodle_branch:
-        description: 'Moodle branch (e.g., MOODLE_401_STABLE)'
+        description: 'Moodle branch'
         required: false
         type: choice
         options:
@@ -30,7 +30,7 @@ on:
           - 'MOODLE_403_STABLE'
           - 'MOODLE_404_STABLE'
           - 'MOODLE_405_STABLE'
-        default: 'MOODLE_401_STABLE'
+        default: 'MOODLE_405_STABLE'
       database:
         description: 'Database type'
         required: false
