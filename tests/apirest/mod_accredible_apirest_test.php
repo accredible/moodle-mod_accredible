@@ -528,7 +528,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         $this->assertEquals($result, $resdata);
 
         // When the throw_error is FALSE and the response is NOT successful.
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->setMethods(['post'])
             ->getMock();
 
@@ -547,7 +547,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         $this->assertEquals($result, $resdata);
 
         // When the throw_error is TRUE and the response is NOT successful.
-        $mockclient3 = $this->getMockBuilder('client')
+        $mockclient3 = $this->getMockBuilder(client::class)
             ->setMethods(['post'])
             ->getMock();
         $mockclient3->error = 'The requested URL returned error: 401 Unauthorized';
