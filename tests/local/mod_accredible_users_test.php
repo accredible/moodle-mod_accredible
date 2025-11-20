@@ -36,6 +36,21 @@ class mod_accredible_users_test extends \advanced_testcase {
      */
     protected $mockapi;
     /**
+     * User.
+     * @var \stdClass $user
+     */
+    protected $user;
+    /**
+     * Course.
+     * @var \stdClass $course
+     */
+    protected $course;
+    /**
+     * Context.
+     * @var \context_course $context
+     */
+    protected $context;
+    /**
      * Setup before every test.
      */
     public function setUp(): void {

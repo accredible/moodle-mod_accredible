@@ -34,6 +34,16 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
      */
     protected $mockapi;
     /**
+     * User.
+     * @var \stdClass $user
+     */
+    protected $user;
+    /**
+     * Course.
+     * @var \stdClass $course
+     */
+    protected $course;
+    /**
      * Setup before every test.
      */
     public function setUp(): void {

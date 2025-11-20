@@ -27,6 +27,17 @@ namespace mod_accredible\local;
  */
 class mod_accredible_formhelper_test extends \advanced_testcase {
     /**
+     * Course.
+     * @var \stdClass $course
+     */
+    protected $course;
+    /**
+     * Course grade item ID.
+     * @var int $coursegradeitemid
+     */
+    protected $coursegradeitemid;
+
+    /**
      * Setup before every test.
      */
     public function setUp(): void {

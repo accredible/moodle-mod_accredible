@@ -27,7 +27,8 @@ namespace mod_accredible\local;
  */
 class mod_accredible_accredible_test extends \advanced_testcase {
     /**
-     * @var The accredible instance.
+     * The accredible instance.
+     * @var \mod_accredible\local\accredible
      */
     protected $accredible;
 
