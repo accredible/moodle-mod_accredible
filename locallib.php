@@ -498,7 +498,7 @@ function serialize_completion_array($completionarray) {
  * @param stdObject $completionobject
  */
 function unserialize_completion_array($completionobject) {
-    return (array)unserialize(base64_decode( $completionobject ));
+    return $completionobject === null ? [] : (array)unserialize(base64_decode( $completionobject ));
 }
 
 /**
