@@ -152,11 +152,13 @@ class mod_accredible_client_test extends \advanced_testcase {
                 'Accredible-Integration: Moodle',
             ],
         ];
+        $error = 'The requested URL returned error: 401 Unauthorized';
 
         // Mock curl.
         $mockcurl = $this->getMockBuilder(curl::class)
             ->setMethods(['get'])
             ->getMock();
+        $mockcurl->error = $error;
 
         $mockcurl->expects($this->once())
             ->method('get')
@@ -164,13 +166,11 @@ class mod_accredible_client_test extends \advanced_testcase {
                 $this->equalTo(null),
                 $this->equalTo($options));
 
-        $mockcurl->error = 'The requested URL returned error: 401 Unauthorized';
-
         // Expect to call debugging.
         $client = new client($mockcurl);
         $this->assertDebuggingCalled($client->get($url));
 
         // Expect to return an error message.
-        $this->assertEquals($client->error, 'The requested URL returned error: 401 Unauthorized');
+        $this->assertEquals($client->error, $error);
     }
 }

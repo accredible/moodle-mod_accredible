@@ -95,8 +95,6 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * @covers ::load_course_field_options
      */
     public function test_load_course_field_options() {
-        global $DB;
-
         $formhelper = new formhelper();
 
         $expected = [
@@ -356,26 +354,6 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
             "1" => ["field" => "3", "attribute" => "moodle_year"],
         ];
         $this->assertEquals($expected, $result);
-    }
-
-    /**
-     * fetch course grate item record
-     *
-     * @param int $courseid
-     */
-    private function fetch_course_grade_item($courseid) {
-        global $DB;
-
-        return $DB->get_record(
-            'grade_items',
-            [
-                'courseid' => $courseid,
-                'itemtype' => 'course',
-                'itemmodule' => null,
-            ],
-            '*',
-            MUST_EXIST
-        );
     }
 
     /**

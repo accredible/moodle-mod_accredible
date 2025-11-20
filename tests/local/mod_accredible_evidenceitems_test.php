@@ -242,8 +242,6 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * @covers ::course_duration_evidence
      */
     public function test_course_duration_evidence() {
-        global $DB;
-
         $evidenceitems = new evidenceitems();
 
         // When there are not enrolments.
