@@ -127,7 +127,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertEquals($result, $resdata->credential);
 
         // When the apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->setMethods(['post'])
             ->getMock();
 
@@ -214,7 +214,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertEquals($result, $resdata->credential);
 
         // When the apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->setMethods(['post'])
             ->getMock();
 
@@ -348,7 +348,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertEquals($result, $resdata->credentials[0]);
 
         // When apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->setMethods(['get'])
             ->getMock();
 
@@ -425,7 +425,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertEquals($result, $resdata->credentials[1]);
 
         // When apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->setMethods(['get'])
             ->getMock();
 

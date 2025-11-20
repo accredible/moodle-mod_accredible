@@ -154,7 +154,7 @@ class mod_accredible_client_test extends \advanced_testcase {
         ];
 
         // Mock curl.
-        $mockcurl = $this->getMockBuilder('curl')
+        $mockcurl = $this->getMockBuilder(curl::class)
             ->setMethods(['get'])
             ->getMock();
 

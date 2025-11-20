@@ -99,7 +99,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
         ]);
 
         // When the apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->setMethods(['get'])
             ->getMock();
 
@@ -184,7 +184,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
         ]);
 
         // When the apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->setMethods(['post'])
             ->getMock();
 
