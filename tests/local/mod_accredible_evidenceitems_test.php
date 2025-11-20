@@ -17,6 +17,7 @@
 namespace mod_accredible\local;
 
 use mod_accredible\apirest\apirest;
+use mod_accredible\client\client;
 
 /**
  * Unit tests for mod/accredible/classes/local/evidenceitems.php
