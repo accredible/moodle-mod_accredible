@@ -550,6 +550,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         $mockclient3 = $this->getMockBuilder('client')
             ->setMethods(['post'])
             ->getMock();
+        $mockclient3->error = 'The requested URL returned error: 401 Unauthorized';
 
         // Mock API response data.
         $resdata = $this->mockapi->resdata('unauthorized_error.json');
