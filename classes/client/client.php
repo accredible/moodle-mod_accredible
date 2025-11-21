@@ -119,7 +119,7 @@ class client {
                 $curl->error . '<br />' . $method . ' ' . $url . '</div>', DEBUG_DEVELOPER);
         };
 
-        if ($response === null || $response === '') {
+        if ($response === false || is_null($response) || $response === '') {
             return null;
         }
 
