@@ -155,7 +155,7 @@ class mod_accredible_client_test extends \advanced_testcase {
         $error = 'The requested URL returned error: 401 Unauthorized';
 
         // Mock curl.
-        $mockcurl = $this->getMockBuilder(curl::class)
+        $mockcurl = $this->getMockBuilder('curl')
             ->setMethods(['get'])
             ->getMock();
         $mockcurl->error = $error;
