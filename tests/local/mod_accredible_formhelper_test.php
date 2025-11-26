@@ -27,6 +27,17 @@ namespace mod_accredible\local;
  */
 class mod_accredible_formhelper_test extends \advanced_testcase {
     /**
+     * Course.
+     * @var \stdClass $course
+     */
+    protected $course;
+    /**
+     * Course grade item ID.
+     * @var int $coursegradeitemid
+     */
+    protected $coursegradeitemid;
+
+    /**
      * Setup before every test.
      */
     public function setUp(): void {
@@ -35,11 +46,11 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $this->course = $this->getDataGenerator()->create_course();
-        $gradeitem = array(
+        $gradeitem = [
             'courseid' => $this->course->id,
             'itemtype' => 'course',
-            'itemmodule' => null
-        );
+            'itemmodule' => null,
+        ];
         if (!$DB->record_exists('grade_items', $gradeitem)) {
             $DB->insert_record('grade_items', $gradeitem);
         }
@@ -54,10 +65,10 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $formhelper = new formhelper();
 
         // When there are no grade items.
-        $expected = array(
+        $expected = [
             '' => 'Select an Activity Grade',
-            $this->coursegradeitemid => get_string('coursetotal', 'accredible')
-        );
+            $this->coursegradeitemid => get_string('coursetotal', 'accredible'),
+        ];
         $result = $formhelper->load_grade_item_options($this->course->id);
         $this->assertEquals($expected, $result);
 
@@ -68,12 +79,12 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $quizid2 = $this->create_quiz_module($this->course->id, 'Quiz 2');
         $gradeitemid2 = $this->create_grade_item($this->course->id, 'Quiz 2', 'quiz', $quizid2);
 
-        $expected = array(
+        $expected = [
             '' => 'Select an Activity Grade',
             $this->coursegradeitemid => get_string('coursetotal', 'accredible'),
             $gradeitemid1 => 'Quiz 1',
             $gradeitemid2 => 'Quiz 2',
-        );
+        ];
         $result = $formhelper->load_grade_item_options($this->course->id);
         $this->assertEquals($expected, $result);
     }
@@ -84,8 +95,6 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * @covers ::load_course_field_options
      */
     public function test_load_course_field_options() {
-        global $DB;
-
         $formhelper = new formhelper();
 
         $expected = [
@@ -110,26 +119,26 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
 
         // When there are no custom fields.
         $expected = [
-            ['value' => '', 'name' => 'Select a Moodle course custom field']
+            ['value' => '', 'name' => 'Select a Moodle course custom field'],
         ];
         $result = $formhelper->load_course_custom_field_options();
         $this->assertEquals($expected, $result);
 
         // When there are custom fields.
-        $customfield1 = array(
+        $customfield1 = [
             'shortname' => 'customfield1',
             'name' => 'Custom Field 1',
             'timecreated' => time(),
-            'timemodified' => time()
-        );
+            'timemodified' => time(),
+        ];
         $customfield1id = $DB->insert_record('customfield_field', $customfield1);
 
-        $customfield2 = array(
+        $customfield2 = [
             'shortname' => 'customfield2',
             'name' => 'Custom Field 2',
             'timecreated' => time(),
-            'timemodified' => time()
-        );
+            'timemodified' => time(),
+        ];
         $customfield2id = $DB->insert_record('customfield_field', $customfield2);
 
         $expected = [
@@ -152,22 +161,22 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
 
         // When there are no user_info_field records.
         $expected = [
-            ['value' => '', 'name' => 'Select a Moodle user profile field']
+            ['value' => '', 'name' => 'Select a Moodle user profile field'],
         ];
         $result = $formhelper->load_user_profile_field_options();
         $this->assertEquals($expected, $result);
 
         // When there are user_info_field records.
-        $userinfofield1 = array(
+        $userinfofield1 = [
             'shortname' => 'userinfo1',
-            'name' => 'User Info 1'
-        );
+            'name' => 'User Info 1',
+        ];
         $userinfofield1id = $DB->insert_record('user_info_field', $userinfofield1);
 
-        $userinfofield2 = array(
+        $userinfofield2 = [
             'shortname' => 'userinfo2',
-            'name' => 'User Info 2'
-        );
+            'name' => 'User Info 2',
+        ];
         $userinfofield2id = $DB->insert_record('user_info_field', $userinfofield2);
 
         $expected = [
@@ -190,12 +199,12 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $options = [
             'key1' => 'Option 1',
             'key2' => 'Option 2',
-            'key3' => 'Option 3'
+            'key3' => 'Option 3',
         ];
         $expected = [
             ['name' => 'Option 1', 'value' => 'key1'],
             ['name' => 'Option 2', 'value' => 'key2'],
-            ['name' => 'Option 3', 'value' => 'key3']
+            ['name' => 'Option 3', 'value' => 'key3'],
         ];
         $result = $formhelper->map_select_options($options);
         $this->assertEquals($expected, $result);
@@ -227,7 +236,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
             ->method('get_attribute_keys')
             ->will($this->returnValueMap([
                 ['text', ['key1' => 'Text Attribute 1', 'key2' => 'Text Attribute 2']],
-                ['date', ['key3' => 'Date Attribute 1']]
+                ['date', ['key3' => 'Date Attribute 1']],
             ]));
         $formhelper = $this->create_formhelper_with_mock($attributekeysmock);
 
@@ -235,7 +244,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
             '' => get_string('accrediblecustomattributeselectprompt', 'accredible'),
             'key1' => 'Text Attribute 1',
             'key2' => 'Text Attribute 2',
-            'key3' => 'Date Attribute 1'
+            'key3' => 'Date Attribute 1',
         ];
         $result = $formhelper->get_attributekeys_choices();
         $this->assertEquals($expected, $result);
@@ -250,7 +259,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
             ->method('get_attribute_keys')
             ->will($this->returnValueMap([
                 ['text', []],
-                ['date', []]
+                ['date', []],
             ]));
         $formhelper = $this->create_formhelper_with_mock($attributekeysmock);
 
@@ -273,7 +282,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         $expected = [
             'coursefieldmapping' => [],
             'coursecustomfieldmapping' => [],
-            'userprofilefieldmapping' => []
+            'userprofilefieldmapping' => [],
         ];
         $this->assertEquals($expected, $result);
 
@@ -282,18 +291,18 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
             (object)[
                 'table' => 'course',
                 'field' => 'startdate',
-                'accredibleattribute' => 'Moodle Course Start Date'
+                'accredibleattribute' => 'Moodle Course Start Date',
             ],
             (object)[
                 'table' => 'user_info_field',
                 'id' => 123,
-                'accredibleattribute' => 'Moodle User Birthday'
+                'accredibleattribute' => 'Moodle User Birthday',
             ],
             (object)[
                 'table' => 'customfield_field',
                 'id' => 321,
-                'accredibleattribute' => 'Moodle Typology'
-            ]
+                'accredibleattribute' => 'Moodle Typology',
+            ],
         ]);
         $result = $formhelper->attributemapping_default_values($jsoninput);
         $expected = [
@@ -301,23 +310,23 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
                 [
                     'index' => 0,
                     'field' => 'startdate',
-                    'accredibleattribute' => 'Moodle Course Start Date'
-                ]
+                    'accredibleattribute' => 'Moodle Course Start Date',
+                ],
             ],
             'coursecustomfieldmapping' => [
                 [
                     'index' => 0,
                     'id' => 321,
-                    'accredibleattribute' => 'Moodle Typology'
-                ]
+                    'accredibleattribute' => 'Moodle Typology',
+                ],
             ],
             'userprofilefieldmapping' => [
                 [
                     'index' => 0,
                     'id' => 123,
-                    'accredibleattribute' => 'Moodle User Birthday'
-                ]
-            ]
+                    'accredibleattribute' => 'Moodle User Birthday',
+                ],
+            ],
         ];
         $this->assertEquals($expected, $result);
     }
@@ -337,34 +346,14 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         // When the associative array is provided.
         $given = [
             "2" => ["field" => "1", "attribute" => "moodle_course_grade"],
-            "3" => ["field" => "3", "attribute" => "moodle_year"]
+            "3" => ["field" => "3", "attribute" => "moodle_year"],
         ];
         $result = $formhelper->reindexarray($given);
         $expected = [
             "0" => ["field" => "1", "attribute" => "moodle_course_grade"],
-            "1" => ["field" => "3", "attribute" => "moodle_year"]
+            "1" => ["field" => "3", "attribute" => "moodle_year"],
         ];
         $this->assertEquals($expected, $result);
-    }
-
-    /**
-     * fetch course grate item record
-     *
-     * @param int $courseid
-     */
-    private function fetch_course_grade_item($courseid) {
-        global $DB;
-
-        return $DB->get_record(
-            'grade_items',
-            array(
-                'courseid' => $courseid,
-                'itemtype' => 'course',
-                'itemmodule' => null
-            ),
-            '*',
-            MUST_EXIST
-        );
     }
 
     /**
@@ -377,12 +366,12 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
         global $DB;
 
         return $DB->insert_record('quiz',
-            array(
+            [
                 'course' => $courseid,
                 'name' => $name,
                 'intro' => 'Default intro',
-                'grade' => 10
-            )
+                'grade' => 10,
+            ]
         );
     }
 
@@ -396,14 +385,14 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      */
     private function create_grade_item($courseid, $itemname, $itemmodule, $iteminstance) {
         global $DB;
-        $gradeitem = array(
+        $gradeitem = [
             "courseid" => $courseid,
             "itemname" => $itemname,
             "itemtype" => 'mod',
             "itemmodule" => $itemmodule,
             "iteminstance" => $iteminstance,
-            "itemnumber" => 0
-        );
+            "itemnumber" => 0,
+        ];
         return $DB->insert_record('grade_items', $gradeitem);
     }
 

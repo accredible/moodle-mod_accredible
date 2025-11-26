@@ -27,7 +27,8 @@ namespace mod_accredible\local;
  */
 class mod_accredible_accredible_test extends \advanced_testcase {
     /**
-     * @var The accredible instance.
+     * The accredible instance.
+     * @var \mod_accredible\local\accredible
      */
     protected $accredible;
 
@@ -103,20 +104,20 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $overrides->coursefieldmapping = [
             [
                 'field' => 'startdate',
-                'accredibleattribute' => 'Moodle Course Start Date'
-            ]
+                'accredibleattribute' => 'Moodle Course Start Date',
+            ],
         ];
         $overrides->coursecustomfieldmapping = [
             [
                 'id' => '123',
-                'accredibleattribute' => 'Moodle Course Custom Field'
-            ]
+                'accredibleattribute' => 'Moodle Course Custom Field',
+            ],
         ];
         $overrides->userprofilefieldmapping = [
             [
                 'id' => '345',
-                'accredibleattribute' => 'Moodle User Profile Field'
-            ]
+                'accredibleattribute' => 'Moodle User Profile Field',
+            ],
         ];
         $post = $this->generatepostobject($overrides);
 
@@ -189,7 +190,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         global $DB;
 
         $course = $this->getDataGenerator()->create_course(
-            array('startdate' => 1707436800)
+            ['startdate' => 1707436800]
         );
         $user = $this->getDataGenerator()->create_user();
 
@@ -238,20 +239,20 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $overrides->coursefieldmapping = [
             [
                 'field' => 'fullname',
-                'accredibleattribute' => null
-            ]
+                'accredibleattribute' => null,
+            ],
         ];
         $overrides->coursecustomfieldmapping = [
             [
                 'id' => $customfieldfieldid,
-                'accredibleattribute' => ''
-            ]
+                'accredibleattribute' => '',
+            ],
         ];
         $overrides->userprofilefieldmapping = [
             [
                 'id' => null,
-                'accredibleattribute' => 'Moodle User Profile Field'
-            ]
+                'accredibleattribute' => 'Moodle User Profile Field',
+            ],
         ];
         $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
@@ -266,8 +267,8 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $overrides->coursefieldmapping = [
             [
                 'field' => 'fullname',
-                'accredibleattribute' => 'Moodle Course Field'
-            ]
+                'accredibleattribute' => 'Moodle Course Field',
+            ],
         ];
         $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
@@ -275,7 +276,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
         $this->assertEquals([
-            'Moodle Course Field' => $course->fullname
+            'Moodle Course Field' => $course->fullname,
         ], $result);
 
         // When saving a record with a course field mapping (datetime).
@@ -284,8 +285,8 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $overrides->coursefieldmapping = [
             [
                 'field' => 'startdate',
-                'accredibleattribute' => 'Moodle Course Field'
-            ]
+                'accredibleattribute' => 'Moodle Course Field',
+            ],
         ];
         $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
@@ -293,7 +294,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
         $this->assertEquals([
-            'Moodle Course Field' => '2024-02-09'
+            'Moodle Course Field' => '2024-02-09',
         ], $result);
 
         // When saving a record with a course custom field mapping (textarea).
@@ -302,8 +303,8 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $overrides->coursecustomfieldmapping = [
             [
                 'id' => $customfieldfieldid,
-                'accredibleattribute' => 'Moodle Course Custom Field'
-            ]
+                'accredibleattribute' => 'Moodle Course Custom Field',
+            ],
         ];
         $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
@@ -311,7 +312,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
         $this->assertEquals([
-            'Moodle Course Custom Field' => 'hoge hoge'
+            'Moodle Course Custom Field' => 'hoge hoge',
         ], $result);
 
         // When saving a record with a course custom field mapping (datetime).
@@ -339,8 +340,8 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $overrides->coursecustomfieldmapping = [
             [
                 'id' => $customfieldfieldiddate,
-                'accredibleattribute' => 'Moodle Course Custom Field'
-            ]
+                'accredibleattribute' => 'Moodle Course Custom Field',
+            ],
         ];
         $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
@@ -348,7 +349,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
         $this->assertEquals([
-            'Moodle Course Custom Field' => '2024-02-09'
+            'Moodle Course Custom Field' => '2024-02-09',
         ], $result);
 
         // When saving a record with a course custom field mapping (select).
@@ -378,8 +379,8 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $overrides->coursecustomfieldmapping = [
             [
                 'id' => $customfieldfieldidselect,
-                'accredibleattribute' => 'Moodle Course Custom Field'
-            ]
+                'accredibleattribute' => 'Moodle Course Custom Field',
+            ],
         ];
         $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
@@ -387,7 +388,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
         $this->assertEquals([
-            'Moodle Course Custom Field' => 'test2'
+            'Moodle Course Custom Field' => 'test2',
         ], $result);
 
         // When saving a record with user info field mapping (datetime).
@@ -396,8 +397,8 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $overrides->userprofilefieldmapping = [
             [
                 'id' => $userinfofieldid,
-                'accredibleattribute' => 'Moodle User Profile Field'
-            ]
+                'accredibleattribute' => 'Moodle User Profile Field',
+            ],
         ];
         $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
@@ -405,7 +406,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
         $this->assertEquals([
-            'Moodle User Profile Field' => '2024-02-09'
+            'Moodle User Profile Field' => '2024-02-09',
         ], $result);
 
         // When saving a record with user info field mapping (textarea).
@@ -434,8 +435,8 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $overrides->userprofilefieldmapping = [
             [
                 'id' => $userinfofieldidtext,
-                'accredibleattribute' => 'Moodle User Profile Field'
-            ]
+                'accredibleattribute' => 'Moodle User Profile Field',
+            ],
         ];
         $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
@@ -443,7 +444,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
 
         $result = $this->accredible->load_credential_custom_attributes($accrediblerecord, $user->id);
         $this->assertEquals([
-            'Moodle User Profile Field' => 'huga huga'
+            'Moodle User Profile Field' => 'huga huga',
         ], $result);
 
         // When saving a record with all mapping fields.
@@ -452,20 +453,20 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $overrides->coursefieldmapping = [
             [
                 'field' => 'fullname',
-                'accredibleattribute' => 'Moodle Course Field'
-            ]
+                'accredibleattribute' => 'Moodle Course Field',
+            ],
         ];
         $overrides->coursecustomfieldmapping = [
             [
                 'id' => $customfieldfieldid,
-                'accredibleattribute' => 'Moodle Course Custom Field'
-            ]
+                'accredibleattribute' => 'Moodle Course Custom Field',
+            ],
         ];
         $overrides->userprofilefieldmapping = [
             [
                 'id' => $userinfofieldid,
-                'accredibleattribute' => 'Moodle User Profile Field'
-            ]
+                'accredibleattribute' => 'Moodle User Profile Field',
+            ],
         ];
         $post = $this->generatepostobject($overrides);
         $accredibleid = $this->accredible->save_record($post);
@@ -475,7 +476,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $this->assertEquals([
             'Moodle Course Field' => $course->fullname,
             'Moodle Course Custom Field' => 'hoge hoge',
-            'Moodle User Profile Field' => '2024-02-09'
+            'Moodle User Profile Field' => '2024-02-09',
         ], $result);
     }
 
@@ -499,7 +500,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
             'groupid' => 1,
             'coursefieldmapping' => [],
             'coursecustomfieldmapping' => [],
-            'userprofilefieldmapping' => []
+            'userprofilefieldmapping' => [],
         ];
 
         // Apply overrides.
