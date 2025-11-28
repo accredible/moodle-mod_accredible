@@ -31,6 +31,26 @@ use mod_accredible\local\credentials;
  */
 class mod_accredible_credentials_test extends \advanced_testcase {
     /**
+     * Mock API response data.
+     * @var class $mockapi
+     */
+    protected $mockapi;
+    /**
+     * User.
+     * @var \stdClass $user
+     */
+    protected $user;
+    /**
+     * User with email.
+     * @var \stdClass $userwithemail
+     */
+    protected $userwithemail;
+    /**
+     * Course.
+     * @var \stdClass $course
+     */
+    protected $course;
+    /**
      * Setup before every test.
      */
     public function setUp(): void {
@@ -58,7 +78,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         };
 
         $this->user = $this->getDataGenerator()->create_user();
-        $this->userwithemail = $this->getDataGenerator()->create_user(array('email' => 'person2@example.com'));
+        $this->userwithemail = $this->getDataGenerator()->create_user(['email' => 'person2@example.com']);
         $this->course = $this->getDataGenerator()->create_course();
     }
 
@@ -80,20 +100,20 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         // Expect to call the endpoint with this URL.
         $url = 'https://api.accredible.com/v1/credentials';
 
-        $reqdata = json_encode(array(
-            "credential" => array(
+        $reqdata = json_encode([
+            "credential" => [
                 "group_id" => $mockgroupid,
-                "recipient" => array(
+                "recipient" => [
                     "name" => fullname($this->user),
-                    "email" => $this->user->email
-                ),
+                    "email" => $this->user->email,
+                ],
                 "issued_on" => null,
                 "expired_on" => null,
-                "custom_attributes" => array(
-                    "test" => 25
-                )
-            )
-        ));
+                "custom_attributes" => [
+                    "test" => 25,
+                ],
+            ],
+        ]);
 
         $mockclient1->expects($this->once())
             ->method('post')
@@ -103,11 +123,11 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         // Expect to return the created credential.
         $api = new apirest($mockclient1);
         $localcredentials = new credentials($api);
-        $result = $localcredentials->create_credential($this->user, $mockgroupid, null, array("test" => 25));
+        $result = $localcredentials->create_credential($this->user, $mockgroupid, null, ["test" => 25]);
         $this->assertEquals($result, $resdata->credential);
 
         // When the apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->setMethods(['post'])
             ->getMock();
 
@@ -152,34 +172,34 @@ class mod_accredible_credentials_test extends \advanced_testcase {
 
         $mockgroupid = 9549;
 
-        $instanceid = $DB->insert_record('accredible', array("achievementid" => "moodle-course",
+        $instanceid = $DB->insert_record('accredible', ["achievementid" => "moodle-course",
             'name' => 'Moodle Course',
             'course' => $this->course->id,
             'finalquiz' => false,
             'passinggrade' => 0,
-            'groupid' => $mockgroupid));
+            'groupid' => $mockgroupid]);
 
         // Expect to call the endpoint once.
         $url = 'https://api.accredible.com/v1/credentials';
 
-        $courselink = (new \moodle_url('/course/view.php', array('id' => $this->course->id)))->__toString();
+        $courselink = (new \moodle_url('/course/view.php', ['id' => $this->course->id]))->__toString();
         $completeddate = date('Y-m-d', (int) time());
 
-        $reqdata = json_encode(array(
-            "credential" => array(
+        $reqdata = json_encode([
+            "credential" => [
                 "group_name" => "moodle-course",
-                "recipient" => array(
+                "recipient" => [
                     "name" => fullname($this->user),
-                    "email" => $this->user->email
-                ),
+                    "email" => $this->user->email,
+                ],
                 "issued_on" => $completeddate,
                 "expired_on" => null,
                 "custom_attributes" => null,
                 "name" => "",
                 "description" => null,
-                "course_link" => $courselink
-            )
-        ));
+                "course_link" => $courselink,
+            ],
+        ]);
 
         $mockclient1->expects($this->once())
             ->method('post')
@@ -194,7 +214,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertEquals($result, $resdata->credential);
 
         // When the apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->setMethods(['post'])
             ->getMock();
 
@@ -259,7 +279,6 @@ class mod_accredible_credentials_test extends \advanced_testcase {
             ->getMock();
 
         // Mock API response data.
-        $mockclient2->error = 'The requested URL returned error: 401 Unauthorized';
         $resdata = $this->mockapi->resdata('unauthorized_error.json');
 
         // Expect to call the endpoint once with page and page_size.
@@ -298,7 +317,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $api = new apirest($mockclient3);
         $localcredentials = new credentials($api);
         $result = $localcredentials->get_credentials(9549);
-        $this->assertEquals($result, array());
+        $this->assertEquals($result, []);
     }
 
     /**
@@ -329,7 +348,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertEquals($result, $resdata->credentials[0]);
 
         // When apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->setMethods(['get'])
             ->getMock();
 
@@ -406,7 +425,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertEquals($result, $resdata->credentials[1]);
 
         // When apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->setMethods(['get'])
             ->getMock();
 

@@ -107,7 +107,7 @@ class client {
      * @param string $url
      * @param string $method
      * @param string $reqdata a JSON encoded string
-     * @return stdObject
+     * @return mixed
      */
     private function send_req($url, $method, $reqdata = null) {
         $curl = $this->curl;
@@ -118,6 +118,10 @@ class client {
             debugging('<div style="padding-top: 70px; font-size: 0.9rem;"><b>ACCREDIBLE API ERROR</b> ' .
                 $curl->error . '<br />' . $method . ' ' . $url . '</div>', DEBUG_DEVELOPER);
         };
+
+        if ($response === false || is_null($response) || $response === '') {
+            return null;
+        }
 
         return json_decode($response);
     }

@@ -29,6 +29,21 @@ use mod_accredible\apirest\apirest;
  */
 class mod_accredible_locallib_test extends \advanced_testcase {
     /**
+     * Mock API response data.
+     * @var class $mockapi
+     */
+    protected $mockapi;
+    /**
+     * User.
+     * @var \stdClass $user
+     */
+    protected $user;
+    /**
+     * Course.
+     * @var \stdClass $course
+     */
+    protected $course;
+    /**
      * Setup before every test.
      */
     public function setUp(): void {
@@ -87,13 +102,13 @@ class mod_accredible_locallib_test extends \advanced_testcase {
             ["category" => $quiz2->name, "percent" => 50],
             ["category" => $quiz3->name, "percent" => 50]];
 
-        $resdata = array(
+        $resdata = [
             "description" => "Course Transcript",
             "string_object" => json_encode($transcriptitems),
             "category" => "transcript",
             "custom" => true,
-            "hidden" => true
-        );
+            "hidden" => true,
+        ];
 
         // It responds with transcriptitems.
         $this->assertEquals($result, $resdata);
@@ -116,13 +131,13 @@ class mod_accredible_locallib_test extends \advanced_testcase {
         $transcriptitems = [["category" => $quiz1->name, "percent" => 100],
             ["category" => $quiz3->name, "percent" => 50]];
 
-        $resdata = array(
+        $resdata = [
             "description" => "Course Transcript",
             "string_object" => json_encode($transcriptitems),
             "category" => "transcript",
             "custom" => true,
-            "hidden" => true
-        );
+            "hidden" => true,
+        ];
 
         // It responds with transcriptitems.
         // Final_quiz_id is excluded from the transcripts returned.
@@ -152,11 +167,11 @@ class mod_accredible_locallib_test extends \advanced_testcase {
      */
     public function test_accredible_check_if_cert_earned() {
         global $DB;
-        $user = array(
+        $user = [
             'id'    => $this->user->id,
             'email' => $this->user->email,
-            'name'  => $this->user->firstname . ' ' . $this->user->lastname
-        );
+            'name'  => $this->user->firstname . ' ' . $this->user->lastname,
+        ];
 
         // When no quiz available.
         $accredible = $this->create_accredible_instance($this->course->id);
@@ -200,18 +215,18 @@ class mod_accredible_locallib_test extends \advanced_testcase {
      */
     private function create_accredible_instance($courseid, $finalquizid = 0) {
         global $DB;
-        $dbrecord = array(
+        $dbrecord = [
             "name"                 => 'Accredible Test',
             "course"               => $courseid,
             "finalquiz"            => $finalquizid,
             "passinggrade"         => 70,
             "timecreated"          => time(),
             "groupid"              => 1,
-            "completionactivities" => null
-        );
+            "completionactivities" => null,
+        ];
 
         $id = $DB->insert_record('accredible', $dbrecord);
-        return $DB->get_record('accredible', array('id' => $id));
+        return $DB->get_record('accredible', ['id' => $id]);
     }
 
     /**
@@ -220,7 +235,7 @@ class mod_accredible_locallib_test extends \advanced_testcase {
      * @param int $courseid
      */
     private function create_quiz_module($courseid) {
-        $quiz = array("course" => $courseid, "grade" => 10);
+        $quiz = ["course" => $courseid, "grade" => 10];
         return $this->getDataGenerator()->create_module('quiz', $quiz);
     }
 
@@ -233,7 +248,7 @@ class mod_accredible_locallib_test extends \advanced_testcase {
      */
     private function create_quiz_grades($quizid, $userid, $grade) {
         global $DB;
-        $quizgrade = array("quiz" => $quizid, "userid" => $userid, "grade" => $grade);
+        $quizgrade = ["quiz" => $quizid, "userid" => $userid, "grade" => $grade];
         $DB->insert_record('quiz_grades', $quizgrade);
     }
 }
