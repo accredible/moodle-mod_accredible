@@ -68,7 +68,7 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
     public function test_get_attribute_keys() {
         // When the apirest returns attribute keys.
         $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -99,7 +99,7 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
 
         // When the apirest returns an error response.
         $mockclient2 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -125,7 +125,7 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
 
         // When the apirest returns no attribute keys.
         $mockclient3 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -146,7 +146,7 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
 
         // When apirest returns attribute keys for the given kind.
         $mockclient4 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         $reqdata1 = json_encode(['page' => 1, 'page_size' => 50, 'kind' => 'date']);

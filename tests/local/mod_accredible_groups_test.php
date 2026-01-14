@@ -71,7 +71,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
     public function test_get_groups() {
         // When the apirest returns groups.
         $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -100,7 +100,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
 
         // When the apirest returns an error response.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -127,7 +127,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
 
         // When the apirest returns no groups.
         $mockclient3 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -154,7 +154,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
     public function test_get_templates() {
         // When the apirest returns groups.
         $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -185,7 +185,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
 
         // When the apirest returns an error response.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -214,7 +214,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
 
         // When the apirest returns no groups.
         $mockclient3 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.

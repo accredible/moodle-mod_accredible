@@ -90,7 +90,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
     public function test_get_credential() {
         // When the response is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -110,7 +110,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the credential is not found.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
         $mockclient2->error = 'The requested URL returned error: 404 Not found';
 
@@ -131,7 +131,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the api key is invalid.
         $mockclient3 = $this->getMockBuilder(client::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -157,7 +157,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
     public function test_get_credentials() {
         // When the response is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -178,7 +178,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When no credentials are returned from the API.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -199,7 +199,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the api key is invalid.
         $mockclient3 = $this->getMockBuilder(client::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -226,7 +226,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
     public function test_recipient_sso_link() {
         // When the response is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -252,7 +252,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the api returns not found error.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
         $mockclient2->error = 'The requested URL returned error: 404 Not found';
 
@@ -285,7 +285,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
     public function test_create_credential() {
         // When the credential creation is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -319,7 +319,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the credential creation fails and the api returns an error.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -358,7 +358,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
     public function test_create_credential_legacy() {
         // When the credential creation is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -395,7 +395,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the credential creation fails and the api returns an error.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -422,7 +422,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
     public function test_search_groups() {
         // When the response is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -445,7 +445,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the arguments are empty and the response is successful.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -468,7 +468,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the api key is invalid.
         $mockclient3 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -498,7 +498,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
     public function test_create_evidence_item() {
         // When the throw_error is FALSE and the response is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -529,7 +529,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the throw_error is FALSE and the response is NOT successful.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -548,7 +548,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the throw_error is TRUE and the response is NOT successful.
         $mockclient3 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
         $mockclient3->error = 'The requested URL returned error: 401 Unauthorized';
 
@@ -585,7 +585,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         $startdate = strtotime('2022-04-15');
         $enddate = strtotime('2022-04-15');
         $mockclient1 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Expect to call the endpoint once with url and reqdata.
@@ -620,7 +620,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         $startdate = strtotime('2022-04-15');
         $enddate = strtotime('2022-04-17');
         $mockclient2 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Expect to call the endpoint once with url and reqdata.
@@ -674,7 +674,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
     public function test_update_evidence_item_grade() {
         // When the grade is a valid number and the response is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
-            ->setMethods(['put'])
+            ->onlyMethods(['put'])
             ->getMock();
 
         // Mock API response data.
@@ -696,7 +696,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the grade is a valid number but the evidence item is not found.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['put'])
+            ->onlyMethods(['put'])
             ->getMock();
         $mockclient2->error = 'The requested URL returned error: 404 Not found';
 
@@ -719,7 +719,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the grade is a valid number but the api key is invalid.
         $mockclient3 = $this->getMockBuilder(client::class)
-            ->setMethods(['put'])
+            ->onlyMethods(['put'])
             ->getMock();
 
         // Mock API response data.
@@ -774,7 +774,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
     public function test_get_group() {
         // When the response is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -795,7 +795,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the api key is invalid.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -821,7 +821,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
     public function test_get_groups() {
         // When the response is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -841,7 +841,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the arguments are empty and the response is successful.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -861,7 +861,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the api key is invalid.
         $mockclient3 = $this->getMockBuilder(client::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -889,7 +889,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the response is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -911,7 +911,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the arguments are empty and the response is successful.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -933,7 +933,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
 
         // When the api key is invalid.
         $mockclient3 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.

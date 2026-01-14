@@ -117,7 +117,7 @@ class mod_accredible_users_test extends \advanced_testcase {
         $expectedresponse = ['0' => $userrespone, '1' => $user2respone];
 
         $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -140,7 +140,7 @@ class mod_accredible_users_test extends \advanced_testcase {
 
         // When apirest returns an error response.
         $mockclient2 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
