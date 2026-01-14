@@ -88,7 +88,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      */
     public function test_create_credential() {
         // When the credential creation is successful.
-        $mockclient1 = $this->getMockBuilder('client')
+        $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])
             ->getMock();
 
@@ -163,7 +163,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
     public function test_create_credential_legacy() {
         global $DB;
         // When the credential creation is successful.
-        $mockclient1 = $this->getMockBuilder('client')
+        $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])
             ->getMock();
 
@@ -250,7 +250,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      */
     public function test_get_credentials() {
         // When the credential search is successful.
-        $mockclient1 = $this->getMockBuilder('client')
+        $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
             ->getMock();
 
@@ -274,7 +274,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertEquals($result, $resdatapage12);
 
         // When apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
             ->getMock();
 
@@ -300,7 +300,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertTrue($foundexception);
 
         // When the credential search returns no credentials.
-        $mockclient3 = $this->getMockBuilder('client')
+        $mockclient3 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
             ->getMock();
 
@@ -326,7 +326,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      */
     public function test_check_for_existing_credential() {
         // When an existing credential exists for a group_id and user_email.
-        $mockclient1 = $this->getMockBuilder('client')
+        $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
             ->getMock();
 
@@ -374,7 +374,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertTrue($foundexception);
 
         // When there is no credential for the group_id.
-        $mockclient3 = $this->getMockBuilder('client')
+        $mockclient3 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
             ->getMock();
 
@@ -400,7 +400,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      */
     public function test_check_for_existing_certificate() {
         // When an existing credential exists for a group_id and user_email.
-        $mockclient1 = $this->getMockBuilder('client')
+        $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
             ->getMock();
 
@@ -451,7 +451,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertTrue($foundexception);
 
         // When no credential exists for the group_id and user_id.
-        $mockclient3 = $this->getMockBuilder('client')
+        $mockclient3 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
             ->getMock();
 

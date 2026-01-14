@@ -17,6 +17,7 @@
 namespace mod_accredible\local;
 
 use mod_accredible\apirest\apirest;
+use mod_accredible\client\client;
 
 /**
  * Unit tests for mod/accredible/classes/local/attribute_keys.php
@@ -67,7 +68,7 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
      */
     public function test_get_attribute_keys() {
         // When the apirest returns attribute keys.
-        $mockclient1 = $this->getMockBuilder('client')
+        $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])
             ->getMock();
 
@@ -98,7 +99,7 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
         ]);
 
         // When the apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])
             ->getMock();
 
@@ -124,7 +125,7 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
         $this->assertTrue($foundexception);
 
         // When the apirest returns no attribute keys.
-        $mockclient3 = $this->getMockBuilder('client')
+        $mockclient3 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])
             ->getMock();
 
@@ -145,7 +146,7 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
         $this->assertEquals($result, []);
 
         // When apirest returns attribute keys for the given kind.
-        $mockclient4 = $this->getMockBuilder('client')
+        $mockclient4 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])
             ->getMock();
 

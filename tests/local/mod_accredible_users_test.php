@@ -116,7 +116,7 @@ class mod_accredible_users_test extends \advanced_testcase {
                               'credential_id'  => 10250012];
         $expectedresponse = ['0' => $userrespone, '1' => $user2respone];
 
-        $mockclient1 = $this->getMockBuilder('client')
+        $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
             ->getMock();
 
@@ -139,7 +139,7 @@ class mod_accredible_users_test extends \advanced_testcase {
         $this->assertEquals($result, $expectedresponse);
 
         // When apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
             ->getMock();
 

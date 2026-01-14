@@ -619,7 +619,7 @@ class mod_accredible_apirest_test extends \advanced_testcase {
         // When the startdate < enddate.
         $startdate = strtotime('2022-04-15');
         $enddate = strtotime('2022-04-17');
-        $mockclient2 = $this->getMockBuilder('client')
+        $mockclient2 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])
             ->getMock();
 
