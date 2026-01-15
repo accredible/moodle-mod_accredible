@@ -149,7 +149,6 @@ class mod_accredible_credentials_test extends \advanced_testcase {
 
         try {
             $localcredentials->create_credential($this->user, $mockgroupid);
-            $this->assertEquals($result, $resdata->credential);
         } catch (\moodle_exception $error) {
             $foundexception = true;
         }
@@ -237,7 +236,6 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         try {
             $localcredentials->create_credential_legacy($this->user, "moodle-course",
             "", null, $courselink, $completeddate);
-            $this->assertEquals($result, $resdata->credential);
         } catch (\moodle_exception $error) {
             $foundexception = true;
         }

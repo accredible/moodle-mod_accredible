@@ -168,7 +168,13 @@ class apirest {
 
         $data = json_encode($data);
 
-        return $this->client->post("{$this->apiendpoint}credentials", $data);
+        $result = $this->client->post("{$this->apiendpoint}credentials", $data);
+
+        if ($this->client->error || (isset($result->success) && $result->success === false)) {
+            throw new \Exception($this->client->error ?? $result->data ?? 'Unknown error');
+        }
+
+        return $result;
     }
 
     /**
@@ -277,7 +283,13 @@ class apirest {
 
         $data = json_encode($data);
 
-        return $this->client->post("{$this->apiendpoint}credentials", $data);
+        $result = $this->client->post("{$this->apiendpoint}credentials", $data);
+
+        if ($this->client->error || (isset($result->success) && $result->success === false)) {
+            throw new \Exception($this->client->error ?? $result->data ?? 'Unknown error');
+        }
+
+        return $result;
     }
 
     /**
