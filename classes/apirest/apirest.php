@@ -82,9 +82,15 @@ class apirest {
         } else {
             $email = '';
         }
-        return $this->client->get(
+        $result = $this->client->get(
             "{$this->apiendpoint}all_credentials?group_id={$groupid}&email={$email}&page_size={$pagesize}&page={$page}"
         );
+
+        if ($this->client->error || (isset($result->success) && $result->success === false)) {
+            throw new \Exception($this->client->error ?? $result->data ?? 'Unknown error');
+        }
+
+        return $result;
     }
 
     /**
