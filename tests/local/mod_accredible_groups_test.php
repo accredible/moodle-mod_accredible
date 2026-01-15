@@ -82,10 +82,19 @@ class mod_accredible_groups_test extends \advanced_testcase {
         $url1 = 'https://api.accredible.com/v1/issuer/all_groups?page_size=50&page=1';
         $url2 = 'https://api.accredible.com/v1/issuer/all_groups?page_size=50&page=2';
 
+        $callcount = 0;
         $mockclient1->expects($this->exactly(2))
             ->method('get')
-            ->withConsecutive([$this->equalTo($url1)], [$this->equalTo($url2)])
-            ->will($this->onConsecutiveCalls($resdata1, $resdata2));
+            ->willReturnCallback(function($arg1) use (&$callcount, $url1, $url2, $resdata1, $resdata2) {
+                $callcount++;
+                if ($callcount === 1) {
+                    $this->assertEquals($url1, $arg1);
+                    return $resdata1;
+                } else {
+                    $this->assertEquals($url2, $arg1);
+                    return $resdata2;
+                }
+            });
 
         // Expect to return groups.
         $api = new apirest($mockclient1);
@@ -167,10 +176,21 @@ class mod_accredible_groups_test extends \advanced_testcase {
         // Expect to call the endpoint once with page and page_size.
         $url = 'https://api.accredible.com/v1/issuer/groups/search';
 
+        $callcount = 0;
         $mockclient1->expects($this->exactly(2))
             ->method('post')
-            ->withConsecutive([$this->equalTo($url), $this->equalTo($reqdata1)], [$this->equalTo($url), $this->equalTo($reqdata2)])
-            ->will($this->onConsecutiveCalls($resdata1, $resdata2));
+            ->willReturnCallback(function($arg1, $arg2) use (&$callcount, $url, $reqdata1, $reqdata2, $resdata1, $resdata2) {
+                $callcount++;
+                if ($callcount === 1) {
+                    $this->assertEquals($url, $arg1);
+                    $this->assertEquals($reqdata1, $arg2);
+                    return $resdata1;
+                } else {
+                    $this->assertEquals($url, $arg1);
+                    $this->assertEquals($reqdata2, $arg2);
+                    return $resdata2;
+                }
+            });
 
         // Expect to return group name arrays.
         $api = new apirest($mockclient1);
