@@ -44,7 +44,6 @@ use mod_accredible\local\formhelper;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_accredible_mod_form extends moodleform_mod {
-
     /**
      * Called to define this moodle form
      *
@@ -213,7 +212,10 @@ class mod_accredible_mod_form extends moodleform_mod {
         );
         $mform->disabledIf('gradeattributekeyname', 'attributekysnumber', 'eq', 0);
         $mform->addElement(
-            'static', 'emptygradeattributekeyname', '', get_string(
+            'static',
+            'emptygradeattributekeyname', 
+            '', 
+            get_string(
                 'emptygradeattributekeyname',
                 'accredible',
                 $dashboardurl

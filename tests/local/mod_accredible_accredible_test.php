@@ -484,7 +484,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
     /**
      * Generates a mock $post object for testing.
      *
-     * @param stdClass $overrides An object with properties to override.
+     * @param stdClass|null $overrides An object with properties to override.
      * @return stdClass The generated $post object.
      */
     private function generatepostobject(?\stdClass $overrides = null): \stdClass {
