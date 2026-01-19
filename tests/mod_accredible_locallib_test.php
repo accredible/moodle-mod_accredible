@@ -28,7 +28,6 @@ use mod_accredible\apirest\apirest;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_accredible_locallib_test extends \advanced_testcase {
-
     /**
      * Mock API response data.
      *

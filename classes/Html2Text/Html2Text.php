@@ -25,7 +25,6 @@ namespace mod_accredible\Html2Text;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class Html2Text {
-
     /**
      * Tries to convert the given HTML into a plain text format - best suited for
      * e-mail display, etc.

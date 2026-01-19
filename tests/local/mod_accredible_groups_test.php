@@ -31,7 +31,6 @@ use mod_accredible\local\groups;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_accredible_groups_test extends \advanced_testcase {
-
     /**
      * Mock API response data.
      * @var class $mockapi

@@ -28,7 +28,6 @@ use mod_accredible\local\attribute_keys;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class formhelper {
-
     /**
      * Load grade item options for the custom attribute mapping dropdown.
      *

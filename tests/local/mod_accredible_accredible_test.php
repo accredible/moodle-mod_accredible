@@ -26,7 +26,6 @@ namespace mod_accredible\local;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_accredible_accredible_test extends \advanced_testcase {
-
     /**
      * The accredible instance.
      * @var \mod_accredible\local\accredible
@@ -133,7 +132,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
                     return is_string($subject->attributemapping) && is_array(json_decode($subject->attributemapping, true));
                 })
             )
-        ->willReturn(true);
+            ->willReturn(true);
 
         $result = $this->accredible->save_record($post);
         $this->assertEquals(1, $result);
@@ -488,7 +487,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
      * @param stdClass $overrides An object with properties to override.
      * @return stdClass The generated $post object.
      */
-    private function generatepostobject(\stdClass $overrides = null): \stdClass {
+    private function generatepostobject(?\stdClass $overrides = null): \stdClass {
         $post = (object) [
             'name' => 'New Certificate',
             'instance' => null,

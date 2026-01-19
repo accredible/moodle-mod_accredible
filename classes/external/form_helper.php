@@ -34,7 +34,6 @@ use mod_accredible\local\users;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class form_helper extends \external_api {
-
     /**
      * Returns parameter types for reload_users function.
      *

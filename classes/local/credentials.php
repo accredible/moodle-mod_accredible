@@ -27,7 +27,6 @@ use mod_accredible\apirest\apirest;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class credentials {
-
     /**
      * HTTP request apirest.
      * @var apirest

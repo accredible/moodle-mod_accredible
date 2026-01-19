@@ -25,7 +25,6 @@ namespace mod_accredible\local;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class attributemapping {
-
     /**
      * Valid fields for the 'course' table that can be mapped.
      * @var string[] VALID_COURSE_FIELDS

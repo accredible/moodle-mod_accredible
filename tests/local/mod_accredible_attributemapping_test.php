@@ -26,7 +26,6 @@ namespace mod_accredible\local;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_accredible_attributemapping_test extends \advanced_testcase {
-
     /**
      * Setup testcase.
      */

@@ -28,7 +28,6 @@ use mod_accredible\client\client;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_accredible_client_test extends \advanced_testcase {
-
     /**
      * Setup before every test.
      */

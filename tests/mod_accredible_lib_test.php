@@ -31,7 +31,6 @@ require_once($CFG->dirroot . '/mod/accredible/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_accredible_lib_test extends \advanced_testcase {
-
     /**
      * Sample test
      * later: remove after adding real tests
