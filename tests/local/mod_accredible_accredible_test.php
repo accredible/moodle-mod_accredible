@@ -37,6 +37,7 @@ class mod_accredible_accredible_test extends \advanced_testcase
      * Setup before every test.
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         $this->accredible = new accredible();
     }

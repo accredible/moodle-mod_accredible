@@ -38,6 +38,7 @@ class mod_accredible_lib_test extends \advanced_testcase
      * @coversNothing
      */
     public function test_sample() {
+        parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
 

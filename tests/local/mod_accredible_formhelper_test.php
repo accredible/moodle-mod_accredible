@@ -44,6 +44,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase
     public function setUp(): void {
         global $DB;
 
+        parent::setUp();
         $this->resetAfterTest();
 
         $this->course = $this->getDataGenerator()->create_course();

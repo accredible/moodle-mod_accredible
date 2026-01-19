@@ -49,6 +49,7 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase
      * Setup before every test.
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
 
         // Add plugin settings.

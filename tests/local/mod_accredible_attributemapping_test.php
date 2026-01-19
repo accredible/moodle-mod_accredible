@@ -31,6 +31,7 @@ class mod_accredible_attributemapping_test extends \advanced_testcase
      * Setup testcase.
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
     }
 
