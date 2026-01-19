@@ -25,9 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
-require_once $CFG->dirroot . '/course/moodleform_mod.php';
-require_once $CFG->dirroot . '/mod/accredible/lib.php';
-require_once $CFG->dirroot . '/mod/accredible/locallib.php';
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
+require_once($CFG->dirroot . '/mod/accredible/lib.php');
+require_once($CFG->dirroot . '/mod/accredible/locallib.php');
 
 use mod_accredible\Html2Text\Html2Text;
 use mod_accredible\local\credentials;
@@ -213,8 +213,8 @@ class mod_accredible_mod_form extends moodleform_mod {
         $mform->disabledIf('gradeattributekeyname', 'attributekysnumber', 'eq', 0);
         $mform->addElement(
             'static',
-            'emptygradeattributekeyname', 
-            '', 
+            'emptygradeattributekeyname',
+            '',
             get_string(
                 'emptygradeattributekeyname',
                 'accredible',
@@ -310,7 +310,8 @@ class mod_accredible_mod_form extends moodleform_mod {
                         'static',
                         'certlink' . $user['id'],
                         $user['name'] . '    ' . $user['email'],
-                        'Certificate ' . $user['credential_id'] . ' - <a href=' . $user['credential_url'] . ' target="_blank">link</a>'
+                        'Certificate ' . $user['credential_id'] .
+                            ' - <a href=' . $user['credential_url'] . ' target="_blank">link</a>'
                     );
                     $mform->addElement('html', '<div class="hidden">');
                     $mform->addElement(
