@@ -26,8 +26,8 @@ use mod_accredible\local\attributemapping;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class accredible
-{
+class accredible {
+
     /**
      * Saves or updates an Accredible plugin instance record in the 'accredible' table.
      * This function handles both the creation of new records and the updating of existing ones.

@@ -25,8 +25,8 @@ namespace mod_accredible\local;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_formhelper_test extends \advanced_testcase
-{
+class mod_accredible_formhelper_test extends \advanced_testcase {
+
     /**
      * Course.
      * @var \stdClass $course

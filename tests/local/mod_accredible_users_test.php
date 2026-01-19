@@ -29,8 +29,8 @@ use mod_accredible\apirest\apirest;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_users_test extends \advanced_testcase
-{
+class mod_accredible_users_test extends \advanced_testcase {
+
     /**
      * Mock API response data.
      * @var class $mockapi
@@ -102,7 +102,7 @@ class mod_accredible_users_test extends \advanced_testcase
                              'email'          => $this->user->email,
                              'name'           => $this->user->firstname . ' ' . $this->user->lastname,
                              'credential_url' => null,
-                             'credential_id'  => null];
+                             'credential_id'  => null, ];
         $expectedresponse = ['0' => $userrespone];
         $enrolledusers = get_enrolled_users($this->context, "mod/accredible:view", null, 'u.*', 'id');
         $result = $userhelper->get_users_with_credentials($enrolledusers);
@@ -115,7 +115,7 @@ class mod_accredible_users_test extends \advanced_testcase
                               'email'          => $user2->email,
                               'name'           => $user2->firstname . ' ' . $user2->lastname,
                               'credential_url' => 'https://www.credential.net/10250012',
-                              'credential_id'  => 10250012];
+                              'credential_id'  => 10250012, ];
         $expectedresponse = ['0' => $userrespone, '1' => $user2respone];
 
         $mockclient1 = $this->getMockBuilder(client::class)
@@ -187,12 +187,12 @@ class mod_accredible_users_test extends \advanced_testcase
                        'email'          => $this->user->email,
                        'name'           => $this->user->firstname . ' ' . $this->user->lastname,
                        'credential_url' => null,
-                       'credential_id'  => null];
+                       'credential_id'  => null, ];
         $user2 = ['id'             => $generateduser2->id,
                        'email'          => $generateduser2->email,
                        'name'           => $generateduser2->firstname . ' ' . $generateduser2->lastname,
                        'credential_url' => 'https://www.credential.net/10250012',
-                       'credential_id'  => 10250012];
+                       'credential_id'  => 10250012, ];
 
         $users = [$user1, $user2];
 

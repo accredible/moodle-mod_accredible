@@ -26,8 +26,8 @@ use mod_accredible\apirest\apirest;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class evidenceitems
-{
+class evidenceitems {
+
     /**
      * HTTP request apirest.
      * @var apirest

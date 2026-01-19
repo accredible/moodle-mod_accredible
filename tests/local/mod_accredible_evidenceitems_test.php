@@ -28,8 +28,8 @@ use mod_accredible\client\client;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_evidenceitems_test extends \advanced_testcase
-{
+class mod_accredible_evidenceitems_test extends \advanced_testcase {
+
     /**
      * Mock API response data.
      * @var class $mockapi
@@ -364,7 +364,7 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase
                       "attempt"         => 1,
                       "uniqueid"        => $questionusageid,
                       "layout"          => "layout",
-                      "state"           => "finished"];
+                      "state"           => "finished", ];
         return $DB->insert_record('quiz_attempts', $data);
     }
 
@@ -387,7 +387,7 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase
                       "behaviour"       => "manualgraded",
                       "minfraction"     => 1,
                       "maxfraction"     => 1,
-                      "timemodified"    => time()];
+                      "timemodified"    => time(), ];
         $DB->insert_record('question_attempts', $data);
     }
 

@@ -30,8 +30,8 @@ require_once($CFG->dirroot . '/mod/accredible/backup/moodle2/backup_accredible_s
 /**
  * Provides all the settings and steps to perform one complete backup of accredible activity
  */
-class backup_accredible_activity_task extends backup_activity_task
-{
+class backup_accredible_activity_task extends backup_activity_task {
+
     /**
      * Define (add) particular settings this activity can have
      */

@@ -26,8 +26,8 @@ use mod_accredible\client\client;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class apirest
-{
+class apirest {
+
     /**
      * API base URL.
      * Use `public` to make unit testing possible.

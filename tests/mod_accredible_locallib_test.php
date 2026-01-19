@@ -27,8 +27,8 @@ use mod_accredible\apirest\apirest;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_locallib_test extends \advanced_testcase
-{
+class mod_accredible_locallib_test extends \advanced_testcase {
+
     /**
      * Mock API response data.
      *
@@ -107,7 +107,7 @@ class mod_accredible_locallib_test extends \advanced_testcase
 
         $transcriptitems = [["category" => $quiz1->name, "percent" => 100],
             ["category" => $quiz2->name, "percent" => 50],
-            ["category" => $quiz3->name, "percent" => 50]];
+            ["category" => $quiz3->name, "percent" => 50], ];
 
         $resdata = [
             "description" => "Course Transcript",
@@ -136,7 +136,7 @@ class mod_accredible_locallib_test extends \advanced_testcase
         $result = accredible_get_transcript($this->course->id, $this->user->id, $quiz2->id);
 
         $transcriptitems = [["category" => $quiz1->name, "percent" => 100],
-            ["category" => $quiz3->name, "percent" => 50]];
+            ["category" => $quiz3->name, "percent" => 50], ];
 
         $resdata = [
             "description" => "Course Transcript",

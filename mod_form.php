@@ -25,9 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
-require_once($CFG->dirroot . '/course/moodleform_mod.php');
-require_once($CFG->dirroot . '/mod/accredible/lib.php');
-require_once($CFG->dirroot . '/mod/accredible/locallib.php');
+require_once $CFG->dirroot . '/course/moodleform_mod.php';
+require_once $CFG->dirroot . '/mod/accredible/lib.php';
+require_once $CFG->dirroot . '/mod/accredible/locallib.php';
 
 use mod_accredible\Html2Text\Html2Text;
 use mod_accredible\local\credentials;
@@ -50,7 +50,8 @@ class mod_accredible_mod_form extends moodleform_mod
      *
      * @return void
      */
-    public function definition() {
+    public function definition()
+    {
         global $DB, $COURSE, $CFG, $PAGE, $OUTPUT;
 
         $credentialsclient = new credentials();
@@ -212,11 +213,13 @@ class mod_accredible_mod_form extends moodleform_mod
             $inputstyle
         );
         $mform->disabledIf('gradeattributekeyname', 'attributekysnumber', 'eq', 0);
-        $mform->addElement('static', 'emptygradeattributekeyname', '', get_string(
-            'emptygradeattributekeyname',
-            'accredible',
-            $dashboardurl
-        ));
+        $mform->addElement(
+            'static', 'emptygradeattributekeyname', '', get_string(
+                'emptygradeattributekeyname',
+                'accredible',
+                $dashboardurl
+            )
+        );
         $mform->addElement('html', '</div>');
 
         if ($updatingcert && $accrediblecertificate->achievementid) {
@@ -419,10 +422,11 @@ class mod_accredible_mod_form extends moodleform_mod
      * Called right before form submission.
      * We use it to include missing form data from mustache templates.
      *
-     * @param stdClass $data passed by reference
+     * @param  stdClass $data passed by reference
      * @return void
      */
-    public function data_postprocessing($data) {
+    public function data_postprocessing($data)
+    {
         parent::data_postprocessing($data);
         $submitteddata = $this->_form->getSubmitValues();
 
@@ -438,13 +442,14 @@ class mod_accredible_mod_form extends moodleform_mod
     /**
      * Sets the default value for a mapping field in the form.
      *
-     * @param MoodleQuickForm $mform The form instance to modify.
-     * @param array $defaultvalues The default values for the form fields.
-     * @param string $mappingname The name of the mapping field.
-     * @param string $fieldname The specific field within the mapping to set.
-     * @param int $num The index of the field in case of multiple fields with the same name.
+     * @param MoodleQuickForm $mform         The form instance to modify.
+     * @param array           $defaultvalues The default values for the form fields.
+     * @param string          $mappingname   The name of the mapping field.
+     * @param string          $fieldname     The specific field within the mapping to set.
+     * @param int             $num           The index of the field in case of multiple fields with the same name.
      */
-    private function set_mapping_field_default($mform, $defaultvalues, $mappingname, $fieldname, $num = 0) {
+    private function set_mapping_field_default($mform, $defaultvalues, $mappingname, $fieldname, $num = 0)
+    {
         $value = '';
         if (isset($defaultvalues[$mappingname][$num][$fieldname])) {
             $value = $defaultvalues[$mappingname][$num][$fieldname];

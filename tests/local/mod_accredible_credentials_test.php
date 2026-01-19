@@ -29,8 +29,8 @@ use mod_accredible\local\credentials;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_credentials_test extends \advanced_testcase
-{
+class mod_accredible_credentials_test extends \advanced_testcase {
+
     /**
      * Mock API response data.
      * @var class $mockapi
@@ -178,7 +178,7 @@ class mod_accredible_credentials_test extends \advanced_testcase
             'course' => $this->course->id,
             'finalquiz' => false,
             'passinggrade' => 0,
-            'groupid' => $mockgroupid]);
+            'groupid' => $mockgroupid, ]);
 
         // Expect to call the endpoint once.
         $url = 'https://api.accredible.com/v1/credentials';
