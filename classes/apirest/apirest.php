@@ -46,8 +46,7 @@ class apirest
      *
      * @param stdObject $client a mock client for testing
      */
-    public function __construct($client = null)
-    {
+    public function __construct($client = null) {
         global $CFG;
 
         $this->apiendpoint = 'https://api.accredible.com/v1/';
@@ -77,8 +76,7 @@ class apirest
      * @param string $page
      * @return stdObject
      */
-    public function get_credentials($groupid = null, $email = null, $pagesize = null, $page = 1)
-    {
+    public function get_credentials($groupid = null, $email = null, $pagesize = null, $page = 1) {
         if ($email) {
             $email = strtolower($email);
             $email = rawurlencode($email);
@@ -95,8 +93,7 @@ class apirest
      * @param int $credentialid
      * @return stdObject
      */
-    public function get_credential($credentialid)
-    {
+    public function get_credential($credentialid) {
         return $this->client->get("{$this->apiendpoint}credentials/{$credentialid}");
     }
 
@@ -145,8 +142,7 @@ class apirest
      * @param string $kind - text, date, email, image
      * @return stdObject
      */
-    public function search_attribute_keys($pagesize = 50, $page = 1, $kind = 'text')
-    {
+    public function search_attribute_keys($pagesize = 50, $page = 1, $kind = 'text') {
         $data = json_encode(['page' => $page, 'page_size' => $pagesize, 'kind' => $kind]);
         return $this->client->post("{$this->apiendpoint}attribute_keys/search", $data);
     }
@@ -195,8 +191,7 @@ class apirest
      * @param bool $throwerror
      * @return stdObject
      */
-    public function create_evidence_item($evidenceitem, $credentialid, $throwerror = false)
-    {
+    public function create_evidence_item($evidenceitem, $credentialid, $throwerror = false) {
         $data = json_encode($evidenceitem);
         $result = $this->client->post("{$this->apiendpoint}credentials/{$credentialid}/evidence_items", $data);
         if ($throwerror && $this->client->error) {
@@ -219,8 +214,7 @@ class apirest
      * @param bool $hidden
      * @return stdObject
      */
-    public function create_evidence_item_duration($startdate, $enddate, $credentialid, $hidden = false)
-    {
+    public function create_evidence_item_duration($startdate, $enddate, $credentialid, $hidden = false) {
 
         $durationinfo = [
             'start_date' => date("Y-m-d", $startdate),
@@ -243,7 +237,7 @@ class apirest
 
             return $result;
             // It may be completed in one day.
-        } elseif ($durationinfo['end_date'] >= $durationinfo['start_date']) {
+        } else if ($durationinfo['end_date'] >= $durationinfo['start_date']) {
             $durationinfo['duration_in_days'] = 1;
 
             $evidenceitem = [
@@ -314,9 +308,8 @@ class apirest
      * @param int $id
      * @return stdObject
      */
-    public function get_group($id)
-    {
-        return $this->client->get($this->apiendpoint.'issuer/groups/' . $id);
+    public function get_group($id) {
+        return $this->client->get($this->apiendpoint . 'issuer/groups/' . $id);
     }
 
     /**
@@ -325,9 +318,8 @@ class apirest
      * @param string $page
      * @return stdObject
      */
-    public function get_groups($pagesize = 50, $page = 1)
-    {
-        return $this->client->get($this->apiendpoint.'issuer/all_groups?page_size=' . $pagesize . '&page=' . $page);
+    public function get_groups($pagesize = 50, $page = 1) {
+        return $this->client->get($this->apiendpoint . 'issuer/all_groups?page_size=' . $pagesize . '&page=' . $page);
     }
 
     /**
@@ -336,8 +328,7 @@ class apirest
      * @param int $page
      * @return stdObject
      */
-    public function search_groups($pagesize = 50, $page = 1)
-    {
+    public function search_groups($pagesize = 50, $page = 1) {
         $data = json_encode(['page' => $page, 'page_size' => $pagesize]);
         return $this->client->post("{$this->apiendpoint}issuer/groups/search", $data);
     }
@@ -350,8 +341,7 @@ class apirest
      * @param bool $hidden
      * @return stdObject
      */
-    public function create_evidence_item_grade($grade, $description, $credentialid, $hidden = false)
-    {
+    public function create_evidence_item_grade($grade, $description, $credentialid, $hidden = false) {
 
         if (is_numeric($grade) && intval($grade) >= 0 && intval($grade) <= 100) {
             $evidenceitem = [
@@ -376,8 +366,7 @@ class apirest
      * @param string $grade - value must be between 0 and 100
      * @return stdObject
      */
-    public function update_evidence_item_grade($credentialid, $evidenceitemid, $grade)
-    {
+    public function update_evidence_item_grade($credentialid, $evidenceitemid, $grade) {
         if (is_numeric($grade) && intval($grade) >= 0 && intval($grade) <= 100) {
             $evidenceitem = ['evidence_item' => ['string_object' => $grade]];
             $data = json_encode($evidenceitem);
@@ -393,8 +382,7 @@ class apirest
      * @param stdObject $object
      * @return stdObject
      */
-    private function strip_empty_keys($object)
-    {
+    private function strip_empty_keys($object) {
 
         $json = json_encode($object);
         $json = preg_replace('/,\s*"[^"]+":null|"[^"]+":null,?/', '', $json);

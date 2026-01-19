@@ -69,7 +69,7 @@ if (has_capability('mod/accredible:manage', $context)) {
         if (isset($certificate->url)) {
             $certificatelink = $certificate->url;
         } else {
-            $certificatelink = 'https://www.credential.net/'.$certificate->id;
+            $certificatelink = 'https://www.credential.net/' . $certificate->id;
         }
           $table->data[] = [
               $certificate->id,
@@ -110,7 +110,7 @@ if (has_capability('mod/accredible:manage', $context)) {
                 if (isset($certificate->url)) {
                     $userscertificatelink = $certificate->url;
                 } else {
-                    $userscertificatelink = 'https://www.credential.net/'.$certificate->id;
+                    $userscertificatelink = 'https://www.credential.net/' . $certificate->id;
                 }
             }
         }
@@ -130,8 +130,10 @@ if (has_capability('mod/accredible:manage', $context)) {
         echo html_writer::tag('br', null);
         if ($certificates && $certificates[0] && $certificates[0]->seo_image) {
             // If we have a certificate, display a large image - else a small one for a badge.
-            if ($certificates && $certificates[0] && $certificates[0]->certificate->image->preview &&
-                strlen($certificates[0]->certificate->image->preview) > 0) {
+            if (
+                $certificates && $certificates[0] && $certificates[0]->certificate->image->preview &&
+                strlen($certificates[0]->certificate->image->preview) > 0
+            ) {
                 $img = html_writer::img(
                     $certificates[0]->seo_image,
                     get_string('viewimgcomplete', 'accredible'),

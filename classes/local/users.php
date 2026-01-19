@@ -45,8 +45,7 @@ class users
      *
      * @param stdObject $apirest a mock apirest for testing.
      */
-    public function __construct($apirest = null)
-    {
+    public function __construct($apirest = null) {
         // A mock apirest is passed when unit testing.
         if ($apirest) {
             $this->apirest = $apirest;
@@ -63,8 +62,7 @@ class users
      * @param int $groupid accredible group id
      * @return array the list of users
      */
-    public function get_users_with_credentials($enrolledusers, $groupid = null)
-    {
+    public function get_users_with_credentials($enrolledusers, $groupid = null) {
         $users = [];
         $certificates = [];
 
@@ -123,8 +121,7 @@ class users
      * @param int $accredibleinstanceid accredible module id
      * @return array list of users
      */
-    public function get_unissued_users($users, $accredibleinstanceid = null)
-    {
+    public function get_unissued_users($users, $accredibleinstanceid = null) {
         global $DB;
         $unissuedusers = [];
 
@@ -147,12 +144,13 @@ class users
      * @param array|int $userids array of user IDs or a single ID.
      * @return array[stdClass] $usergrades
      */
-    public function get_user_grades($accredible, $userids)
-    {
+    public function get_user_grades($accredible, $userids) {
         global $DB;
 
-        if (!isset($accredible) || !isset($accredible->includegradeattribute) || !$accredible->gradeattributegradeitemid
-            || empty($accredible->gradeattributekeyname) || empty($userids)) {
+        if (
+            !isset($accredible) || !isset($accredible->includegradeattribute) || !$accredible->gradeattributegradeitemid
+            || empty($accredible->gradeattributekeyname) || empty($userids)
+        ) {
             return;
         }
 
@@ -161,9 +159,9 @@ class users
         $gradeitem = new \grade_item($gradeitemdb);
 
         $queryparams = ['gradeitem' => $gradeitem->id];
-        list($insql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        [$insql, $params] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
         $queryparams += $params;
-        $grades = $DB->get_records_select('grade_grades', 'itemid = :gradeitem AND userid '.$insql, $queryparams);
+        $grades = $DB->get_records_select('grade_grades', 'itemid = :gradeitem AND userid ' . $insql, $queryparams);
 
         foreach ($grades as $grade) {
             if ($grade->finalgrade) {
@@ -181,8 +179,7 @@ class users
      * @param int $userid
      * @return array $customattributes
      */
-    public function load_user_grade_as_custom_attributes($accredible, $grades, $userid)
-    {
+    public function load_user_grade_as_custom_attributes($accredible, $grades, $userid) {
         if (isset($grades) && isset($grades[$userid])) {
             $customattributes = [$accredible->gradeattributekeyname => $grades[$userid]];
         } else {

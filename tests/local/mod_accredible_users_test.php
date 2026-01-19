@@ -54,8 +54,7 @@ class mod_accredible_users_test extends \advanced_testcase
     /**
      * Setup before every test.
      */
-    public function setUp(): void
-    {
+    public function setUp(): void {
         $this->resetAfterTest();
 
         // Add plugin settings.
@@ -71,8 +70,7 @@ class mod_accredible_users_test extends \advanced_testcase
              * @param string $jsonpath
              * @return array
              */
-            public function resdata($jsonpath)
-            {
+            public function resdata($jsonpath) {
                 global $CFG;
                 $fixturedir = $CFG->dirroot . '/mod/accredible/tests/fixtures/mockapi/v1/';
                 $filepath = $fixturedir . $jsonpath;
@@ -89,8 +87,7 @@ class mod_accredible_users_test extends \advanced_testcase
      * Generate list of users with their credentials from a course
      * @covers ::get_users_with_credentials
      */
-    public function test_get_users_with_credentials()
-    {
+    public function test_get_users_with_credentials() {
         $userhelper = new users();
 
         // When there are not users.
@@ -177,8 +174,7 @@ class mod_accredible_users_test extends \advanced_testcase
      * Generate list of users without credential but with requirements for the course pass.
      * @covers ::get_unissued_users
      */
-    public function test_get_unissued_users()
-    {
+    public function test_get_unissued_users() {
         $userhelper = new users();
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id);
 
@@ -234,8 +230,7 @@ class mod_accredible_users_test extends \advanced_testcase
      * Return list of grades from a grade item.
      * @covers ::get_user_grades
      */
-    public function test_get_user_grades()
-    {
+    public function test_get_user_grades() {
         global $DB;
         $userhelper = new users();
 
@@ -332,8 +327,7 @@ class mod_accredible_users_test extends \advanced_testcase
      * Return list of grades from a grade item.
      * @covers ::load_user_grade_as_custom_attributes
      */
-    public function test_load_user_grade_as_custom_attributes()
-    {
+    public function test_load_user_grade_as_custom_attributes() {
         global $DB;
         $userhelper = new users();
 
@@ -399,8 +393,7 @@ class mod_accredible_users_test extends \advanced_testcase
      * @param string $itemmodule
      * @param int $iteminstance
      */
-    private function create_grade_item($courseid, $itemname, $itemmodule, $iteminstance)
-    {
+    private function create_grade_item($courseid, $itemname, $itemmodule, $iteminstance) {
         global $DB;
         $gradeitem = [
             "courseid" => $courseid,
@@ -418,8 +411,7 @@ class mod_accredible_users_test extends \advanced_testcase
      *
      * @param int $courseid
      */
-    private function create_quiz_module($courseid)
-    {
+    private function create_quiz_module($courseid) {
         $quiz = ["course" => $courseid, "grade" => 10];
         return $this->getDataGenerator()->create_module('quiz', $quiz);
     }
@@ -431,8 +423,7 @@ class mod_accredible_users_test extends \advanced_testcase
      * @param int $userid
      * @param int $grade
      */
-    private function create_quiz_grades($quizid, $userid, $grade)
-    {
+    private function create_quiz_grades($quizid, $userid, $grade) {
         global $DB;
         $quizgrade = ["quiz" => $quizid, "userid" => $userid, "grade" => $grade];
         $DB->insert_record('quiz_grades', $quizgrade);
@@ -445,8 +436,7 @@ class mod_accredible_users_test extends \advanced_testcase
      * @param int $userid
      * @param int $grade
      */
-    private function create_grade_grades($gradeitemid, $userid, $grade)
-    {
+    private function create_grade_grades($gradeitemid, $userid, $grade) {
         global $DB;
         $quizgrade = [
             "itemid" => $gradeitemid,

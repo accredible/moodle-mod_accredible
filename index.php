@@ -58,14 +58,16 @@ $table = new html_table();
 $table->head  = [$strname, get_string('datecreated', 'accredible')];
 
 foreach ($certificates as $certificate) {
-    $link = html_writer::tag('a',
-                             $certificate->name,
-                             ['href' => $CFG->wwwroot . '/mod/accredible/view.php?id=' . $certificate->coursemodule]);
+    $link = html_writer::tag(
+        'a',
+        $certificate->name,
+        ['href' => $CFG->wwwroot . '/mod/accredible/view.php?id=' . $certificate->coursemodule]
+    );
     $issued = date("M d, Y", $certificate->timecreated);
     $table->data[] = [$link, $issued];
 }
 
 echo $OUTPUT->header();
-echo html_writer::tag( 'h3', get_string('indexheader', 'accredible', $course->fullname) );
+echo html_writer::tag('h3', get_string('indexheader', 'accredible', $course->fullname));
 echo html_writer::table($table);
 echo $OUTPUT->footer();

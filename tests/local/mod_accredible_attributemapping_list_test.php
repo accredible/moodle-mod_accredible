@@ -30,8 +30,7 @@ class mod_accredible_attributemapping_list_test extends \advanced_testcase
     /**
      * Setup testcase.
      */
-    public function setUp(): void
-    {
+    public function setUp(): void {
         $this->resetAfterTest();
     }
 
@@ -39,8 +38,7 @@ class mod_accredible_attributemapping_list_test extends \advanced_testcase
      * Test whether it validates attribute mappings.
      * @covers  ::validate_attributemapping
      */
-    public function test_validate_attributemapping()
-    {
+    public function test_validate_attributemapping() {
         // When $accredibleattribute in mappings is duplicated.
         $accredibleattribute = 'grade';
         $mapping1 = new attributemapping('course', $accredibleattribute, 'fullname');
@@ -75,8 +73,7 @@ class mod_accredible_attributemapping_list_test extends \advanced_testcase
      * Test whether it converts attributemappings into a string.
      * @covers  ::get_text_content
      */
-    public function test_get_text_content()
-    {
+    public function test_get_text_content() {
         // When attributemapping_list has a valid value.
         $mapping1 = new attributemapping('course', 'grade', 'fullname');
         $mapping2 = new attributemapping('user_info_field', 'user_id', 'mooodle_user_id', 100);

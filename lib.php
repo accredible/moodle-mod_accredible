@@ -39,8 +39,7 @@ use mod_accredible\local\accredible;
  * @param stdObject $post
  * @return array $certificate new certificate object
  */
-function accredible_add_instance($post)
-{
+function accredible_add_instance($post) {
     global $DB;
 
     $post->groupid = isset($post->groupid) ? $post->groupid : null;
@@ -114,8 +113,7 @@ function accredible_add_instance($post)
  * @param stdClass $post
  * @return stdClass $certificate updated
  */
-function accredible_update_instance($post)
-{
+function accredible_update_instance($post) {
     // To update your certificate details, go to accredible.com.
     global $DB;
 
@@ -151,7 +149,7 @@ function accredible_update_instance($post)
         // Int userid => boolean issuecertificate.
         if ($existingrecord->achievementid) {
             $groupid = $existingrecord->achievementid;
-        } elseif ($existingrecord->groupid) {
+        } else if ($existingrecord->groupid) {
             $groupid = $existingrecord->groupid;
         }
         foreach ($post->unissuedusers as $userid => $issuecertificate) {
@@ -189,7 +187,7 @@ function accredible_update_instance($post)
                         $evidenceitems->post_essay_answers($userid, $post->course, $credentialid);
                         $evidenceitems->course_duration_evidence($userid, $post->course, $credentialid, $completedtimestamp);
                     }
-                } elseif ($existingrecord->achievementid) {
+                } else if ($existingrecord->achievementid) {
                     if ($post->finalquiz) {
                         $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
                         $grade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
@@ -299,8 +297,7 @@ function accredible_update_instance($post)
  * @param int $id
  * @return bool true if successful
  */
-function accredible_delete_instance($id)
-{
+function accredible_delete_instance($id) {
     global $DB;
 
     // Ensure the certificate exists.
@@ -318,8 +315,7 @@ function accredible_delete_instance($id)
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed True if module supports feature, null if doesn't know
  */
-function accredible_supports($feature)
-{
+function accredible_supports($feature) {
     switch ($feature) {
         case FEATURE_MOD_INTRO:
             return false;

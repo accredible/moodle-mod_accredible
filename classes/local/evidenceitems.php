@@ -39,8 +39,7 @@ class evidenceitems
      *
      * @param stdObject $apirest a mock apirest for testing.
      */
-    public function __construct($apirest = null)
-    {
+    public function __construct($apirest = null) {
         // A mock apirest is passed when unit testing.
         if ($apirest) {
             $this->apirest = $apirest;
@@ -56,8 +55,7 @@ class evidenceitems
      * @param stdObject $evidenceitem
      * @param bool $throwerror
      */
-    public function post_evidence($credentialid, $evidenceitem, $throwerror = false)
-    {
+    public function post_evidence($credentialid, $evidenceitem, $throwerror = false) {
         $this->apirest->create_evidence_item(['evidence_item' => $evidenceitem], $credentialid, $throwerror);
     }
 
@@ -68,8 +66,7 @@ class evidenceitems
      * @param int $courseid
      * @param int $credentialid
      */
-    public function post_essay_answers($userid, $courseid, $credentialid)
-    {
+    public function post_essay_answers($userid, $courseid, $credentialid) {
         global $DB;
 
         // Grab the course quizes.
@@ -118,12 +115,12 @@ class evidenceitems
                         $questionsoutput .= "p {font-size: 14px; line-height: 18px;} </style>";
                         $questionsoutput .= "<div id='main'>";
                         $questionsoutput .= "<h1>" . $quiz->name . "</h1>";
-                        $questionsoutput .= "<h5>Time Taken: ".
-                            seconds_to_str(current($questions)->timefinish - current($questions)->timestart) ."</h5>";
+                        $questionsoutput .= "<h5>Time Taken: " .
+                            seconds_to_str(current($questions)->timefinish - current($questions)->timestart) . "</h5>";
 
                         foreach ($questions as $questionattempt) {
                             $questionsoutput .= $questionattempt->question;
-                            $questionsoutput .= "<div class='answer'>".$questionattempt->answer."</div>";
+                            $questionsoutput .= "<div class='answer'>" . $questionattempt->answer . "</div>";
                         }
 
                         $questionsoutput .= "</div>";
@@ -147,8 +144,7 @@ class evidenceitems
      * @param int $credentialid
      * @param int|null $completedtimestamp
      */
-    public function course_duration_evidence($userid, $courseid, $credentialid, $completedtimestamp = null)
-    {
+    public function course_duration_evidence($userid, $courseid, $credentialid, $completedtimestamp = null) {
         global $DB;
 
         $sql = "SELECT enrol.id, ue.timestart
@@ -163,8 +159,10 @@ class evidenceitems
                 $completedtimestamp = time();
             }
 
-            if ($enrolmenttimestamp && $enrolmenttimestamp != 0 &&
-                ($enrolmenttimestamp < $completedtimestamp)) {
+            if (
+                $enrolmenttimestamp && $enrolmenttimestamp != 0 &&
+                ($enrolmenttimestamp < $completedtimestamp)
+            ) {
                 $this->apirest->create_evidence_item_duration($enrolmenttimestamp, $completedtimestamp, $credentialid, true);
             }
         }

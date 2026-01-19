@@ -28,8 +28,7 @@
  *
  * @param int $oldversion
  */
-function xmldb_accredible_upgrade($oldversion = 0)
-{
+function xmldb_accredible_upgrade($oldversion = 0) {
 
     global $CFG, $THEME, $DB;
     $dbman = $DB->get_manager();

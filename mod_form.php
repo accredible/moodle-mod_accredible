@@ -25,9 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
-require_once($CFG->dirroot.'/course/moodleform_mod.php');
-require_once($CFG->dirroot.'/mod/accredible/lib.php');
-require_once($CFG->dirroot.'/mod/accredible/locallib.php');
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
+require_once($CFG->dirroot . '/mod/accredible/lib.php');
+require_once($CFG->dirroot . '/mod/accredible/locallib.php');
 
 use mod_accredible\Html2Text\Html2Text;
 use mod_accredible\local\credentials;
@@ -45,14 +45,12 @@ use mod_accredible\local\formhelper;
  */
 class mod_accredible_mod_form extends moodleform_mod
 {
-
     /**
      * Called to define this moodle form
      *
      * @return void
      */
-    public function definition()
-    {
+    public function definition() {
         global $DB, $COURSE, $CFG, $PAGE, $OUTPUT;
 
         $credentialsclient = new credentials();
@@ -94,7 +92,7 @@ class mod_accredible_mod_form extends moodleform_mod
             $id = $cm->course;
             $course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
             $accrediblecertificate = $DB->get_record('accredible', ['id' => $cm->instance], '*', MUST_EXIST);
-        } elseif (optional_param('course', '', PARAM_INT)) { // New form init.
+        } else if (optional_param('course', '', PARAM_INT)) { // New form init.
             $id = optional_param('course', '', PARAM_INT);
             $course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
             // See if other accredible certificates already exist for this course.
@@ -282,7 +280,7 @@ class mod_accredible_mod_form extends moodleform_mod
                 // No existing certificate, add this user to the unissued users list.
                 $mform->addElement(
                     'advcheckbox',
-                    'unissuedusers['.$user['id'].']',
+                    'unissuedusers[' . $user['id'] . ']',
                     $user['name'] . '    ' . $user['email'],
                     null,
                     ['group' => 2]
@@ -306,14 +304,14 @@ class mod_accredible_mod_form extends moodleform_mod
                 if ($user['credential_id']) {
                     $mform->addElement(
                         'static',
-                        'certlink'.$user['id'],
+                        'certlink' . $user['id'],
                         $user['name'] . '    ' . $user['email'],
-                        'Certificate '. $user['credential_id'].' - <a href='.$user['credential_url'].' target="_blank">link</a>'
+                        'Certificate ' . $user['credential_id'] . ' - <a href=' . $user['credential_url'] . ' target="_blank">link</a>'
                     );
                     $mform->addElement('html', '<div class="hidden">');
                     $mform->addElement(
                         'advcheckbox',
-                        'users['.$user['id'].']',
+                        'users[' . $user['id'] . ']',
                         $user['name'] . '    ' . $user['email'],
                         null,
                         ['group' => 1]
@@ -322,7 +320,7 @@ class mod_accredible_mod_form extends moodleform_mod
                 } else { // Show a checkbox if they don't.
                     $mform->addElement(
                         'advcheckbox',
-                        'users['.$user['id'].']',
+                        'users[' . $user['id'] . ']',
                         $user['name'] . '    ' . $user['email'],
                         null,
                         ['group' => 1]
@@ -333,7 +331,7 @@ class mod_accredible_mod_form extends moodleform_mod
             foreach ($users as $user) {
                 $mform->addElement(
                     'advcheckbox',
-                    'users['.$user->id.']',
+                    'users[' . $user->id . ']',
                     $user->firstname . ' ' . $user->lastname . '    ' . $user->email,
                     null,
                     ['group' => 1]
@@ -424,8 +422,7 @@ class mod_accredible_mod_form extends moodleform_mod
      * @param stdClass $data passed by reference
      * @return void
      */
-    public function data_postprocessing($data)
-    {
+    public function data_postprocessing($data) {
         parent::data_postprocessing($data);
         $submitteddata = $this->_form->getSubmitValues();
 
@@ -447,8 +444,7 @@ class mod_accredible_mod_form extends moodleform_mod
      * @param string $fieldname The specific field within the mapping to set.
      * @param int $num The index of the field in case of multiple fields with the same name.
      */
-    private function set_mapping_field_default($mform, $defaultvalues, $mappingname, $fieldname, $num = 0)
-    {
+    private function set_mapping_field_default($mform, $defaultvalues, $mappingname, $fieldname, $num = 0) {
         $value = '';
         if (isset($defaultvalues[$mappingname][$num][$fieldname])) {
             $value = $defaultvalues[$mappingname][$num][$fieldname];

@@ -36,8 +36,7 @@ class mod_accredible_accredible_test extends \advanced_testcase
     /**
      * Setup before every test.
      */
-    public function setUp(): void
-    {
+    public function setUp(): void {
         $this->resetAfterTest();
         $this->accredible = new accredible();
     }
@@ -46,8 +45,7 @@ class mod_accredible_accredible_test extends \advanced_testcase
      * Test save_record method.
      * @covers ::save_record
      */
-    public function test_save_record()
-    {
+    public function test_save_record() {
         global $DB;
 
         // When creating a new record.
@@ -130,7 +128,7 @@ class mod_accredible_accredible_test extends \advanced_testcase
             ->with(
                 'accredible',
                 $this->callback(function ($subject) {
-                // Check if attributemapping is a string and is an array afer decoding.
+                    // Check if attributemapping is a string and is an array afer decoding.
                     return is_string($subject->attributemapping) && is_array(json_decode($subject->attributemapping, true));
                 })
             )
@@ -189,8 +187,7 @@ class mod_accredible_accredible_test extends \advanced_testcase
      * Test load_credential_custom_attributes method.
      * @covers ::load_credential_custom_attributes
      */
-    public function test_load_credential_custom_attributes()
-    {
+    public function test_load_credential_custom_attributes() {
         global $DB;
 
         $course = $this->getDataGenerator()->create_course(
@@ -490,8 +487,7 @@ class mod_accredible_accredible_test extends \advanced_testcase
      * @param stdClass $overrides An object with properties to override.
      * @return stdClass The generated $post object.
      */
-    private function generatepostobject(\stdClass $overrides = null): \stdClass
-    {
+    private function generatepostobject(\stdClass $overrides = null): \stdClass {
         $post = (object) [
             'name' => 'New Certificate',
             'instance' => null,

@@ -71,8 +71,7 @@ class attributemapping
      * @param int|null $id
      * @throws InvalidArgumentException If any validation fails
      */
-    public function __construct($table, $accredibleattribute, $field = null, $id = null)
-    {
+    public function __construct($table, $accredibleattribute, $field = null, $id = null) {
         // Handle validation.
         $this->validate_table($table);
         $this->validate_field($table, $field);
@@ -88,8 +87,7 @@ class attributemapping
      * Updates the attributemapping object into an object suitable for saving into the db.
      * @return stdObject updated attributemapping object
      */
-    public function get_db_object()
-    {
+    public function get_db_object() {
         // Remove empty values.
         $object = (object) array_filter((array) $this);
         return $object;
@@ -100,8 +98,7 @@ class attributemapping
      * @param string $table
      * @throws InvalidArgumentException If the table name is invalid
      */
-    private function validate_table($table)
-    {
+    private function validate_table($table) {
         $validtables = ["course", "user_info_field", "customfield_field"];
         if (!in_array($table, $validtables)) {
             throw new \InvalidArgumentException("Invalid table value");
@@ -114,8 +111,7 @@ class attributemapping
      * @param string|null $field
      * @throws InvalidArgumentException If the field name is invalid
      */
-    private function validate_field($table, $field)
-    {
+    private function validate_field($table, $field) {
         if (!$field) {
             return;
         }
@@ -133,8 +129,7 @@ class attributemapping
      * @param int|null $id
      * @throws InvalidArgumentException If the ID is invalid
      */
-    private function validate_id($table, $id)
-    {
+    private function validate_id($table, $id) {
         if (!$id) {
             return;
         }

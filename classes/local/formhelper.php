@@ -37,8 +37,7 @@ class formhelper
      * @param int $courseid The ID of the course to retrieve
      * @return array Associative array of grade item IDs and their names, suitable for form dropdown.
      */
-    public function load_grade_item_options($courseid)
-    {
+    public function load_grade_item_options($courseid) {
         global $DB;
 
         $options = ['' => 'Select an Activity Grade'];
@@ -83,13 +82,12 @@ class formhelper
      *
      * @return array Associative array of course field names suitable for form dropdown.
      */
-    public function load_course_field_options()
-    {
+    public function load_course_field_options() {
         $options = [
             [
                 'value' => '',
                 'name' => 'Select a Moodle course field',
-            ]
+            ],
         ];
         $fields = attributemapping::VALID_COURSE_FIELDS;
         foreach ($fields as $field) {
@@ -109,17 +107,16 @@ class formhelper
      *
      * @return array Associative array of custom field IDs and their names, suitable for form dropdown.
      */
-    public function load_course_custom_field_options()
-    {
+    public function load_course_custom_field_options() {
         global $DB;
 
         $options = [
             [
                 'value' => '',
                 'name' => 'Select a Moodle course custom field',
-            ]
+            ],
         ];
-        $customfields = $DB->get_records('customfield_field', array(), '', 'id, name');
+        $customfields = $DB->get_records('customfield_field', [], '', 'id, name');
         foreach ($customfields as $field) {
             $options[] = [
                 'value' => $field->id,
@@ -137,17 +134,16 @@ class formhelper
      *
      * @return array Associative array of user profile field IDs and their names, suitable for form dropdown.
      */
-    public function load_user_profile_field_options()
-    {
+    public function load_user_profile_field_options() {
         global $DB;
 
         $options = [
             [
                 'value' => '',
                 'name' => 'Select a Moodle user profile field',
-            ]
+            ],
         ];
-        $profilefields = $DB->get_records('user_info_field', array(), '', 'id, name');
+        $profilefields = $DB->get_records('user_info_field', [], '', 'id, name');
         foreach ($profilefields as $field) {
             $options[] = [
                 'value' => $field->id,
@@ -167,8 +163,7 @@ class formhelper
      * @param array $options An associative array of options where the key is the option name and the value is the option value.
      * @return array An array of associative arrays with 'name' and 'value' keys.
      */
-    public function map_select_options($options)
-    {
+    public function map_select_options($options) {
         $selectoptions = [];
         if (!isset($options)) {
             return $selectoptions;
@@ -193,8 +188,7 @@ class formhelper
      *
      * @return array An associative array of attribute key choices for a select input.
      */
-    public function get_attributekeys_choices()
-    {
+    public function get_attributekeys_choices() {
         $attributekeysclient = $this->get_attribute_keys_client();
         $firstoption = ['' => get_string('accrediblecustomattributeselectprompt', 'accredible')];
 
@@ -215,8 +209,7 @@ class formhelper
      * @return array Associative array with keys 'coursefieldmapping', 'coursecustomfieldmapping', and 'userprofilefieldmapping',
      *               each containing an array of mappings relevant to that category.
      */
-    public function attributemapping_default_values($attributemapping)
-    {
+    public function attributemapping_default_values($attributemapping) {
         $defaultvalues = [
             'coursefieldmapping' => [],
             'coursecustomfieldmapping' => [],
@@ -266,8 +259,7 @@ class formhelper
      *
      * @return attribute_keys An instance of the attribute_keys client.
      */
-    public function get_attribute_keys_client()
-    {
+    public function get_attribute_keys_client() {
         return  new attribute_keys();
     }
 
@@ -280,8 +272,7 @@ class formhelper
      * @param array $array The associative array to be reindexed.
      * @return array The reindexed array with sequential numeric keys.
      */
-    public function reindexarray($array)
-    {
+    public function reindexarray($array) {
         if (!isset($array)) {
             return [];
         }

@@ -40,8 +40,7 @@ class mod_accredible_groups_test extends \advanced_testcase
     /**
      * Setup before every test.
      */
-    public function setUp(): void
-    {
+    public function setUp(): void {
         $this->resetAfterTest();
 
         // Add plugin settings.
@@ -57,8 +56,7 @@ class mod_accredible_groups_test extends \advanced_testcase
              * @param string $jsonpath
              * @return array
              */
-            public function resdata($jsonpath)
-            {
+            public function resdata($jsonpath) {
                 global $CFG;
                 $fixturedir = $CFG->dirroot . '/mod/accredible/tests/fixtures/mockapi/v1/';
                 $filepath = $fixturedir . $jsonpath;
@@ -71,8 +69,7 @@ class mod_accredible_groups_test extends \advanced_testcase
      * Test whether it returns groups
      * @covers ::get_groups
      */
-    public function test_get_groups()
-    {
+    public function test_get_groups() {
         // When the apirest returns groups.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
@@ -164,8 +161,7 @@ class mod_accredible_groups_test extends \advanced_testcase
      * Test whether it returns group name arrays
      * @covers ::get_templates
      */
-    public function test_get_templates()
-    {
+    public function test_get_templates() {
         // When the apirest returns groups.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])

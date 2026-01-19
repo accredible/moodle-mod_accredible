@@ -39,8 +39,7 @@ use mod_accredible\local\accredible;
  * @param array $user
  * @return bool
  */
-function accredible_check_if_cert_earned($record, $user)
-{
+function accredible_check_if_cert_earned($record, $user) {
     global $DB;
 
     $earned = false;
@@ -101,8 +100,7 @@ function accredible_check_if_cert_earned($record, $user)
  * @param int $groupid
  * @param string $email
  */
-function accredible_get_recipient_sso_linik($groupid, $email)
-{
+function accredible_get_recipient_sso_linik($groupid, $email) {
     global $CFG;
 
     $apirest = new apirest();
@@ -198,8 +196,7 @@ function accredible_issue_default_certificate(
  * @param int $courseid ID of the course.
  * @param int $cmid ID of the couse module.
  */
-function accredible_log_creation($certificateid, $userid, $courseid, $cmid)
-{
+function accredible_log_creation($certificateid, $userid, $courseid, $cmid) {
     global $DB;
 
     // Get context.
@@ -224,8 +221,7 @@ function accredible_log_creation($certificateid, $userid, $courseid, $cmid)
  *
  * @param core/event $event quiz mod attempt_submitted event
  */
-function accredible_quiz_submission_handler($event)
-{
+function accredible_quiz_submission_handler($event) {
     global $DB, $CFG;
     require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
@@ -433,8 +429,7 @@ function accredible_quiz_submission_handler($event)
  *
  * @param core/event $event
  */
-function accredible_course_completed_handler($event)
-{
+function accredible_course_completed_handler($event) {
     global $DB, $CFG;
 
     $localcredentials = new credentials();
@@ -490,8 +485,7 @@ function accredible_course_completed_handler($event)
  * @param int $userid
  * @param int $finalquizid
  */
-function accredible_get_transcript($courseid, $userid, $finalquizid)
-{
+function accredible_get_transcript($courseid, $userid, $finalquizid) {
     global $DB, $CFG;
 
     $totalitems = 0;
@@ -518,8 +512,10 @@ function accredible_get_transcript($courseid, $userid, $finalquizid)
 
     // If they've completed over 2/3 of items
     // and have a passing average, make a transcript.
-    if ($totalitems !== 0 && $itemscompleted !== 0 && $itemscompleted / $totalitems >= 0.66 &&
-        $totalscore / $itemscompleted > 50) {
+    if (
+        $totalitems !== 0 && $itemscompleted !== 0 && $itemscompleted / $totalitems >= 0.66 &&
+        $totalscore / $itemscompleted > 50
+    ) {
         return [
             'description' => 'Course Transcript',
             'string_object' => json_encode($transcriptitems),
@@ -537,8 +533,7 @@ function accredible_get_transcript($courseid, $userid, $finalquizid)
  *
  * @param Array $completionarray
  */
-function serialize_completion_array($completionarray)
-{
+function serialize_completion_array($completionarray) {
     return base64_encode(serialize((array)$completionarray));
 }
 
@@ -547,8 +542,7 @@ function serialize_completion_array($completionarray)
  *
  * @param stdObject $completionobject
  */
-function unserialize_completion_array($completionobject)
-{
+function unserialize_completion_array($completionobject) {
     return is_null($completionobject) ? [] : (array)unserialize(base64_decode($completionobject));
 }
 
@@ -562,8 +556,7 @@ function unserialize_completion_array($completionobject)
  * @param stdObject $accrediblerecord
  * @param stdObject $user
  */
-function accredible_manual_issue_completion_timestamp($accrediblerecord, $user)
-{
+function accredible_manual_issue_completion_timestamp($accrediblerecord, $user) {
     global $DB;
 
     $completedtimestamp = false;
@@ -623,8 +616,7 @@ function accredible_manual_issue_completion_timestamp($accrediblerecord, $user)
  * @param int $number
  * @return string
  */
-function number_ending($number)
-{
+function number_ending($number) {
     return ($number > 1) ? 's' : '';
 }
 
@@ -634,8 +626,7 @@ function number_ending($number)
  * @param int $seconds
  * @return string
  */
-function seconds_to_str($seconds)
-{
+function seconds_to_str($seconds) {
     $hours = floor(($seconds %= 86400) / 3600);
     if ($hours) {
         return $hours . ' hour' . number_ending($hours);

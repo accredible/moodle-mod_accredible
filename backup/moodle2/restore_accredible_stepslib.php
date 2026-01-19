@@ -27,12 +27,10 @@
  */
 class restore_accredible_activity_structure_step extends restore_activity_structure_step
 {
-
     /**
      * Define particular steps this activity can have
      */
-    protected function define_structure()
-    {
+    protected function define_structure() {
 
         $paths = [];
 
@@ -46,8 +44,7 @@ class restore_accredible_activity_structure_step extends restore_activity_struct
      * Process accredible activities to add new ones.
      * @param object $data old accredible activity
      */
-    protected function process_accredible($data)
-    {
+    protected function process_accredible($data) {
         global $DB;
 
         $data = (object)$data;
@@ -67,8 +64,7 @@ class restore_accredible_activity_structure_step extends restore_activity_struct
     /**
      * Method to add any related file.
      */
-    protected function after_execute()
-    {
+    protected function after_execute() {
         // Add accredible related files, no need to match by itemname (just internally handled context).
     }
 }

@@ -25,26 +25,23 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/mod/accredible/backup/moodle2/backup_accredible_stepslib.php');
+require_once($CFG->dirroot . '/mod/accredible/backup/moodle2/backup_accredible_stepslib.php');
 
 /**
  * Provides all the settings and steps to perform one complete backup of accredible activity
  */
 class backup_accredible_activity_task extends backup_activity_task
 {
-
     /**
      * Define (add) particular settings this activity can have
      */
-    protected function define_my_settings()
-    {
+    protected function define_my_settings() {
     }
 
     /**
      * Define (add) particular steps this activity can have
      */
-    protected function define_my_steps()
-    {
+    protected function define_my_steps() {
         $this->add_step(new backup_accredible_activity_structure_step('accredible_structure', 'accredible.xml'));
     }
 
@@ -54,8 +51,7 @@ class backup_accredible_activity_task extends backup_activity_task
      * @param string $content
      * @return string
      */
-    public static function encode_content_links($content)
-    {
+    public static function encode_content_links($content) {
         global $CFG;
 
         $base = preg_quote($CFG->wwwroot, "/");

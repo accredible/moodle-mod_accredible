@@ -54,8 +54,7 @@ class mod_accredible_credentials_test extends \advanced_testcase
     /**
      * Setup before every test.
      */
-    public function setUp(): void
-    {
+    public function setUp(): void {
         $this->resetAfterTest();
 
         // Add plugin settings.
@@ -71,8 +70,7 @@ class mod_accredible_credentials_test extends \advanced_testcase
              * @param string $jsonpath
              * @return array
              */
-            public function resdata($jsonpath)
-            {
+            public function resdata($jsonpath) {
                 global $CFG;
                 $fixturedir = $CFG->dirroot . '/mod/accredible/tests/fixtures/mockapi/v1/';
                 $filepath = $fixturedir . $jsonpath;
@@ -89,8 +87,7 @@ class mod_accredible_credentials_test extends \advanced_testcase
      * Create credential test
      * @covers ::create_credential
      */
-    public function test_create_credential()
-    {
+    public function test_create_credential() {
         // When the credential creation is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])
@@ -163,8 +160,7 @@ class mod_accredible_credentials_test extends \advanced_testcase
      * Create credential legacy test
      * @covers ::create_credential_legacy
      */
-    public function test_create_credential_legacy()
-    {
+    public function test_create_credential_legacy() {
         global $DB;
         // When the credential creation is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
@@ -263,8 +259,7 @@ class mod_accredible_credentials_test extends \advanced_testcase
      * Get credentials test
      * @covers ::get_credentials
      */
-    public function test_get_credentials()
-    {
+    public function test_get_credentials() {
         // When the credential search is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
@@ -349,8 +344,7 @@ class mod_accredible_credentials_test extends \advanced_testcase
      * Check existing credential test
      * @covers ::check_for_existing_credential
      */
-    public function test_check_for_existing_credential()
-    {
+    public function test_check_for_existing_credential() {
         // When an existing credential exists for a group_id and user_email.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
@@ -360,8 +354,8 @@ class mod_accredible_credentials_test extends \advanced_testcase
         $resdata = $this->mockapi->resdata('credentials/search_success.json');
 
         // Expect to call the endpoint once with page and page_size.
-        $url = "https://api.accredible.com/v1/all_credentials?group_id=9549&email=".
-            rawurlencode($this->userwithemail->email)."&page_size=&page=1";
+        $url = "https://api.accredible.com/v1/all_credentials?group_id=9549&email=" .
+            rawurlencode($this->userwithemail->email) . "&page_size=&page=1";
         $mockclient1->expects($this->once())
             ->method('get')
             ->with($this->equalTo($url))
@@ -424,8 +418,7 @@ class mod_accredible_credentials_test extends \advanced_testcase
      * Check existing certificate test
      * @covers ::check_for_existing_certificate
      */
-    public function test_check_for_existing_certificate()
-    {
+    public function test_check_for_existing_certificate() {
         // When an existing credential exists for a group_id and user_email.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
@@ -435,8 +428,8 @@ class mod_accredible_credentials_test extends \advanced_testcase
         $resdata = $this->mockapi->resdata('credentials/search_success_page_2.json');
 
         // Expect to call the endpoint once.
-        $url = "https://api.accredible.com/v1/all_credentials?group_id=9549&email=".
-            rawurlencode($this->userwithemail->email)."&page_size=50&page=1";
+        $url = "https://api.accredible.com/v1/all_credentials?group_id=9549&email=" .
+            rawurlencode($this->userwithemail->email) . "&page_size=50&page=1";
         $mockclient1->expects($this->once())
             ->method('get')
             ->with($this->equalTo($url))

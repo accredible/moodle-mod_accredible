@@ -37,8 +37,7 @@ class mod_accredible_lib_test extends \advanced_testcase
      * later: remove after adding real tests
      * @coversNothing
      */
-    public function test_sample()
-    {
+    public function test_sample() {
         $this->resetAfterTest();
         $this->setAdminUser();
 

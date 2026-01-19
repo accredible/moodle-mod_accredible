@@ -38,8 +38,7 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase
     /**
      * Setup before every test.
      */
-    public function setUp(): void
-    {
+    public function setUp(): void {
         $this->resetAfterTest();
 
         // Add plugin settings.
@@ -55,8 +54,7 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase
              * @param string $jsonpath
              * @return array
              */
-            public function resdata($jsonpath)
-            {
+            public function resdata($jsonpath) {
                 global $CFG;
                 $fixturedir = $CFG->dirroot . '/mod/accredible/tests/fixtures/mockapi/v1/';
                 $filepath = $fixturedir . $jsonpath;
@@ -69,8 +67,7 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase
      * Test whether it returns attribute keys.
      * @covers ::get_attribute_keys
      */
-    public function test_get_attribute_keys()
-    {
+    public function test_get_attribute_keys() {
         // When the apirest returns attribute keys.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])

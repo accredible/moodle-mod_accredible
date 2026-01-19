@@ -39,8 +39,7 @@ class credentials
      *
      * @param stdObject $apirest a mock apirest for testing.
      */
-    public function __construct($apirest = null)
-    {
+    public function __construct($apirest = null) {
         // A mock apirest is passed when unit testing.
         if ($apirest) {
             $this->apirest = $apirest;
@@ -57,8 +56,7 @@ class credentials
      * @param array $customattributes
      * @return stdObject
      */
-    public function create_credential($user, $groupid, $issuedon = null, $customattributes = null)
-    {
+    public function create_credential($user, $groupid, $issuedon = null, $customattributes = null) {
         global $CFG;
 
         try {
@@ -151,8 +149,7 @@ class credentials
      * @param string|null $email Limit the returned Credentials to a specific recipient's email address.
      * @return array[stdClass] $credentials
      */
-    public function get_credentials($groupid, $email = null)
-    {
+    public function get_credentials($groupid, $email = null) {
         global $CFG;
         $pagesize = 50;
         $page = 1;
@@ -210,8 +207,7 @@ class credentials
      * @param string $email
      * @return array[stdClass] || false
      */
-    public function check_for_existing_credential($groupid, $email)
-    {
+    public function check_for_existing_credential($groupid, $email) {
         global $CFG;
         try {
             $credentials = $this->apirest->get_credentials($groupid, $email);
@@ -240,8 +236,7 @@ class credentials
      * @param stdObject $user
      * @return array[stdClass] || false
      */
-    public function check_for_existing_certificate($achievementid, $user)
-    {
+    public function check_for_existing_certificate($achievementid, $user) {
         global $DB;
         $existingcertificate = false;
         $certificates = $this->get_credentials($achievementid, $user->email);
