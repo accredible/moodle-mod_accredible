@@ -50,8 +50,7 @@ class mod_accredible_locallib_test extends \advanced_testcase
     /**
      * Setup before every test.
      */
-    public function setUp(): void
-    {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $this->user = $this->getDataGenerator()->create_user();
@@ -71,8 +70,7 @@ class mod_accredible_locallib_test extends \advanced_testcase
              * @param  string $jsonpath
              * @return array
              */
-            public function resdata($jsonpath)
-            {
+            public function resdata($jsonpath) {
                 global $CFG;
                 $fixturedir = $CFG->dirroot . '/mod/accredible/tests/fixtures/mockapi/v1/';
                 $filepath = $fixturedir . $jsonpath;
@@ -86,8 +84,7 @@ class mod_accredible_locallib_test extends \advanced_testcase
      *
      * @covers ::accredible_get_transcript
      */
-    public function test_accredible_get_transcript()
-    {
+    public function test_accredible_get_transcript() {
         global $DB;
 
         // When no quiz available for user.
@@ -176,8 +173,7 @@ class mod_accredible_locallib_test extends \advanced_testcase
      *
      * @covers ::accredible_get_transcript
      */
-    public function test_accredible_check_if_cert_earned()
-    {
+    public function test_accredible_check_if_cert_earned() {
         global $DB;
         $user = [
             'id'    => $this->user->id,
@@ -225,8 +221,7 @@ class mod_accredible_locallib_test extends \advanced_testcase
      * @param int $courseid
      * @param int $finalquizid
      */
-    private function create_accredible_instance($courseid, $finalquizid = 0)
-    {
+    private function create_accredible_instance($courseid, $finalquizid = 0) {
         global $DB;
         $dbrecord = [
             "name"                 => 'Accredible Test',
@@ -247,8 +242,7 @@ class mod_accredible_locallib_test extends \advanced_testcase
      *
      * @param int $courseid
      */
-    private function create_quiz_module($courseid)
-    {
+    private function create_quiz_module($courseid) {
         $quiz = ["course" => $courseid, "grade" => 10];
         return $this->getDataGenerator()->create_module('quiz', $quiz);
     }
@@ -260,8 +254,7 @@ class mod_accredible_locallib_test extends \advanced_testcase
      * @param int $userid
      * @param int $grade
      */
-    private function create_quiz_grades($quizid, $userid, $grade)
-    {
+    private function create_quiz_grades($quizid, $userid, $grade) {
         global $DB;
         $quizgrade = ["quiz" => $quizid, "userid" => $userid, "grade" => $grade];
         $DB->insert_record('quiz_grades', $quizgrade);

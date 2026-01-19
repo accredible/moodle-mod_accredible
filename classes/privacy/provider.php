@@ -42,15 +42,16 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      * @param  collection $collection The collection to add metadata to.
      * @return collection $collection The array of metadata.
      */
-    public static function get_metadata(collection $collection): collection
-    {
+    public static function get_metadata(collection $collection): collection {
 
         $collection->add_external_location_link(
-            'accredible', [
+            'accredible',
+            [
             'email' => 'privacy:metadata:accredible:email',
             'fullname' => 'privacy:metadata:accredible:fullname',
             'quizgrade' => 'privacy:metadata:accredible:quizgrade',
-            ], 'privacy:metadata:accredible'
+            ],
+            'privacy:metadata:accredible'
         );
 
         return $collection;
@@ -62,8 +63,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      * @param  int $userid The user to search.
      * @return contextlist $contextlist The list of contexts used in this plugin.
      */
-    public static function get_contexts_for_userid(int $userid): contextlist
-    {
+    public static function get_contexts_for_userid(int $userid): contextlist {
         return new contextlist();
     }
 
@@ -72,8 +72,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      *
      * @param approved_contextlist $contextlist The approved contexts to export information for.
      */
-    public static function export_user_data(approved_contextlist $contextlist)
-    {
+    public static function export_user_data(approved_contextlist $contextlist) {
     }
 
     /**
@@ -81,8 +80,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      *
      * @param context $context Context to delete data from.
      */
-    public static function delete_data_for_all_users_in_context(\context $context)
-    {
+    public static function delete_data_for_all_users_in_context(\context $context) {
     }
 
     /**
@@ -90,8 +88,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      *
      * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
      */
-    public static function delete_data_for_user(approved_contextlist $contextlist)
-    {
+    public static function delete_data_for_user(approved_contextlist $contextlist) {
     }
 
     /**
@@ -99,8 +96,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      *
      * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
      */
-    public static function get_users_in_context(userlist $userlist)
-    {
+    public static function get_users_in_context(userlist $userlist) {
     }
 
     /**
@@ -108,7 +104,6 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      *
      * @param approved_userlist $userlist The approved context and user information to delete information for.
      */
-    public static function delete_data_for_users(approved_userlist $userlist)
-    {
+    public static function delete_data_for_users(approved_userlist $userlist) {
     }
 }
