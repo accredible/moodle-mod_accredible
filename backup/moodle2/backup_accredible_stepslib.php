@@ -25,14 +25,16 @@
 /**
  * Defines the complete accredible structure for backup, with file and id annotations
  */
-class backup_accredible_activity_structure_step extends backup_activity_structure_step {
+class backup_accredible_activity_structure_step extends backup_activity_structure_step
+{
 
     /**
      * Define the structure of the backup workflow.
      *
      * @return restore_path_element $structure
      */
-    protected function define_structure() {
+    protected function define_structure()
+    {
         // XML nodes declaration.
         $accredible = new backup_nested_element('accredible', ['id'], [
             'name', 'course', 'achievementid', 'description', 'finalquiz', 'passinggrade', 'completionactivities',

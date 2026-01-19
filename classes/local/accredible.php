@@ -26,7 +26,8 @@ use mod_accredible\local\attributemapping;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class accredible {
+class accredible
+{
 
     /**
      * Saves or updates an Accredible plugin instance record in the 'accredible' table.
@@ -36,7 +37,8 @@ class accredible {
      * @param stdClass|null $existingrecord Optional. Existing certificate data to be updated.
      * @return bool|int Returns the new record ID on insert, or true on update success.
      */
-    public function save_record($post, $existingrecord = null) {
+    public function save_record($post, $existingrecord = null)
+    {
         global $DB;
 
         $includegradeattribute = $post->includegradeattribute ?? 0;
@@ -81,7 +83,8 @@ class accredible {
      * @param int $userid The ID of the user for whom the credential is being loaded.
      * @return array An associative array of custom attributes for an Accredible credential.
      */
-    public function load_credential_custom_attributes($accredible, $userid) {
+    public function load_credential_custom_attributes($accredible, $userid)
+    {
         $customattributes = [];
         if (!isset($accredible->attributemapping) || empty($accredible->attributemapping)) {
             return $customattributes;
@@ -127,7 +130,8 @@ class accredible {
      * @param int $courseid The ID of the course from which to retrieve the field value.
      * @return mixed|null Returns the value of the specified field if found, or null if the course or field is not found.
      */
-    private function load_course_field_value($field, $courseid) {
+    private function load_course_field_value($field, $courseid)
+    {
         global $DB;
 
         $course = $DB->get_record(
@@ -158,7 +162,8 @@ class accredible {
      * @param int $courseid The ID of the course instance.
      * @return mixed|null Returns the value of the custom field if found, or null if not found.
      */
-    private function load_customfield_field_value($customfieldfieldid, $courseid) {
+    private function load_customfield_field_value($customfieldfieldid, $courseid)
+    {
         global $DB;
 
         $customfielddata = $DB->get_record(
@@ -187,9 +192,9 @@ class accredible {
         );
         if ($customfield->type === 'date') {
             return $this->date($value);
-        } else if ($customfield->type === 'textarea') {
+        } elseif ($customfield->type === 'textarea') {
             return strip_tags($value);
-        } else if ($customfield->type === 'select') {
+        } elseif ($customfield->type === 'select') {
             return $this->customfield_selected_option($value, $customfield->configdata);
         } else {
             return $value;
@@ -206,7 +211,8 @@ class accredible {
      * @param int $userid The ID of the user.
      * @return mixed|null Returns the value of the user info field if found, or null if not found.
      */
-    private function load_user_info_field_value($userinfofieldid, $userid) {
+    private function load_user_info_field_value($userinfofieldid, $userid)
+    {
         global $DB;
 
         $userinfodata = $DB->get_record(
@@ -230,7 +236,7 @@ class accredible {
         );
         if ($userinfofield->datatype === 'datetime') {
             return $this->date($userinfodata->data);
-        } else if ($userinfofield->datatype === 'textarea') {
+        } elseif ($userinfofield->datatype === 'textarea') {
             return strip_tags($userinfodata->data);
         } else {
             return $userinfodata->data;
@@ -243,7 +249,8 @@ class accredible {
      * @param int $value The timestamp to be formatted.
      * @return string The formatted date string.
      */
-    private function date($value) {
+    private function date($value)
+    {
         if ($value === null || $value === '') {
             return;
         }
@@ -258,7 +265,8 @@ class accredible {
      * @param string $configdata JSON encoded string containing the configuration of the custom field, including options.
      * @return string|null The label of the selected option, or null if the index is out of range or invalid.
      */
-    private function customfield_selected_option($value, $configdata) {
+    private function customfield_selected_option($value, $configdata)
+    {
         if ((int) $value === 0) {
             return;
         }
@@ -274,7 +282,8 @@ class accredible {
      * @param string $text The text to be split.
      * @return array An array of strings, each representing a line in the input text.
      */
-    private function split_by_line($text) {
+    private function split_by_line($text)
+    {
         return preg_split("/\r\n|\n|\r/", $text);
     }
 
@@ -285,7 +294,8 @@ class accredible {
      * and user field mappings.
      * @return string JSON encoded attribute mapping list.
      */
-    private function build_attribute_mapping_list($post) {
+    private function build_attribute_mapping_list($post)
+    {
         $coursefieldmapping = $this->parse_attributemapping(
             'course',
             isset($post->coursefieldmapping) ? $post->coursefieldmapping : []
@@ -303,7 +313,7 @@ class accredible {
             return null;
         }
 
-        $attributemappings = array_map(function($mapping) {
+        $attributemappings = array_map(function ($mapping) {
             return new attributemapping($mapping->table, $mapping->accredibleattribute, $mapping->field, $mapping->id);
         }, $mergedmappings);
 
@@ -322,7 +332,8 @@ class accredible {
      * @param array $postedmapping The array of mappings posted from the form.
      * @return array An array of objects, each representing a mapping configuration.
      */
-    private function parse_attributemapping($table, $postedmapping) {
+    private function parse_attributemapping($table, $postedmapping)
+    {
         $parsedmapping = [];
         foreach ($postedmapping as $mapping) {
             $entry = (object) [

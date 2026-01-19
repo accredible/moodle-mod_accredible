@@ -49,7 +49,6 @@ $localcredentials = new credentials();
 
 // User has admin privileges, show table of certificates.
 if (has_capability('mod/accredible:manage', $context)) {
-
     // Get array of certificates.
     if ($accrediblecertificate->achievementid) { // Legacy achievment ID.
         $certificates = $localcredentials->get_credentials($accrediblecertificate->achievementid);
@@ -66,7 +65,7 @@ if (has_capability('mod/accredible:manage', $context)) {
     ];
 
     foreach ($certificates as $certificate) {
-        $issuedate = date_format( date_create($certificate->issued_on), "M d, Y" );
+        $issuedate = date_format(date_create($certificate->issued_on), "M d, Y");
         if (isset($certificate->url)) {
             $certificatelink = $certificate->url;
         } else {
@@ -81,16 +80,16 @@ if (has_capability('mod/accredible:manage', $context)) {
     }
 
     echo $OUTPUT->header();
-    echo html_writer::tag( 'h3', get_string('viewheader', 'accredible', $accrediblecertificate->name) );
+    echo html_writer::tag('h3', get_string('viewheader', 'accredible', $accrediblecertificate->name));
     if ($accrediblecertificate->groupid) {
-        echo html_writer::tag( 'h5', get_string('viewsubheader', 'accredible', $accrediblecertificate->groupid) );
+        echo html_writer::tag('h5', get_string('viewsubheader', 'accredible', $accrediblecertificate->groupid));
     } else {
-        echo html_writer::tag( 'h5', get_string('viewsubheaderold', 'accredible', $accrediblecertificate->achievementid) );
+        echo html_writer::tag('h5', get_string('viewsubheaderold', 'accredible', $accrediblecertificate->achievementid));
     }
 
-    echo html_writer::tag( 'p', get_string('gotodashboard', 'accredible') );
+    echo html_writer::tag('p', get_string('gotodashboard', 'accredible'));
 
-    echo html_writer::tag( 'br', null );
+    echo html_writer::tag('br', null);
     echo html_writer::table($table);
     echo $OUTPUT->footer($course);
 } else {
@@ -121,7 +120,6 @@ if (has_capability('mod/accredible:manage', $context)) {
     echo $OUTPUT->header();
 
     if ($userscertificatelink) {
-
         if (method_exists($PAGE->theme, 'image_url')) {
             $src = $OUTPUT->image_url('incomplete_cert', 'accredible');
         } else {
@@ -129,22 +127,28 @@ if (has_capability('mod/accredible:manage', $context)) {
         }
 
         echo html_writer::start_div('text-center');
-        echo html_writer::tag( 'br', null );
+        echo html_writer::tag('br', null);
         if ($certificates && $certificates[0] && $certificates[0]->seo_image) {
             // If we have a certificate, display a large image - else a small one for a badge.
             if ($certificates && $certificates[0] && $certificates[0]->certificate->image->preview &&
                 strlen($certificates[0]->certificate->image->preview) > 0) {
-                $img = html_writer::img($certificates[0]->seo_image,
-                    get_string('viewimgcomplete', 'accredible'), ['width' => '90%'] );
+                $img = html_writer::img(
+                    $certificates[0]->seo_image,
+                    get_string('viewimgcomplete', 'accredible'),
+                    ['width' => '90%']
+                );
             } else {
-                $img = html_writer::img($certificates[0]->seo_image,
-                    get_string('viewimgcomplete', 'accredible'), ['width' => '25%'] );
+                $img = html_writer::img(
+                    $certificates[0]->seo_image,
+                    get_string('viewimgcomplete', 'accredible'),
+                    ['width' => '25%']
+                );
             }
         } else {
-            $img = html_writer::img($src, get_string('viewimgcomplete', 'accredible'), ['width' => '90%'] );
+            $img = html_writer::img($src, get_string('viewimgcomplete', 'accredible'), ['width' => '90%']);
         }
 
-        echo html_writer::link( $userscertificatelink, $img, ['target' => '_blank'] );
+        echo html_writer::link($userscertificatelink, $img, ['target' => '_blank']);
         echo html_writer::end_div('text-center');
     } else {
         if (method_exists($PAGE->theme, 'image_url')) {
@@ -154,8 +158,8 @@ if (has_capability('mod/accredible:manage', $context)) {
         }
 
         echo html_writer::start_div('text-center');
-        echo html_writer::tag( 'br', null );
-        echo html_writer::img($src, get_string('viewimgincomplete', 'accredible'), ['width' => '90%'] );
+        echo html_writer::tag('br', null);
+        echo html_writer::img($src, get_string('viewimgincomplete', 'accredible'), ['width' => '90%']);
         echo html_writer::end_div('text-center');
     }
 

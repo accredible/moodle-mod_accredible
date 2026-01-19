@@ -30,7 +30,8 @@ use mod_accredible\local\groups;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_groups_test extends \advanced_testcase {
+class mod_accredible_groups_test extends \advanced_testcase
+{
     /**
      * Mock API response data.
      * @var class $mockapi
@@ -39,7 +40,8 @@ class mod_accredible_groups_test extends \advanced_testcase {
     /**
      * Setup before every test.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         $this->resetAfterTest();
 
         // Add plugin settings.
@@ -55,7 +57,8 @@ class mod_accredible_groups_test extends \advanced_testcase {
              * @param string $jsonpath
              * @return array
              */
-            public function resdata($jsonpath) {
+            public function resdata($jsonpath)
+            {
                 global $CFG;
                 $fixturedir = $CFG->dirroot . '/mod/accredible/tests/fixtures/mockapi/v1/';
                 $filepath = $fixturedir . $jsonpath;
@@ -68,7 +71,8 @@ class mod_accredible_groups_test extends \advanced_testcase {
      * Test whether it returns groups
      * @covers ::get_groups
      */
-    public function test_get_groups() {
+    public function test_get_groups()
+    {
         // When the apirest returns groups.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
@@ -85,7 +89,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
         $callcount = 0;
         $mockclient1->expects($this->exactly(2))
             ->method('get')
-            ->willReturnCallback(function($arg1) use (&$callcount, $url1, $url2, $resdata1, $resdata2) {
+            ->willReturnCallback(function ($arg1) use (&$callcount, $url1, $url2, $resdata1, $resdata2) {
                 $callcount++;
                 if ($callcount === 1) {
                     $this->assertEquals($url1, $arg1);
@@ -160,7 +164,8 @@ class mod_accredible_groups_test extends \advanced_testcase {
      * Test whether it returns group name arrays
      * @covers ::get_templates
      */
-    public function test_get_templates() {
+    public function test_get_templates()
+    {
         // When the apirest returns groups.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])
@@ -179,7 +184,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
         $callcount = 0;
         $mockclient1->expects($this->exactly(2))
             ->method('post')
-            ->willReturnCallback(function($arg1, $arg2) use (&$callcount, $url, $reqdata1, $reqdata2, $resdata1, $resdata2) {
+            ->willReturnCallback(function ($arg1, $arg2) use (&$callcount, $url, $reqdata1, $reqdata2, $resdata1, $resdata2) {
                 $callcount++;
                 if ($callcount === 1) {
                     $this->assertEquals($url, $arg1);

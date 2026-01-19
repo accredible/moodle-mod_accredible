@@ -28,7 +28,8 @@
  *
  * @param int $oldversion
  */
-function xmldb_accredible_upgrade($oldversion=0) {
+function xmldb_accredible_upgrade($oldversion = 0)
+{
 
     global $CFG, $THEME, $DB;
     $dbman = $DB->get_manager();
@@ -36,7 +37,6 @@ function xmldb_accredible_upgrade($oldversion=0) {
     $result = true;
 
     if ($oldversion < 2014111800) {
-
         // Changing type of field description on table accredible to text.
         $table = new xmldb_table('accredible');
         $field = new xmldb_field('description', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null, 'achievementid');
@@ -49,7 +49,6 @@ function xmldb_accredible_upgrade($oldversion=0) {
     }
 
     if ($oldversion < 2014112600) {
-
         // Define field completionactivities to be added to accredible.
         $table = new xmldb_table('accredible');
         $field = new xmldb_field('completionactivities', XMLDB_TYPE_TEXT, null, null, null, null, null, 'passinggrade');
@@ -64,7 +63,6 @@ function xmldb_accredible_upgrade($oldversion=0) {
     }
 
     if ($oldversion < 2014121800) {
-
         // Define field certificatename to be added to accredible.
         $table = new xmldb_table('accredible');
         $field = new xmldb_field('certificatename', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'timecreated');
@@ -87,7 +85,6 @@ function xmldb_accredible_upgrade($oldversion=0) {
     }
 
     if ($oldversion < 2016111000) {
-
         // Define field groupid to be added to accredible.
         $table = new xmldb_table('accredible');
         $field = new xmldb_field('groupid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'certificatename');
@@ -127,15 +124,22 @@ function xmldb_accredible_upgrade($oldversion=0) {
 
         // Accredible savepoint reached.
         upgrade_mod_savepoint(true, 2016111000, 'accredible');
-
     }
 
     if ($oldversion < 2022060900) {
         $table = new xmldb_table('accredible');
 
         // Define field includegradeattribute to be added to accredible.
-        $field = new xmldb_field('includegradeattribute', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0',
-            'completionactivities');
+        $field = new xmldb_field(
+            'includegradeattribute',
+            XMLDB_TYPE_INTEGER,
+            '1',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'completionactivities'
+        );
 
         // Conditionally launch add field groupid.
         if (!$dbman->field_exists($table, $field)) {
@@ -143,8 +147,16 @@ function xmldb_accredible_upgrade($oldversion=0) {
         }
 
         // Define field gradeattributegradeitemid to be added to accredible.
-        $field = new xmldb_field('gradeattributegradeitemid', XMLDB_TYPE_INTEGER, '10', null, null, null,
-            null, 'includegradeattribute');
+        $field = new xmldb_field(
+            'gradeattributegradeitemid',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            null,
+            null,
+            null,
+            'includegradeattribute'
+        );
 
         // Conditionally launch add field groupid.
         if (!$dbman->field_exists($table, $field)) {
@@ -152,8 +164,16 @@ function xmldb_accredible_upgrade($oldversion=0) {
         }
 
         // Define field gradeattributekeyname to be added to accredible.
-        $field = new xmldb_field('gradeattributekeyname', XMLDB_TYPE_CHAR, '255', null, null, null,
-            null, 'gradeattributegradeitemid');
+        $field = new xmldb_field(
+            'gradeattributekeyname',
+            XMLDB_TYPE_CHAR,
+            '255',
+            null,
+            null,
+            null,
+            null,
+            'gradeattributegradeitemid'
+        );
 
         // Conditionally launch add field groupid.
         if (!$dbman->field_exists($table, $field)) {

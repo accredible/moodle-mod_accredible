@@ -28,7 +28,8 @@ use mod_accredible\client\client;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_evidenceitems_test extends \advanced_testcase {
+class mod_accredible_evidenceitems_test extends \advanced_testcase
+{
     /**
      * Mock API response data.
      * @var class $mockapi
@@ -47,7 +48,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
     /**
      * Setup before every test.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         $this->resetAfterTest();
 
         // Add plugin settings.
@@ -63,7 +65,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
              * @param string $jsonpath
              * @return array
              */
-            public function resdata($jsonpath) {
+            public function resdata($jsonpath)
+            {
                 global $CFG;
                 $fixturedir = $CFG->dirroot . '/mod/accredible/tests/fixtures/mockapi/v1/';
                 $filepath = $fixturedir . $jsonpath;
@@ -79,7 +82,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * Post credential evidence test
      * @covers ::post_evidence
      */
-    public function test_post_evidence() {
+    public function test_post_evidence()
+    {
         // When the throw_error is FALSE and the response is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])
@@ -100,8 +104,10 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
 
         $mockclient1->expects($this->once())
             ->method('post')
-            ->with($this->equalTo($url),
-                   $this->equalTo($reqdata))
+            ->with(
+                $this->equalTo($url),
+                $this->equalTo($reqdata)
+            )
             ->willReturn($resdata);
 
         // Expect to return resdata.
@@ -121,8 +127,10 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
 
         $mockclient2->expects($this->once())
             ->method('post')
-            ->with($this->equalTo($url),
-                   $this->equalTo($reqdata))
+            ->with(
+                $this->equalTo($url),
+                $this->equalTo($reqdata)
+            )
             ->willReturn($resdata);
 
         // Expect to not throwing an exception.
@@ -142,8 +150,10 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
 
         $mockclient3->expects($this->once())
             ->method('post')
-            ->with($this->equalTo($url),
-                   $this->equalTo($reqdata))
+            ->with(
+                $this->equalTo($url),
+                $this->equalTo($reqdata)
+            )
             ->willReturn($resdata);
 
         // Expect to return resdata without throwing an exception.
@@ -162,7 +172,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * Post credential evidence from essay answers test
      * @covers ::post_essay_answers
      */
-    public function test_post_essay_answers() {
+    public function test_post_essay_answers()
+    {
         global $DB;
 
         $evidenceitems = new evidenceitems();
@@ -241,7 +252,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * Post credential evidence test
      * @covers ::course_duration_evidence
      */
-    public function test_course_duration_evidence() {
+    public function test_course_duration_evidence()
+    {
         $evidenceitems = new evidenceitems();
 
         // When there are not enrolments.
@@ -309,7 +321,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
      *
      * @param int $courseid
      */
-    private function create_enrolment($courseid) {
+    private function create_enrolment($courseid)
+    {
         global $DB;
         $data = ["courseid" => $courseid];
         return $DB->insert_record('enrol', $data);
@@ -322,7 +335,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * @param int $userid
      * @param date $timestart
      */
-    private function create_user_enrolment($enrolid, $userid, $timestart) {
+    private function create_user_enrolment($enrolid, $userid, $timestart)
+    {
         global $DB;
         $data = ["enrolid" => $enrolid, "userid" => $userid, "modifierid" => $userid, "timestart" => $timestart];
         return $DB->insert_record('user_enrolments', $data);
@@ -334,7 +348,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * @param int $courseid
      * @param int $userid
      */
-    private function create_quiz_module($courseid, $userid = null) {
+    private function create_quiz_module($courseid, $userid = null)
+    {
         $quiz = ["course" => $courseid, "grade" => 10];
         if ($userid) {
             $quiz["userid"] = $userid;
@@ -349,7 +364,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * @param int $userid
      * @param int $questionusageid
      */
-    private function create_quiz_attempt($quizid, $userid, $questionusageid) {
+    private function create_quiz_attempt($quizid, $userid, $questionusageid)
+    {
         global $DB;
         $data = ["quiz"            => $quizid,
                       "userid"          => $userid,
@@ -368,7 +384,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * @param int $questionusageid
      * @param int $questionid
      */
-    private function create_question_attempt($quizid, $userid, $questionusageid, $questionid) {
+    private function create_question_attempt($quizid, $userid, $questionusageid, $questionid)
+    {
         global $DB;
         $data = ["quiz"            => $quizid,
                       "userid"          => $userid,
@@ -386,7 +403,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
     /**
      * Create question usage
      */
-    private function create_question_usage() {
+    private function create_question_usage()
+    {
         global $DB;
         $data = ["id" => 1, "contextid" => 1];
         return $DB->insert_record('question_usages', $data);
@@ -399,7 +417,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * @param int $userid
      * @param int $grade
      */
-    private function create_quiz_grades($quizid, $userid, $grade) {
+    private function create_quiz_grades($quizid, $userid, $grade)
+    {
         global $DB;
         $quizgrade = ["quiz" => $quizid, "userid" => $userid, "grade" => $grade];
         return $DB->insert_record('quiz_grades', $quizgrade);

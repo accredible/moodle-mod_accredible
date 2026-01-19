@@ -33,13 +33,15 @@ use mod_accredible\local\users;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class form_helper extends \external_api {
+class form_helper extends \external_api
+{
     /**
      * Returns parameter types for reload_users function.
      *
      * @return \external_function_parameters Parameters
      */
-    public static function reload_users_parameters() {
+    public static function reload_users_parameters()
+    {
         return new \external_function_parameters([
             'courseid' => new \external_value(PARAM_INT, 'Course ID.'),
             'groupid' => new \external_value(PARAM_INT, 'Group ID.'),
@@ -52,7 +54,8 @@ class form_helper extends \external_api {
      *
      * @return \external_description Result type
      */
-    public static function reload_users_returns() {
+    public static function reload_users_returns()
+    {
         return new \external_single_structure([
             'users' => new \external_multiple_structure(
                 new \external_single_structure([
@@ -84,9 +87,12 @@ class form_helper extends \external_api {
      *
      * @return array of users.
      */
-    public static function reload_users($courseid, $groupid, $instanceid = null) {
-        $params = self::validate_parameters(self::reload_users_parameters(),
-            ['courseid' => $courseid, 'groupid' => $groupid, 'instanceid' => $instanceid]);
+    public static function reload_users($courseid, $groupid, $instanceid = null)
+    {
+        $params = self::validate_parameters(
+            self::reload_users_parameters(),
+            ['courseid' => $courseid, 'groupid' => $groupid, 'instanceid' => $instanceid]
+        );
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 

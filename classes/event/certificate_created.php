@@ -25,12 +25,14 @@ namespace mod_accredible\event;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class certificate_created extends \core\event\base {
+class certificate_created extends \core\event\base
+{
 
     /**
      * Init function to assign variables
      */
-    protected function init() {
+    protected function init()
+    {
         $this->data['crud'] = 'c'; // ... create.
         $this->data['edulevel'] = self::LEVEL_TEACHING;
         $this->data['objecttable'] = 'accredible';
@@ -40,7 +42,8 @@ class certificate_created extends \core\event\base {
      * Get the event message.
      * @return string
      */
-    public static function get_name() {
+    public static function get_name()
+    {
         return get_string('eventcertificatecreated', 'mod_accredible');
     }
 
@@ -48,7 +51,8 @@ class certificate_created extends \core\event\base {
      * Get the event description.
      * @return string
      */
-    public function get_description() {
+    public function get_description()
+    {
         return "User {$this->userid} issued certificate id {$this->objectid}.";
     }
 }

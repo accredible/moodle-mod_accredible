@@ -25,7 +25,8 @@ namespace mod_accredible\local;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_formhelper_test extends \advanced_testcase {
+class mod_accredible_formhelper_test extends \advanced_testcase
+{
     /**
      * Course.
      * @var \stdClass $course
@@ -40,7 +41,8 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
     /**
      * Setup before every test.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         global $DB;
 
         $this->resetAfterTest();
@@ -61,7 +63,8 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * Test the load_grade_item_options method.
      * @covers ::load_grade_item_options
      */
-    public function test_load_grade_item_options() {
+    public function test_load_grade_item_options()
+    {
         $formhelper = new formhelper();
 
         // When there are no grade items.
@@ -94,7 +97,8 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * Test the load_course_field_options method.
      * @covers ::load_course_field_options
      */
-    public function test_load_course_field_options() {
+    public function test_load_course_field_options()
+    {
         $formhelper = new formhelper();
 
         $expected = [
@@ -112,7 +116,8 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * Test the load_course_custom_field_options method.
      * @covers ::load_course_custom_field_options
      */
-    public function test_load_course_custom_field_options() {
+    public function test_load_course_custom_field_options()
+    {
         global $DB;
 
         $formhelper = new formhelper();
@@ -155,7 +160,8 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * Test the load_user_profile_field_options method.
      * @covers ::load_user_profile_field_options
      */
-    public function test_load_user_profile_field_options() {
+    public function test_load_user_profile_field_options()
+    {
         global $DB;
         $formhelper = new formhelper();
 
@@ -192,7 +198,8 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * Test the map_select_options method.
      * @covers ::map_select_options
      */
-    public function test_map_select_options() {
+    public function test_map_select_options()
+    {
         $formhelper = new formhelper();
 
         // When the options array has values.
@@ -225,7 +232,8 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * Test the get_attributekeys_choices method.
      * @covers ::get_attributekeys_choices
      */
-    public function test_get_attributekeys_choices() {
+    public function test_get_attributekeys_choices()
+    {
         // Mock attribute_keys class and 1 method.
         $attributekeysmock = $this->getMockBuilder(attribute_keys::class)
             ->onlyMethods(['get_attribute_keys'])
@@ -274,7 +282,8 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * Test the attributemapping_default_values method.
      * @covers ::attributemapping_default_values
      */
-    public function test_attributemapping_default_values() {
+    public function test_attributemapping_default_values()
+    {
         $formhelper = new formhelper();
 
         // When the JSON string $attributemapping is null.
@@ -335,7 +344,8 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * Test the reindexarray method.
      * @covers ::reindexarray
      */
-    public function test_reindexarray() {
+    public function test_reindexarray()
+    {
         $formhelper = new formhelper();
 
         // When the associative array is not passed.
@@ -362,10 +372,12 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * @param int $courseid
      * @param string $name
      */
-    private function create_quiz_module($courseid, $name) {
+    private function create_quiz_module($courseid, $name)
+    {
         global $DB;
 
-        return $DB->insert_record('quiz',
+        return $DB->insert_record(
+            'quiz',
             [
                 'course' => $courseid,
                 'name' => $name,
@@ -383,7 +395,8 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * @param string $itemmodule
      * @param int $iteminstance
      */
-    private function create_grade_item($courseid, $itemname, $itemmodule, $iteminstance) {
+    private function create_grade_item($courseid, $itemname, $itemmodule, $iteminstance)
+    {
         global $DB;
         $gradeitem = [
             "courseid" => $courseid,
@@ -402,7 +415,8 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * @param mixed $attributekeysmock The mock instance of the attribute_keys class.
      * @return formhelper The formhelper class instance extended with a mock attribute_keys client.
      */
-    private function create_formhelper_with_mock($attributekeysmock) {
+    private function create_formhelper_with_mock($attributekeysmock)
+    {
         // Use an anonymous class to extend formhelper and inject the mock.
         return new class($attributekeysmock) extends formhelper {
             // Mock instance of the attribute_keys client.
@@ -415,7 +429,8 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
              *
              * @param mixed $mockclient The mock instance of the attribute_keys client.
              */
-            public function __construct($mockclient) {
+            public function __construct($mockclient)
+            {
                 $this->mockclient = $mockclient;
             }
 
@@ -424,7 +439,8 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
              *
              * @return $mockclient The mock instance of the attribute_keys client.
              */
-            public function get_attribute_keys_client() {
+            public function get_attribute_keys_client()
+            {
                 return $this->mockclient;
             }
         };

@@ -26,7 +26,8 @@ use mod_accredible\apirest\apirest;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class credentials {
+class credentials
+{
     /**
      * HTTP request apirest.
      * @var apirest
@@ -38,7 +39,8 @@ class credentials {
      *
      * @param stdObject $apirest a mock apirest for testing.
      */
-    public function __construct($apirest = null) {
+    public function __construct($apirest = null)
+    {
         // A mock apirest is passed when unit testing.
         if ($apirest) {
             $this->apirest = $apirest;
@@ -55,12 +57,19 @@ class credentials {
      * @param array $customattributes
      * @return stdObject
      */
-    public function create_credential($user, $groupid, $issuedon = null, $customattributes = null) {
+    public function create_credential($user, $groupid, $issuedon = null, $customattributes = null)
+    {
         global $CFG;
 
         try {
-            $credential = $this->apirest->create_credential(fullname($user), $user->email, $groupid, $issuedon,
-                null, $customattributes);
+            $credential = $this->apirest->create_credential(
+                fullname($user),
+                $user->email,
+                $groupid,
+                $issuedon,
+                null,
+                $customattributes
+            );
 
             if (isset($credential->success) && $credential->success === false) {
                 throw new \Exception($credential->data ?? 'Unknown error');
@@ -72,8 +81,13 @@ class credentials {
             // Include the achievement id that triggered the error.
             // Direct the user to accredible's support.
             // Dump the achievement id to debug_info.
-            throw new \moodle_exception('credentialcreateerror', 'accredible',
-                'https://help.accredible.com/hc/en-us', $user->email, $groupid);
+            throw new \moodle_exception(
+                'credentialcreateerror',
+                'accredible',
+                'https://help.accredible.com/hc/en-us',
+                $user->email,
+                $groupid
+            );
         }
     }
 
@@ -88,12 +102,28 @@ class credentials {
      * @param array $customattributes
      * @return stdObject
      */
-    public function create_credential_legacy($user, $achievementname, $coursename,
-        $coursedescription, $courselink, $issuedon, $customattributes = null) {
+    public function create_credential_legacy(
+        $user,
+        $achievementname,
+        $coursename,
+        $coursedescription,
+        $courselink,
+        $issuedon,
+        $customattributes = null
+    ) {
         global $CFG;
         try {
-            $credential = $this->apirest->create_credential_legacy(fullname($user),
-                $user->email, $achievementname, $issuedon, null, $coursename, $coursedescription, $courselink, $customattributes);
+            $credential = $this->apirest->create_credential_legacy(
+                fullname($user),
+                $user->email,
+                $achievementname,
+                $issuedon,
+                null,
+                $coursename,
+                $coursedescription,
+                $courselink,
+                $customattributes
+            );
 
             if (isset($credential->success) && $credential->success === false) {
                 throw new \Exception($credential->data ?? 'Unknown error');
@@ -105,8 +135,13 @@ class credentials {
             // Include the achievement id that triggered the error.
             // Direct the user to accredible's support.
             // Dump the achievement id to debug_info.
-            throw new \moodle_exception('credentialcreateerror', 'accredible',
-                'https://help.accredible.com/hc/en-us', $user->email, $achievementname);
+            throw new \moodle_exception(
+                'credentialcreateerror',
+                'accredible',
+                'https://help.accredible.com/hc/en-us',
+                $user->email,
+                $achievementname
+            );
         }
     }
 
@@ -116,7 +151,8 @@ class credentials {
      * @param string|null $email Limit the returned Credentials to a specific recipient's email address.
      * @return array[stdClass] $credentials
      */
-    public function get_credentials($groupid, $email= null) {
+    public function get_credentials($groupid, $email = null)
+    {
         global $CFG;
         $pagesize = 50;
         $page = 1;
@@ -159,8 +195,12 @@ class credentials {
             if (isset($credentialspage)) {
                 $exceptionparam->last_response = $credentialspage;
             }
-            throw new \moodle_exception('getcredentialserror', 'accredible',
-                'https://help.accredible.com/hc/en-us', $exceptionparam);
+            throw new \moodle_exception(
+                'getcredentialserror',
+                'accredible',
+                'https://help.accredible.com/hc/en-us',
+                $exceptionparam
+            );
         }
     }
 
@@ -170,7 +210,8 @@ class credentials {
      * @param string $email
      * @return array[stdClass] || false
      */
-    public function check_for_existing_credential($groupid, $email) {
+    public function check_for_existing_credential($groupid, $email)
+    {
         global $CFG;
         try {
             $credentials = $this->apirest->get_credentials($groupid, $email);
@@ -199,7 +240,8 @@ class credentials {
      * @param stdObject $user
      * @return array[stdClass] || false
      */
-    public function check_for_existing_certificate($achievementid, $user) {
+    public function check_for_existing_certificate($achievementid, $user)
+    {
         global $DB;
         $existingcertificate = false;
         $certificates = $this->get_credentials($achievementid, $user->email);

@@ -25,11 +25,13 @@ namespace mod_accredible\local;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_attributemapping_test extends \advanced_testcase {
+class mod_accredible_attributemapping_test extends \advanced_testcase
+{
     /**
      * Setup testcase.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         $this->resetAfterTest();
     }
 
@@ -37,7 +39,8 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
      * Test whether it validates table property.
      * @covers  ::validate_table
      */
-    public function test_validate_table() {
+    public function test_validate_table()
+    {
         // When $table has an invalid value.
         $table = 'invalid';
         $accredibleattribute = 'grade';
@@ -64,7 +67,8 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
      * Test whether it validates field property.
      * @covers  ::validate_field
      */
-    public function test_validate_field() {
+    public function test_validate_field()
+    {
         // When $table is course and $field has an invalid value.
         $table = 'course';
         $field = 'incorrect_field';
@@ -98,7 +102,8 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
      * Test whether it validates id property.
      * @covers  ::validate_id
      */
-    public function test_validate_id() {
+    public function test_validate_id()
+    {
         // When $table is user_info_field and has no $id value.
         $table = 'user_info_field';
         $field = 'age';
@@ -146,7 +151,8 @@ class mod_accredible_attributemapping_test extends \advanced_testcase {
      * Test whether it returns an object with no null/empty values.
      * @covers  ::get_db_object
      */
-    public function test_get_db_object() {
+    public function test_get_db_object()
+    {
         // When $table has a valid value.
         $table = 'course';
         $field = 'fullname';

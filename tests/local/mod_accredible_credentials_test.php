@@ -29,7 +29,8 @@ use mod_accredible\local\credentials;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_credentials_test extends \advanced_testcase {
+class mod_accredible_credentials_test extends \advanced_testcase
+{
     /**
      * Mock API response data.
      * @var class $mockapi
@@ -53,7 +54,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
     /**
      * Setup before every test.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         $this->resetAfterTest();
 
         // Add plugin settings.
@@ -69,7 +71,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
              * @param string $jsonpath
              * @return array
              */
-            public function resdata($jsonpath) {
+            public function resdata($jsonpath)
+            {
                 global $CFG;
                 $fixturedir = $CFG->dirroot . '/mod/accredible/tests/fixtures/mockapi/v1/';
                 $filepath = $fixturedir . $jsonpath;
@@ -86,7 +89,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      * Create credential test
      * @covers ::create_credential
      */
-    public function test_create_credential() {
+    public function test_create_credential()
+    {
         // When the credential creation is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])
@@ -159,7 +163,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      * Create credential legacy test
      * @covers ::create_credential_legacy
      */
-    public function test_create_credential_legacy() {
+    public function test_create_credential_legacy()
+    {
         global $DB;
         // When the credential creation is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
@@ -208,8 +213,14 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         // Expect to return the created credential.
         $api = new apirest($mockclient1);
         $localcredentials = new credentials($api);
-        $result = $localcredentials->create_credential_legacy($this->user, "moodle-course",
-            "", null, $courselink, $completeddate);
+        $result = $localcredentials->create_credential_legacy(
+            $this->user,
+            "moodle-course",
+            "",
+            null,
+            $courselink,
+            $completeddate
+        );
         $this->assertEquals($result, $resdata->credential);
 
         // When the apirest returns an error response.
@@ -234,8 +245,14 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $foundexception = false;
 
         try {
-            $localcredentials->create_credential_legacy($this->user, "moodle-course",
-            "", null, $courselink, $completeddate);
+            $localcredentials->create_credential_legacy(
+                $this->user,
+                "moodle-course",
+                "",
+                null,
+                $courselink,
+                $completeddate
+            );
         } catch (\moodle_exception $error) {
             $foundexception = true;
         }
@@ -246,7 +263,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      * Get credentials test
      * @covers ::get_credentials
      */
-    public function test_get_credentials() {
+    public function test_get_credentials()
+    {
         // When the credential search is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
@@ -262,7 +280,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $callcount = 0;
         $mockclient1->expects($this->exactly(2))
             ->method('get')
-            ->willReturnCallback(function($arg1) use (&$callcount, $urlpage1, $urlpage2, $resdatapage1, $resdatapage2) {
+            ->willReturnCallback(function ($arg1) use (&$callcount, $urlpage1, $urlpage2, $resdatapage1, $resdatapage2) {
                 $callcount++;
                 if ($callcount === 1) {
                     $this->assertEquals($urlpage1, $arg1);
@@ -331,7 +349,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      * Check existing credential test
      * @covers ::check_for_existing_credential
      */
-    public function test_check_for_existing_credential() {
+    public function test_check_for_existing_credential()
+    {
         // When an existing credential exists for a group_id and user_email.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
@@ -405,7 +424,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      * Check existing certificate test
      * @covers ::check_for_existing_certificate
      */
-    public function test_check_for_existing_certificate() {
+    public function test_check_for_existing_certificate()
+    {
         // When an existing credential exists for a group_id and user_email.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])

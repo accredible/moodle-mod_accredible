@@ -27,11 +27,13 @@ use mod_accredible\client\client;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_client_test extends \advanced_testcase {
+class mod_accredible_client_test extends \advanced_testcase
+{
     /**
      * Setup before every test.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -43,7 +45,8 @@ class mod_accredible_client_test extends \advanced_testcase {
      * Tests whether it calls the curl get function.
      * @covers  ::get
      */
-    public function test_get() {
+    public function test_get()
+    {
         $url = 'https://api.accredible.com/v1/all_credentials';
         $options = [
             'CURLOPT_RETURNTRANSFER' => true,
@@ -62,9 +65,11 @@ class mod_accredible_client_test extends \advanced_testcase {
 
         $mockcurl->expects($this->once())
             ->method('get')
-            ->with($this->equalTo($url),
+            ->with(
+                $this->equalTo($url),
                 $this->equalTo(null),
-                $this->equalTo($options));
+                $this->equalTo($options)
+            );
 
         // Expect to call curl get.
         $client = new client($mockcurl);
@@ -75,7 +80,8 @@ class mod_accredible_client_test extends \advanced_testcase {
      * Tests whether it calls the curl post function.
      * @covers  ::post
      */
-    public function test_post() {
+    public function test_post()
+    {
         $url = 'https://api.accredible.com/v1/all_credentials';
         $options = [
             'CURLOPT_RETURNTRANSFER' => true,
@@ -95,9 +101,11 @@ class mod_accredible_client_test extends \advanced_testcase {
         $reqdata = '{"evidence_item":{"string_object":"100"}}';
         $mockcurl->expects($this->once())
             ->method('post')
-            ->with($this->equalTo($url),
+            ->with(
+                $this->equalTo($url),
                 $this->equalTo($reqdata),
-                $this->equalTo($options));
+                $this->equalTo($options)
+            );
 
         // Expect to call curl post.
         $client = new client($mockcurl);
@@ -108,7 +116,8 @@ class mod_accredible_client_test extends \advanced_testcase {
      * Tests whether it calls the curl put function.
      * @covers  ::put
      */
-    public function test_put() {
+    public function test_put()
+    {
         $url = 'https://api.accredible.com/v1/all_credentials';
         $options = [
             'CURLOPT_RETURNTRANSFER' => true,
@@ -128,9 +137,11 @@ class mod_accredible_client_test extends \advanced_testcase {
         $reqdata = '{"evidence_item":{"string_object":"100"}}';
         $mockcurl->expects($this->once())
             ->method('put')
-            ->with($this->equalTo($url),
+            ->with(
+                $this->equalTo($url),
                 $this->equalTo($reqdata),
-                $this->equalTo($options));
+                $this->equalTo($options)
+            );
 
         // Expect to call curl put.
         $client = new client($mockcurl);
@@ -141,7 +152,8 @@ class mod_accredible_client_test extends \advanced_testcase {
      * Tests whether it returns an error messages when the request fails.
      * @coversNothing
      */
-    public function test_error() {
+    public function test_error()
+    {
         $url = 'https://api.accredible.com/v1/all_credentials';
         $options = [
             'CURLOPT_RETURNTRANSFER' => true,
@@ -162,9 +174,11 @@ class mod_accredible_client_test extends \advanced_testcase {
 
         $mockcurl->expects($this->once())
             ->method('get')
-            ->with($this->equalTo($url),
+            ->with(
+                $this->equalTo($url),
                 $this->equalTo(null),
-                $this->equalTo($options));
+                $this->equalTo($options)
+            );
 
         // Expect to call debugging.
         $client = new client($mockcurl);
