@@ -82,15 +82,9 @@ class apirest {
         } else {
             $email = '';
         }
-        $result = $this->client->get(
+        return $this->client->get(
             "{$this->apiendpoint}all_credentials?group_id={$groupid}&email={$email}&page_size={$pagesize}&page={$page}"
         );
-
-        if ($this->client->error || (isset($result->success) && $result->success === false)) {
-            throw new \Exception($this->client->error ?? $result->data ?? 'Unknown error');
-        }
-
-        return $result;
     }
 
     /**
@@ -174,13 +168,7 @@ class apirest {
 
         $data = json_encode($data);
 
-        $result = $this->client->post("{$this->apiendpoint}credentials", $data);
-
-        if ($this->client->error || (isset($result->success) && $result->success === false)) {
-            throw new \Exception($this->client->error ?? $result->data ?? 'Unknown error');
-        }
-
-        return $result;
+        return $this->client->post("{$this->apiendpoint}credentials", $data);
     }
 
     /**
@@ -289,13 +277,7 @@ class apirest {
 
         $data = json_encode($data);
 
-        $result = $this->client->post("{$this->apiendpoint}credentials", $data);
-
-        if ($this->client->error || (isset($result->success) && $result->success === false)) {
-            throw new \Exception($this->client->error ?? $result->data ?? 'Unknown error');
-        }
-
-        return $result;
+        return $this->client->post("{$this->apiendpoint}credentials", $data);
     }
 
     /**

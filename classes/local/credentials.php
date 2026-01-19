@@ -62,6 +62,10 @@ class credentials {
             $credential = $this->apirest->create_credential(fullname($user), $user->email, $groupid, $issuedon,
                 null, $customattributes);
 
+            if (isset($credential->success) && $credential->success === false) {
+                throw new \Exception($credential->data ?? 'Unknown error');
+            }
+
             return $credential->credential;
         } catch (\Exception $e) {
             // Throw API exception.
@@ -90,6 +94,10 @@ class credentials {
         try {
             $credential = $this->apirest->create_credential_legacy(fullname($user),
                 $user->email, $achievementname, $issuedon, null, $coursename, $coursedescription, $courselink, $customattributes);
+
+            if (isset($credential->success) && $credential->success === false) {
+                throw new \Exception($credential->data ?? 'Unknown error');
+            }
 
             return $credential->credential;
         } catch (\Exception $e) {
@@ -122,6 +130,11 @@ class credentials {
             // Query the Accredible API and loop until it returns that there is no next page.
             while ($loop === true) {
                 $credentialspage = $this->apirest->get_credentials($groupid, $email, $pagesize, $page);
+
+                if (isset($credentialspage->success) && $credentialspage->success === false) {
+                    throw new \Exception($credentialspage->data ?? 'Unknown error');
+                }
+
                 foreach ($credentialspage->credentials as $credential) {
                     $credentials[] = $credential;
                 }
@@ -161,6 +174,10 @@ class credentials {
         global $CFG;
         try {
             $credentials = $this->apirest->get_credentials($groupid, $email);
+
+            if (isset($credentials->success) && $credentials->success === false) {
+                throw new \Exception($credentials->data ?? 'Unknown error');
+            }
 
             if ($credentials->credentials && $credentials->credentials[0]) {
                 return $credentials->credentials[0];
