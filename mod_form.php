@@ -43,15 +43,14 @@ use mod_accredible\local\formhelper;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_mod_form extends moodleform_mod
-{
+class mod_accredible_mod_form extends moodleform_mod {
+
     /**
      * Called to define this moodle form
      *
      * @return void
      */
-    public function definition()
-    {
+    public function definition() {
         global $DB, $COURSE, $CFG, $PAGE, $OUTPUT;
 
         $credentialsclient = new credentials();
@@ -425,8 +424,7 @@ class mod_accredible_mod_form extends moodleform_mod
      * @param  stdClass $data passed by reference
      * @return void
      */
-    public function data_postprocessing($data)
-    {
+    public function data_postprocessing($data) {
         parent::data_postprocessing($data);
         $submitteddata = $this->_form->getSubmitValues();
 
@@ -448,8 +446,7 @@ class mod_accredible_mod_form extends moodleform_mod
      * @param string          $fieldname     The specific field within the mapping to set.
      * @param int             $num           The index of the field in case of multiple fields with the same name.
      */
-    private function set_mapping_field_default($mform, $defaultvalues, $mappingname, $fieldname, $num = 0)
-    {
+    private function set_mapping_field_default($mform, $defaultvalues, $mappingname, $fieldname, $num = 0) {
         $value = '';
         if (isset($defaultvalues[$mappingname][$num][$fieldname])) {
             $value = $defaultvalues[$mappingname][$num][$fieldname];
