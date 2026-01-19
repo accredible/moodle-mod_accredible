@@ -34,7 +34,10 @@ use core_privacy\local\request\userlist;
 /**
  * Ad hoc task that performs the actions for approved data privacy requests.
  */
-class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\core_userlist_provider, \core_privacy\local\request\plugin\provider {
+class provider implements
+        \core_privacy\local\metadata\provider,
+        \core_privacy\local\request\core_userlist_provider,
+        \core_privacy\local\request\plugin\provider {
     /**
      * Returns meta data about this system.
      *
