@@ -330,7 +330,7 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * @param int $userid
      * @param date $timestart
      * @return int
-    */
+     */
     private function create_user_enrolment($enrolid, $userid, $timestart): int {
         global $DB;
         $data = ["enrolid" => $enrolid, "userid" => $userid, "modifierid" => $userid, "timestart" => $timestart];
@@ -412,7 +412,7 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * @param int $grade
      * @return int
      */
-    private function create_quiz_grades($quizid, $userid, $grade): int   {
+    private function create_quiz_grades($quizid, $userid, $grade): int {
         global $DB;
         $quizgrade = ["quiz" => $quizid, "userid" => $userid, "grade" => $grade];
         return $DB->insert_record('quiz_grades', $quizgrade);

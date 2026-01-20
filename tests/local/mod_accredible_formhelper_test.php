@@ -404,7 +404,7 @@ class mod_accredible_formhelper_test extends \advanced_testcase {
      * @param mixed $attributekeysmock The mock instance of the attribute_keys class.
      * @return formhelper The formhelper class instance extended with a mock attribute_keys client.
      */
-private function create_formhelper_with_mock(mixed $attributekeysmock): formhelper {
+    private function create_formhelper_with_mock(mixed $attributekeysmock): formhelper {
         // Use an anonymous class to extend formhelper and inject the mock.
         return new class ($attributekeysmock) extends formhelper {
             /**
