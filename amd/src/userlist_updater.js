@@ -146,6 +146,7 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification'], function(
          * @param {Object} context - data for template.
          * @param {string} containerid - id of the html element where the template will get append.
          * @param {string|null} certificate - certificate url to select correct template.
+         * @returns {Promise} Resolves when template is rendered.
          */
         renderUser: function(context, containerid, certificate) {
             var template = certificate ? 'core_form/element-static' : 'core_form/element-advcheckbox';
