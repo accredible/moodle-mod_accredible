@@ -83,7 +83,7 @@ class mod_accredible_locallib_test extends \advanced_testcase {
      *
      * @covers ::accredible_get_transcript
      */
-    public function test_accredible_get_transcript() {
+    public function test_accredible_get_transcript(): void {
         global $DB;
 
         // When no quiz available for user.
@@ -172,7 +172,7 @@ class mod_accredible_locallib_test extends \advanced_testcase {
      *
      * @covers ::accredible_get_transcript
      */
-    public function test_accredible_check_if_cert_earned() {
+    public function test_accredible_check_if_cert_earned(): void {
         global $DB;
         $user = [
             'id'    => $this->user->id,
@@ -220,7 +220,7 @@ class mod_accredible_locallib_test extends \advanced_testcase {
      * @param int $courseid
      * @param int $finalquizid
      */
-    private function create_accredible_instance($courseid, $finalquizid = 0) {
+    private function create_accredible_instance($courseid, $finalquizid = 0): mixed {
         global $DB;
         $dbrecord = [
             "name"                 => 'Accredible Test',
@@ -241,7 +241,7 @@ class mod_accredible_locallib_test extends \advanced_testcase {
      *
      * @param int $courseid
      */
-    private function create_quiz_module($courseid) {
+    private function create_quiz_module($courseid): mixed {
         $quiz = ["course" => $courseid, "grade" => 10];
         return $this->getDataGenerator()->create_module('quiz', $quiz);
     }
@@ -253,7 +253,7 @@ class mod_accredible_locallib_test extends \advanced_testcase {
      * @param int $userid
      * @param int $grade
      */
-    private function create_quiz_grades($quizid, $userid, $grade) {
+    private function create_quiz_grades($quizid, $userid, $grade): void {
         global $DB;
         $quizgrade = ["quiz" => $quizid, "userid" => $userid, "grade" => $grade];
         $DB->insert_record('quiz_grades', $quizgrade);

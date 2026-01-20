@@ -87,7 +87,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      * Create credential test
      * @covers ::create_credential
      */
-    public function test_create_credential() {
+    public function test_create_credential(): void {
         // When the credential creation is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])
@@ -160,7 +160,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      * Create credential legacy test
      * @covers ::create_credential_legacy
      */
-    public function test_create_credential_legacy() {
+    public function test_create_credential_legacy(): void {
         global $DB;
         // When the credential creation is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
@@ -259,7 +259,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      * Get credentials test
      * @covers ::get_credentials
      */
-    public function test_get_credentials() {
+    public function test_get_credentials(): void {
         // When the credential search is successful.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
@@ -344,7 +344,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      * Check existing credential test
      * @covers ::check_for_existing_credential
      */
-    public function test_check_for_existing_credential() {
+    public function test_check_for_existing_credential(): void {
         // When an existing credential exists for a group_id and user_email.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
@@ -418,7 +418,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      * Check existing certificate test
      * @covers ::check_for_existing_certificate
      */
-    public function test_check_for_existing_certificate() {
+    public function test_check_for_existing_certificate(): void {
         // When an existing credential exists for a group_id and user_email.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])

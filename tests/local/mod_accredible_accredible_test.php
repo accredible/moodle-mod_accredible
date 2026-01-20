@@ -45,7 +45,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
      * Test save_record method.
      * @covers ::save_record
      */
-    public function test_save_record() {
+    public function test_save_record(): void {
         global $DB;
 
         // When creating a new record.
@@ -187,7 +187,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
      * Test load_credential_custom_attributes method.
      * @covers ::load_credential_custom_attributes
      */
-    public function test_load_credential_custom_attributes() {
+    public function test_load_credential_custom_attributes(): void {
         global $DB;
 
         $course = $this->getDataGenerator()->create_course(

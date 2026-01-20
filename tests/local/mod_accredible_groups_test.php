@@ -69,7 +69,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
      * Test whether it returns groups
      * @covers ::get_groups
      */
-    public function test_get_groups() {
+    public function test_get_groups(): void {
         // When the apirest returns groups.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['get'])
@@ -161,7 +161,7 @@ class mod_accredible_groups_test extends \advanced_testcase {
      * Test whether it returns group name arrays
      * @covers ::get_templates
      */
-    public function test_get_templates() {
+    public function test_get_templates(): void {
         // When the apirest returns groups.
         $mockclient1 = $this->getMockBuilder(client::class)
             ->onlyMethods(['post'])
