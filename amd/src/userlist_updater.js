@@ -38,7 +38,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             t.unissuedusers = $('#id_chooseunissuedusers');
             t.unissuedusersmessage = $('#fitem_id_unissueddescription');
             t.selectallbutton = $('#fitem_id_nosubmit_checkbox_controller1, #fitem_id_nosubmit_checkbox_controller2');
-            
+
             if (t.lastSelectedGroup === '') {
                 t.userwarning.removeClass('hidden');
                 t.manualuserscontainer.addClass('hidden');
@@ -61,7 +61,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             } else {
                 Ajax.call([{
                     methodname: 'mod_accredible_reload_users',
-                    args: { courseid: t.courseid, groupid: $('select#id_groupid').val(), instanceid: t.instanceid}
+                    args: {courseid: t.courseid, groupid: $('select#id_groupid').val(), instanceid: t.instanceid}
                 }])[0].done(t.updateUsers);
 
                 t.userwarning.addClass('hidden');
@@ -98,7 +98,8 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                 if (user.credential_url) {
                     context = {
                         element: {
-                            html: 'Certificate ' + user.credential_id + ' - <a href='+ user.credential_url +' target="_blank">link</a>',
+                            html: 'Certificate ' + user.credential_id + ' - <a href=' + user.credential_url +
+                                ' target="_blank">link</a>',
                             staticlabel: true
                         },
                         label: user.name + '   ' + user.email
@@ -107,7 +108,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                     context = {
                         element: {
                             id: 'id_users_' + user.id,
-                            name: 'users['+ user.id +']',
+                            name: 'users[' + user.id + ']',
                             extraclasses: 'checkboxgroup1',
                             selectedvalue: 1
                         },
@@ -124,7 +125,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                     context = {
                         element: {
                             id: 'id_unissuedusers_' + user.id,
-                            name: 'unissuedusers['+ user.id +']',
+                            name: 'unissuedusers[' + user.id + ']',
                             extraclasses: 'checkboxgroup2',
                             selectedvalue: 1
                         },
@@ -132,24 +133,24 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                     };
 
                     t.renderUser(context, '#unissued-users-container', null);
-                });    
+                });
             } else {
                 t.unissuedusers.hide().addClass('collapsed');
             }
-            
+
         },
 
         /**
          * Render the template with the user context.
          *
-         * @param stdObject context - data for template.
-         * @param string containerid - id of the html element where the template will get append.
-         * @param string certificate - certificate url to select correct template.
+         * @param {Object} context - data for template.
+         * @param {string} containerid - id of the html element where the template will get append.
+         * @param {string|null} certificate - certificate url to select correct template.
          */
         renderUser: function(context, containerid, certificate) {
           var template = certificate ? 'core_form/element-static' : 'core_form/element-advcheckbox';
-          
-          Templates.renderForPromise(template, context).then(function (_ref) {
+
+          Templates.renderForPromise(template, context).then(function(_ref) {
             Templates.appendNodeContents(containerid, _ref.html, _ref.js);
           });
         }
