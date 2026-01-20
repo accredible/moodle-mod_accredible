@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
+define(['jquery', 'core/ajax', 'core/templates', 'core/notification'], function($, Ajax, Templates, Notification) {
     const element = {
         mappingSelects: '[id*="mapping_line"] select',
         addButton: '[id*="_add_new_line"]',
@@ -207,9 +207,10 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
         },
 
         renderMappingLine: function(context, containerid) {
-            Templates.renderForPromise('mod_accredible/mapping_line', context).then(function(_ref) {
-              Templates.appendNodeContents(containerid, _ref.html, _ref.js);
-            });
+            return Templates.renderForPromise('mod_accredible/mapping_line', context).then(function(_ref) {
+                Templates.appendNodeContents(containerid, _ref.html, _ref.js);
+                return true;
+            }).catch(Notification.exception);
         },
     };
     return mappings;

@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
+define(['jquery', 'core/ajax', 'core/templates', 'core/notification'], function($, Ajax, Templates, Notification) {
     var t = {
         /**
          * Initialise the handling.
@@ -148,11 +148,12 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
          * @param {string|null} certificate - certificate url to select correct template.
          */
         renderUser: function(context, containerid, certificate) {
-          var template = certificate ? 'core_form/element-static' : 'core_form/element-advcheckbox';
+            var template = certificate ? 'core_form/element-static' : 'core_form/element-advcheckbox';
 
-          Templates.renderForPromise(template, context).then(function(_ref) {
-            Templates.appendNodeContents(containerid, _ref.html, _ref.js);
-          });
+            return Templates.renderForPromise(template, context).then(function(_ref) {
+                Templates.appendNodeContents(containerid, _ref.html, _ref.js);
+                return true;
+            }).catch(Notification.exception);
         }
     };
     return t;
