@@ -31,6 +31,8 @@ use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\userlist;
 
+// phpcs:disable Universal.OOStructures.AlphabeticExtendsImplements.ImplementsWrongOrder
+
 /**
  * Ad hoc task that performs the actions for approved data privacy requests.
  */
@@ -109,3 +111,5 @@ class provider implements
     public static function delete_data_for_users(approved_userlist $userlist) {
     }
 }
+
+// phpcs:enable Universal.OOStructures.AlphabeticExtendsImplements.ImplementsWrongOrder
