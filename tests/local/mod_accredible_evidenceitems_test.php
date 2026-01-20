@@ -391,7 +391,7 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
                       "minfraction"     => 1,
                       "maxfraction"     => 1,
                       "timemodified"    => time(), ];
-        $DB->insert_record('question_attempts', $data);
+        return $DB->insert_record('question_attempts', $data);
     }
 
     /**
