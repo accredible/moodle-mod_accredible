@@ -206,6 +206,13 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification'], function(
             });
         },
 
+        /**
+         * Render a mapping line template.
+         *
+         * @param {Object} context - data for template.
+         * @param {string} containerid - id of the html element where the template will be appended.
+         * @returns {Promise} Resolves when template is rendered.
+         */
         renderMappingLine: function(context, containerid) {
             return Templates.renderForPromise('mod_accredible/mapping_line', context).then(function(_ref) {
                 Templates.appendNodeContents(containerid, _ref.html, _ref.js);
