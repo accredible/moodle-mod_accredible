@@ -240,7 +240,7 @@ final class mod_accredible_locallib_test extends \advanced_testcase {
     /**
      * Create quiz module test
      *
-     * @param int $courseid 
+     * @param int $courseid
      * @return \stdClass quiz module
      */
     private function create_quiz_module($courseid): \stdClass {
