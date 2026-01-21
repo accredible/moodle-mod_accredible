@@ -53,8 +53,11 @@ class Html2Text {
         }
 
         $html = static::fix_new_lines($html);
+
+        // Ensure proper UTF-8 handling for DOMDocument across PHP versions.
         if (mb_detect_encoding($html, "UTF-8", true)) {
-            $html = mb_convert_encoding($html, "HTML-ENTITIES", "UTF-8");
+            // Prepend XML encoding declaration to ensure DOMDocument handles UTF-8 correctly.
+            $html = '<?xml encoding="UTF-8">' . $html;
         }
 
         $doc = static::get_document($html, $ignoreerror);
