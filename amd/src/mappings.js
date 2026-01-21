@@ -41,7 +41,7 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification'], function(
         listenToAddAction: function() {
             const addButton = $(element.addButton);
             addButton.on('click', mappings.addNewLine);
-            // Enable/disable add button after max attributes added
+            // Enable/disable add button after max attributes added.
             addButton.each((_, element) => {
                 const section = $(element).attr("data-section");
                 mappings.toggleAddButton(section);
