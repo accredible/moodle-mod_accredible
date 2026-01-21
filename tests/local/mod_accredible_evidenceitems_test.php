@@ -315,7 +315,7 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * Create enrolment test
      *
      * @param int $courseid
-     * @return int
+     * @return int enrolment id
      */
     private function create_enrolment($courseid): int {
         global $DB;
@@ -329,7 +329,7 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * @param int $enrolid
      * @param int $userid
      * @param date $timestart
-     * @return int
+     * @return int user enrolment id
      */
     private function create_user_enrolment($enrolid, $userid, $timestart): int {
         global $DB;
@@ -342,6 +342,7 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
      *
      * @param int $courseid
      * @param int $userid
+     * @return \stdClass quiz module
      */
     private function create_quiz_module($courseid, $userid = null): \stdClass {
         $quiz = ["course" => $courseid, "grade" => 10];
@@ -357,7 +358,7 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * @param int $quizid
      * @param int $userid
      * @param int $questionusageid
-     * @return int
+     * @return int quiz attempt id
      */
     private function create_quiz_attempt($quizid, $userid, $questionusageid): int {
         global $DB;
@@ -377,7 +378,7 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * @param int $userid
      * @param int $questionusageid
      * @param int $questionid
-     * @return int
+     * @return int question attempt id
      */
     private function create_question_attempt($quizid, $userid, $questionusageid, $questionid): int {
         global $DB;
@@ -396,7 +397,7 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
 
     /**
      * Create question usage
-     * @return int
+     * @return int question usage id
      */
     private function create_question_usage(): int {
         global $DB;
@@ -407,10 +408,10 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
     /**
      * Create quiz grades test
      *
-     * @param int $quizid
-     * @param int $userid
-     * @param int $grade
-     * @return int
+     * @param int $quizid quiz id
+     * @param int $userid user id
+     * @param int $grade grade
+     * @return int quiz grade id
      */
     private function create_quiz_grades($quizid, $userid, $grade): int {
         global $DB;

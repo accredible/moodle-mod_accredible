@@ -359,6 +359,7 @@ final class mod_accredible_users_test extends \advanced_testcase {
      * @param int $includegradeattribute
      * @param int $gradeattributegradeitemid
      * @param string $gradeattributekeyname
+     * @return int accredible instance id
      */
     private function create_accredible_instance(
         $courseid,
@@ -366,7 +367,7 @@ final class mod_accredible_users_test extends \advanced_testcase {
         $includegradeattribute = 0,
         $gradeattributegradeitemid = null,
         $gradeattributekeyname = null
-    ): mixed {
+    ): int {
 
         global $DB;
         $dbrecord = [
@@ -393,7 +394,7 @@ final class mod_accredible_users_test extends \advanced_testcase {
      * @param string $itemmodule
      * @param int $iteminstance
      */
-    private function create_grade_item($courseid, $itemname, $itemmodule, $iteminstance): mixed {
+    private function create_grade_item($courseid, $itemname, $itemmodule, $iteminstance): int {
         global $DB;
         $gradeitem = [
             "courseid" => $courseid,
@@ -411,7 +412,7 @@ final class mod_accredible_users_test extends \advanced_testcase {
      *
      * @param int $courseid
      */
-    private function create_quiz_module($courseid): mixed {
+    private function create_quiz_module($courseid): \stdClass {
         $quiz = ["course" => $courseid, "grade" => 10];
         return $this->getDataGenerator()->create_module('quiz', $quiz);
     }

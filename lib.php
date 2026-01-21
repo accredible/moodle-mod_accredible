@@ -313,7 +313,7 @@ function accredible_delete_instance($id) {
  *
  * @uses FEATURE_MOD_INTRO
  * @param string $feature FEATURE_xx constant for requested feature
- * @return mixed True if module supports feature, null if doesn't know
+ * @return bool|null True if module supports feature, null if doesn't know
  */
 function accredible_supports($feature) {
     switch ($feature) {

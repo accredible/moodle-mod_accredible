@@ -107,7 +107,7 @@ class client {
      * @param string $url
      * @param string $method
      * @param string $reqdata a JSON encoded string
-     * @return mixed
+     * @return \stdClass|null
      */
     private function send_req($url, $method, $reqdata = null) {
         $curl = $this->curl;

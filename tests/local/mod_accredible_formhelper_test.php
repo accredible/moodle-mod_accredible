@@ -363,7 +363,7 @@ final class mod_accredible_formhelper_test extends \advanced_testcase {
      * @param int $courseid
      * @param string $name
      */
-    private function create_quiz_module($courseid, $name): mixed {
+    private function create_quiz_module($courseid, $name): int {
         global $DB;
 
         return $DB->insert_record(
@@ -385,7 +385,7 @@ final class mod_accredible_formhelper_test extends \advanced_testcase {
      * @param string $itemmodule
      * @param int $iteminstance
      */
-    private function create_grade_item($courseid, $itemname, $itemmodule, $iteminstance): mixed {
+    private function create_grade_item($courseid, $itemname, $itemmodule, $iteminstance): int {
         global $DB;
         $gradeitem = [
             "courseid" => $courseid,
@@ -401,15 +401,15 @@ final class mod_accredible_formhelper_test extends \advanced_testcase {
     /**
      * Helper method to create an instance of formhelper with a mock attribute_keys class.
      *
-     * @param mixed $attributekeysmock The mock instance of the attribute_keys class.
+     * @param object $attributekeysmock The mock instance of the attribute_keys class.
      * @return formhelper The formhelper class instance extended with a mock attribute_keys client.
      */
-    private function create_formhelper_with_mock(mixed $attributekeysmock): formhelper {
+    private function create_formhelper_with_mock($attributekeysmock): formhelper {
         // Use an anonymous class to extend formhelper and inject the mock.
         return new class ($attributekeysmock) extends formhelper {
             /**
              * Mock instance of the attribute_keys client.
-             * @var mixed $mockclient
+             * @var object $mockclient
              */
             public $mockclient;
 
@@ -418,9 +418,9 @@ final class mod_accredible_formhelper_test extends \advanced_testcase {
              *
              * Initializes the anonymous class with the mock client.
              *
-             * @param mixed $mockclient The mock instance of the attribute_keys client.
+             * @param object $mockclient The mock instance of the attribute_keys client.
              */
-            public function __construct(mixed $mockclient) {
+            public function __construct($mockclient) {
                 $this->mockclient = $mockclient;
             }
 
@@ -429,7 +429,7 @@ final class mod_accredible_formhelper_test extends \advanced_testcase {
              *
              * @return $mockclient The mock instance of the attribute_keys client.
              */
-            public function get_attribute_keys_client(): mixed {
+            public function get_attribute_keys_client() {
                 return $this->mockclient;
             }
         };

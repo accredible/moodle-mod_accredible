@@ -219,8 +219,9 @@ final class mod_accredible_locallib_test extends \advanced_testcase {
      *
      * @param int $courseid
      * @param int $finalquizid
+     * @return \stdClass accredible instance
      */
-    private function create_accredible_instance($courseid, $finalquizid = 0): mixed {
+    private function create_accredible_instance($courseid, $finalquizid = 0): \stdClass {
         global $DB;
         $dbrecord = [
             "name"                 => 'Accredible Test',
@@ -239,9 +240,10 @@ final class mod_accredible_locallib_test extends \advanced_testcase {
     /**
      * Create quiz module test
      *
-     * @param int $courseid
+     * @param int $courseid 
+     * @return \stdClass quiz module
      */
-    private function create_quiz_module($courseid): mixed {
+    private function create_quiz_module($courseid): \stdClass {
         $quiz = ["course" => $courseid, "grade" => 10];
         return $this->getDataGenerator()->create_module('quiz', $quiz);
     }
