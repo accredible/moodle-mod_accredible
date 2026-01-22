@@ -155,7 +155,7 @@ jobs:
         run: moodle-plugin-ci mustache
 
       - name: Grunt
-        continue-on-error: true
+        continue-on-error: true # Remove when Moodle3.11 support is dropped
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci grunt --max-lint-warnings 0
 
