@@ -61,6 +61,11 @@ class attribute_keys {
             // Query the Accredible API and loop until it returns that there is no next page.
             for ($i = 0; $i <= 100; $i++) {
                 $response = $this->apirest->search_attribute_keys($pagesize, $page, $kind);
+
+                if (isset($response->success) && $response->success === false) {
+                    throw new \Exception($response->data ?? 'Unknown error');
+                }
+
                 foreach ($response->attribute_keys as $attributekey) {
                     $attributekeys[$attributekey->name] = $attributekey->name;
                 }

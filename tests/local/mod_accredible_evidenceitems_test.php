@@ -81,8 +81,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
      */
     public function test_post_evidence() {
         // When the throw_error is FALSE and the response is successful.
-        $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+        $mockclient1 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -112,7 +112,7 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
 
         // When the throw_error is FALSE and the response is NOT successful.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
         $mockclient2->error = 'The requested URL returned error: 401 Unauthorized';
 
@@ -133,7 +133,7 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
 
         // When the throw_error is TRUE and the response is NOT successful.
         $mockclient3 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
         $mockclient3->error = 'The requested URL returned error: 401 Unauthorized';
 
@@ -199,8 +199,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
         $this->create_question_attempt($quiz->id, $this->user->id, $questionusageid, $question->id);
         $this->create_quiz_attempt($quiz->id, $this->user->id, $questionusageid);
 
-        $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+        $mockclient1 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -267,8 +267,8 @@ class mod_accredible_evidenceitems_test extends \advanced_testcase {
         $enrolid = $this->create_enrolment(1);
         $this->create_user_enrolment($enrolid, $user->id, strtotime('2022-04-15'));
 
-        $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+        $mockclient1 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.

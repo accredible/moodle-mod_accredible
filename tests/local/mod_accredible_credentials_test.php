@@ -88,8 +88,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      */
     public function test_create_credential() {
         // When the credential creation is successful.
-        $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+        $mockclient1 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -128,7 +128,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
 
         // When the apirest returns an error response.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -149,7 +149,6 @@ class mod_accredible_credentials_test extends \advanced_testcase {
 
         try {
             $localcredentials->create_credential($this->user, $mockgroupid);
-            $this->assertEquals($result, $resdata->credential);
         } catch (\moodle_exception $error) {
             $foundexception = true;
         }
@@ -163,8 +162,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
     public function test_create_credential_legacy() {
         global $DB;
         // When the credential creation is successful.
-        $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+        $mockclient1 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -215,7 +214,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
 
         // When the apirest returns an error response.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -237,7 +236,6 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         try {
             $localcredentials->create_credential_legacy($this->user, "moodle-course",
             "", null, $courselink, $completeddate);
-            $this->assertEquals($result, $resdata->credential);
         } catch (\moodle_exception $error) {
             $foundexception = true;
         }
@@ -250,8 +248,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      */
     public function test_get_credentials() {
         // When the credential search is successful.
-        $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+        $mockclient1 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -261,10 +259,19 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         // Expect to call the endpoint once with page and page_size.
         $urlpage1 = "https://api.accredible.com/v1/all_credentials?group_id=9549&email=&page_size=50&page=1";
         $urlpage2 = "https://api.accredible.com/v1/all_credentials?group_id=9549&email=&page_size=50&page=2";
+        $callcount = 0;
         $mockclient1->expects($this->exactly(2))
             ->method('get')
-            ->withConsecutive([$this->equalTo($urlpage1)], [$this->equalTo($urlpage2)])
-            ->will($this->onConsecutiveCalls($resdatapage1, $resdatapage2));
+            ->willReturnCallback(function($arg1) use (&$callcount, $urlpage1, $urlpage2, $resdatapage1, $resdatapage2) {
+                $callcount++;
+                if ($callcount === 1) {
+                    $this->assertEquals($urlpage1, $arg1);
+                    return $resdatapage1;
+                } else {
+                    $this->assertEquals($urlpage2, $arg1);
+                    return $resdatapage2;
+                }
+            });
 
         // Expect to return all credentials of the group_id in the param.
         $api = new apirest($mockclient1);
@@ -274,8 +281,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertEquals($result, $resdatapage12);
 
         // When apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+        $mockclient2 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -300,8 +307,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertTrue($foundexception);
 
         // When the credential search returns no credentials.
-        $mockclient3 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+        $mockclient3 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -326,8 +333,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      */
     public function test_check_for_existing_credential() {
         // When an existing credential exists for a group_id and user_email.
-        $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+        $mockclient1 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -349,7 +356,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
 
         // When apirest returns an error response.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -374,8 +381,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertTrue($foundexception);
 
         // When there is no credential for the group_id.
-        $mockclient3 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+        $mockclient3 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -400,8 +407,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
      */
     public function test_check_for_existing_certificate() {
         // When an existing credential exists for a group_id and user_email.
-        $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+        $mockclient1 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -426,7 +433,7 @@ class mod_accredible_credentials_test extends \advanced_testcase {
 
         // When apirest returns an error response.
         $mockclient2 = $this->getMockBuilder(client::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -451,8 +458,8 @@ class mod_accredible_credentials_test extends \advanced_testcase {
         $this->assertTrue($foundexception);
 
         // When no credential exists for the group_id and user_id.
-        $mockclient3 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+        $mockclient3 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.

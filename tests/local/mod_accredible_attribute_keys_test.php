@@ -17,6 +17,7 @@
 namespace mod_accredible\local;
 
 use mod_accredible\apirest\apirest;
+use mod_accredible\client\client;
 
 /**
  * Unit tests for mod/accredible/classes/local/attribute_keys.php
@@ -67,8 +68,8 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
      */
     public function test_get_attribute_keys() {
         // When the apirest returns attribute keys.
-        $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+        $mockclient1 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -81,10 +82,21 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
         $reqdata1 = json_encode(['page' => 1, 'page_size' => 50, 'kind' => 'text']);
         $reqdata2 = json_encode(['page' => 2, 'page_size' => 50, 'kind' => 'text']);
 
+        $callcount = 0;
         $mockclient1->expects($this->exactly(2))
             ->method('post')
-            ->withConsecutive([$this->equalTo($url), $this->equalTo($reqdata1)], [$this->equalTo($url), $this->equalTo($reqdata2)])
-            ->will($this->onConsecutiveCalls($resdata1, $resdata2));
+            ->willReturnCallback(function($arg1, $arg2) use (&$callcount, $url, $reqdata1, $reqdata2, $resdata1, $resdata2) {
+                $callcount++;
+                if ($callcount === 1) {
+                    $this->assertEquals($url, $arg1);
+                    $this->assertEquals($reqdata1, $arg2);
+                    return $resdata1;
+                } else {
+                    $this->assertEquals($url, $arg1);
+                    $this->assertEquals($reqdata2, $arg2);
+                    return $resdata2;
+                }
+            });
 
         // Expect to return attribute keys.
         $api = new apirest($mockclient1);
@@ -98,8 +110,8 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
         ]);
 
         // When the apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+        $mockclient2 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -124,8 +136,8 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
         $this->assertTrue($foundexception);
 
         // When the apirest returns no attribute keys.
-        $mockclient3 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+        $mockclient3 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['post'])
             ->getMock();
 
         // Mock API response data.
@@ -145,17 +157,28 @@ class mod_accredible_attribute_keys_test extends \advanced_testcase {
         $this->assertEquals($result, []);
 
         // When apirest returns attribute keys for the given kind.
-        $mockclient4 = $this->getMockBuilder('client')
-            ->setMethods(['post'])
+        $mockclient4 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['post'])
             ->getMock();
 
         $reqdata1 = json_encode(['page' => 1, 'page_size' => 50, 'kind' => 'date']);
         $reqdata2 = json_encode(['page' => 2, 'page_size' => 50, 'kind' => 'date']);
 
+        $callcount = 0;
         $mockclient4->expects($this->exactly(2))
             ->method('post')
-            ->withConsecutive([$this->equalTo($url), $this->equalTo($reqdata1)], [$this->equalTo($url), $this->equalTo($reqdata2)])
-            ->will($this->onConsecutiveCalls($resdata1, $resdata2));
+            ->willReturnCallback(function($arg1, $arg2) use (&$callcount, $url, $reqdata1, $reqdata2, $resdata1, $resdata2) {
+                $callcount++;
+                if ($callcount === 1) {
+                    $this->assertEquals($url, $arg1);
+                    $this->assertEquals($reqdata1, $arg2);
+                    return $resdata1;
+                } else {
+                    $this->assertEquals($url, $arg1);
+                    $this->assertEquals($reqdata2, $arg2);
+                    return $resdata2;
+                }
+            });
 
         // Expect to return attribute keys.
         $api = new apirest($mockclient4);

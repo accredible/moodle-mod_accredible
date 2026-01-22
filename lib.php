@@ -192,7 +192,6 @@ function accredible_update_instance($post) {
                         $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
                         $grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
                     }
-                    // TODO: testing.
                     $result = accredible_issue_default_certificate($user->id,
                         $existingrecord->id, fullname($user), $user->email,
                         $grade, $quiz->name, $completedtimestamp, $customattributes);

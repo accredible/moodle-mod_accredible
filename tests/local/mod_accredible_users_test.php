@@ -116,8 +116,8 @@ class mod_accredible_users_test extends \advanced_testcase {
                               'credential_id'  => 10250012];
         $expectedresponse = ['0' => $userrespone, '1' => $user2respone];
 
-        $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+        $mockclient1 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -127,10 +127,19 @@ class mod_accredible_users_test extends \advanced_testcase {
         // Expect to call the endpoint once with page and page_size.
         $urlpage1 = "https://api.accredible.com/v1/all_credentials?group_id=123&email=&page_size=50&page=1";
         $urlpage2 = "https://api.accredible.com/v1/all_credentials?group_id=123&email=&page_size=50&page=2";
+        $callcount = 0;
         $mockclient1->expects($this->exactly(2))
             ->method('get')
-            ->withConsecutive([$this->equalTo($urlpage1)], [$this->equalTo($urlpage2)])
-            ->will($this->onConsecutiveCalls($resdatapage1, $resdatapage2));
+            ->willReturnCallback(function($arg1) use (&$callcount, $urlpage1, $urlpage2, $resdatapage1, $resdatapage2) {
+                $callcount++;
+                if ($callcount === 1) {
+                    $this->assertEquals($urlpage1, $arg1);
+                    return $resdatapage1;
+                } else {
+                    $this->assertEquals($urlpage2, $arg1);
+                    return $resdatapage2;
+                }
+            });
 
         $api = new apirest($mockclient1);
         $userhelper = new users($api);
@@ -139,8 +148,8 @@ class mod_accredible_users_test extends \advanced_testcase {
         $this->assertEquals($result, $expectedresponse);
 
         // When apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+        $mockclient2 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.

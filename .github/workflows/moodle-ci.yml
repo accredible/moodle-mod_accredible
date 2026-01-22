@@ -1,4 +1,11 @@
 name: Moodle Plugin CI
+run-name: >-
+  ${{ github.event_name == 'workflow_dispatch'
+    && format('CI: PHP {0}, {1}, {2}',
+        inputs.custom_php_version || inputs.php_version,
+        inputs.custom_moodle_branch || inputs.moodle_branch,
+        inputs.database)
+    || 'Moodle Plugin CI' }}
 
 on:
   push:

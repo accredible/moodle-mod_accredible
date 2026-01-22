@@ -57,7 +57,7 @@ class mod_accredible_client_test extends \advanced_testcase {
 
         // Mock curl.
         $mockcurl = $this->getMockBuilder('curl')
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
 
         $mockcurl->expects($this->once())
@@ -89,7 +89,7 @@ class mod_accredible_client_test extends \advanced_testcase {
 
         // Mock curl.
         $mockcurl = $this->getMockBuilder('curl')
-            ->setMethods(['post'])
+            ->onlyMethods(['post'])
             ->getMock();
 
         $reqdata = '{"evidence_item":{"string_object":"100"}}';
@@ -122,7 +122,7 @@ class mod_accredible_client_test extends \advanced_testcase {
 
         // Mock curl.
         $mockcurl = $this->getMockBuilder('curl')
-            ->setMethods(['put'])
+            ->onlyMethods(['put'])
             ->getMock();
 
         $reqdata = '{"evidence_item":{"string_object":"100"}}';
@@ -156,7 +156,7 @@ class mod_accredible_client_test extends \advanced_testcase {
 
         // Mock curl.
         $mockcurl = $this->getMockBuilder('curl')
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMock();
         $mockcurl->error = $error;
 
