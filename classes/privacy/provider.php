@@ -24,19 +24,22 @@
  */
 
 namespace mod_accredible\privacy;
+
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\userlist;
+
+// phpcs:disable Universal.OOStructures.AlphabeticExtendsImplements.ImplementsWrongOrder
+
 /**
  * Ad hoc task that performs the actions for approved data privacy requests.
  */
 class provider implements
-  \core_privacy\local\metadata\provider,
-  \core_privacy\local\request\plugin\provider,
-  \core_privacy\local\request\core_userlist_provider {
-
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\request\plugin\provider {
     /**
      * Returns meta data about this system.
      *
@@ -45,11 +48,15 @@ class provider implements
      */
     public static function get_metadata(collection $collection): collection {
 
-        $collection->add_external_location_link('accredible', [
+        $collection->add_external_location_link(
+            'accredible',
+            [
             'email' => 'privacy:metadata:accredible:email',
             'fullname' => 'privacy:metadata:accredible:fullname',
             'quizgrade' => 'privacy:metadata:accredible:quizgrade',
-        ], 'privacy:metadata:accredible');
+            ],
+            'privacy:metadata:accredible'
+        );
 
         return $collection;
     }
@@ -57,7 +64,7 @@ class provider implements
     /**
      * Get the list of contexts that contain user information for the specified user.
      *
-     * @param int $userid The user to search.
+     * @param  int $userid The user to search.
      * @return contextlist $contextlist The list of contexts used in this plugin.
      */
     public static function get_contexts_for_userid(int $userid): contextlist {
@@ -104,3 +111,5 @@ class provider implements
     public static function delete_data_for_users(approved_userlist $userlist) {
     }
 }
+
+// phpcs:enable Universal.OOStructures.AlphabeticExtendsImplements.ImplementsWrongOrder

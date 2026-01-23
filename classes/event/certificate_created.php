@@ -26,7 +26,6 @@ namespace mod_accredible\event;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certificate_created extends \core\event\base {
-
     /**
      * Init function to assign variables
      */

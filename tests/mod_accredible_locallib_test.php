@@ -27,19 +27,22 @@ use mod_accredible\apirest\apirest;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_locallib_test extends \advanced_testcase {
+final class mod_accredible_locallib_test extends \advanced_testcase {
     /**
      * Mock API response data.
+     *
      * @var class $mockapi
      */
     protected $mockapi;
     /**
      * User.
+     *
      * @var \stdClass $user
      */
     protected $user;
     /**
      * Course.
+     *
      * @var \stdClass $course
      */
     protected $course;
@@ -47,6 +50,7 @@ class mod_accredible_locallib_test extends \advanced_testcase {
      * Setup before every test.
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         $this->user = $this->getDataGenerator()->create_user();
         $this->course = $this->getDataGenerator()->create_course();
@@ -61,7 +65,8 @@ class mod_accredible_locallib_test extends \advanced_testcase {
         $this->mockapi = new class {
             /**
              * Returns a mock API response based on the fixture json.
-             * @param string $jsonpath
+             *
+             * @param  string $jsonpath
              * @return array
              */
             public function resdata($jsonpath) {
@@ -75,9 +80,10 @@ class mod_accredible_locallib_test extends \advanced_testcase {
 
     /**
      * Get transcript test
+     *
      * @covers ::accredible_get_transcript
      */
-    public function test_accredible_get_transcript() {
+    public function test_accredible_get_transcript(): void {
         global $DB;
 
         // When no quiz available for user.
@@ -100,7 +106,7 @@ class mod_accredible_locallib_test extends \advanced_testcase {
 
         $transcriptitems = [["category" => $quiz1->name, "percent" => 100],
             ["category" => $quiz2->name, "percent" => 50],
-            ["category" => $quiz3->name, "percent" => 50]];
+            ["category" => $quiz3->name, "percent" => 50], ];
 
         $resdata = [
             "description" => "Course Transcript",
@@ -129,7 +135,7 @@ class mod_accredible_locallib_test extends \advanced_testcase {
         $result = accredible_get_transcript($this->course->id, $this->user->id, $quiz2->id);
 
         $transcriptitems = [["category" => $quiz1->name, "percent" => 100],
-            ["category" => $quiz3->name, "percent" => 50]];
+            ["category" => $quiz3->name, "percent" => 50], ];
 
         $resdata = [
             "description" => "Course Transcript",
@@ -163,9 +169,10 @@ class mod_accredible_locallib_test extends \advanced_testcase {
 
     /**
      * Check if cert earned by user test.
+     *
      * @covers ::accredible_get_transcript
      */
-    public function test_accredible_check_if_cert_earned() {
+    public function test_accredible_check_if_cert_earned(): void {
         global $DB;
         $user = [
             'id'    => $this->user->id,
@@ -212,8 +219,9 @@ class mod_accredible_locallib_test extends \advanced_testcase {
      *
      * @param int $courseid
      * @param int $finalquizid
+     * @return \stdClass accredible instance
      */
-    private function create_accredible_instance($courseid, $finalquizid = 0) {
+    private function create_accredible_instance($courseid, $finalquizid = 0): \stdClass {
         global $DB;
         $dbrecord = [
             "name"                 => 'Accredible Test',
@@ -233,8 +241,9 @@ class mod_accredible_locallib_test extends \advanced_testcase {
      * Create quiz module test
      *
      * @param int $courseid
+     * @return \stdClass quiz module
      */
-    private function create_quiz_module($courseid) {
+    private function create_quiz_module($courseid): \stdClass {
         $quiz = ["course" => $courseid, "grade" => 10];
         return $this->getDataGenerator()->create_module('quiz', $quiz);
     }
@@ -246,7 +255,7 @@ class mod_accredible_locallib_test extends \advanced_testcase {
      * @param int $userid
      * @param int $grade
      */
-    private function create_quiz_grades($quizid, $userid, $grade) {
+    private function create_quiz_grades($quizid, $userid, $grade): void {
         global $DB;
         $quizgrade = ["quiz" => $quizid, "userid" => $userid, "grade" => $grade];
         $DB->insert_record('quiz_grades', $quizgrade);

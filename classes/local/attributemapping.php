@@ -137,5 +137,4 @@ class attributemapping {
             throw new \InvalidArgumentException("Id is required for the '$table' table");
         }
     }
-
 }

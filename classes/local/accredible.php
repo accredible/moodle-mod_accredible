@@ -27,7 +27,6 @@ use mod_accredible\local\attributemapping;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class accredible {
-
     /**
      * Saves or updates an Accredible plugin instance record in the 'accredible' table.
      * This function handles both the creation of new records and the updating of existing ones.
@@ -303,7 +302,7 @@ class accredible {
             return null;
         }
 
-        $attributemappings = array_map(function($mapping) {
+        $attributemappings = array_map(function ($mapping) {
             return new attributemapping($mapping->table, $mapping->accredibleattribute, $mapping->field, $mapping->id);
         }, $mergedmappings);
 

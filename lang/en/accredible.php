@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// phpcs:disable moodle.Files.LangFilesOrdering.IncorrectOrder
+
 $string['achievementid'] = 'Achievement id / cohort name (must be unique)';
 $string['activityname'] = 'Activity name';
 $string['accrediblecustomattributename'] = "Choose an Accredible design attribute:";
@@ -100,3 +102,5 @@ $string['privacy:metadata:accredible:email'] = 'Your email address is sent to Ac
 $string['privacy:metadata:accredible:fullname'] = 'Your full name is sent to Accredible to issue a credential.';
 $string['privacy:metadata:accredible:quizgrade'] = 'Your quiz grade may be sent to Accredible to issue a credential.';
 $string['nouserswarning'] = 'You need to choose an Accredible group in order to see the list of users.';
+
+// phpcs:enable moodle.Files.LangFilesOrdering.IncorrectOrder

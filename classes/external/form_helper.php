@@ -85,8 +85,10 @@ class form_helper extends \external_api {
      * @return array of users.
      */
     public static function reload_users($courseid, $groupid, $instanceid = null) {
-        $params = self::validate_parameters(self::reload_users_parameters(),
-            ['courseid' => $courseid, 'groupid' => $groupid, 'instanceid' => $instanceid]);
+        $params = self::validate_parameters(
+            self::reload_users_parameters(),
+            ['courseid' => $courseid, 'groupid' => $groupid, 'instanceid' => $instanceid]
+        );
         $context = \context_course::instance($courseid);
         self::validate_context($context);
 

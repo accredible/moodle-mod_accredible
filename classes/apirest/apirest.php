@@ -106,8 +106,14 @@ class apirest {
      * @param string|null $redirectto
      * @return stdObject
      */
-    public function recipient_sso_link($credentialid = null, $recipientid = null,
-        $recipientemail = null, $walletview = null, $groupid = null, $redirectto = null) {
+    public function recipient_sso_link(
+        $credentialid = null,
+        $recipientid = null,
+        $recipientemail = null,
+        $walletview = null,
+        $groupid = null,
+        $redirectto = null
+    ) {
 
         if ($recipientemail) {
             $recipientemail = strtolower($recipientemail);
@@ -150,8 +156,14 @@ class apirest {
      * @param stdObject|null $customattributes
      * @return stdObject
      */
-    public function create_credential($recipientname, $recipientemail, $courseid,
-        $issuedon = null, $expiredon = null, $customattributes = null) {
+    public function create_credential(
+        $recipientname,
+        $recipientemail,
+        $courseid,
+        $issuedon = null,
+        $expiredon = null,
+        $customattributes = null
+    ) {
 
         $data = [
             "credential" => [
@@ -183,7 +195,11 @@ class apirest {
         $result = $this->client->post("{$this->apiendpoint}credentials/{$credentialid}/evidence_items", $data);
         if ($throwerror && $this->client->error) {
             throw new \moodle_exception(
-                'evidenceadderror', 'accredible', 'https://help.accredible.com/hc/en-us', $credentialid, $this->client->error
+                'evidenceadderror',
+                'accredible',
+                'https://help.accredible.com/hc/en-us',
+                $credentialid,
+                $this->client->error
             );
         }
         return $result;
@@ -202,12 +218,11 @@ class apirest {
         $durationinfo = [
             'start_date' => date("Y-m-d", $startdate),
             'end_date' => date("Y-m-d", $enddate),
-            'duration_in_days' => floor( ($enddate - $startdate) / 86400),
+            'duration_in_days' => floor(($enddate - $startdate) / 86400),
         ];
 
         // Multi day duration.
         if ($durationinfo['duration_in_days'] && $durationinfo['duration_in_days'] > 0) {
-
             $evidenceitem = [
                 "evidence_item" => [
                     "description" => 'Completed in ' . $durationinfo['duration_in_days'] . ' days',
@@ -236,7 +251,6 @@ class apirest {
             $result = $this->create_evidence_item($evidenceitem, $credentialid);
 
             return $result;
-
         } else {
             throw new \InvalidArgumentException("Enrollment duration must be greater than 0.");
         }
@@ -255,9 +269,17 @@ class apirest {
      * @param stdObject|null $customattributes
      * @return stdObject
      */
-    public function create_credential_legacy($recipientname, $recipientemail,
-        $achievementname, $issuedon = null, $expiredon = null, $coursename = null,
-        $coursedescription = null, $courselink = null, $customattributes = null) {
+    public function create_credential_legacy(
+        $recipientname,
+        $recipientemail,
+        $achievementname,
+        $issuedon = null,
+        $expiredon = null,
+        $coursename = null,
+        $coursedescription = null,
+        $courselink = null,
+        $customattributes = null
+    ) {
 
         $data = [
             "credential" => [
@@ -286,7 +308,7 @@ class apirest {
      * @return stdObject
      */
     public function get_group($id) {
-        return $this->client->get($this->apiendpoint.'issuer/groups/' . $id);
+        return $this->client->get($this->apiendpoint . 'issuer/groups/' . $id);
     }
 
     /**
@@ -296,7 +318,7 @@ class apirest {
      * @return stdObject
      */
     public function get_groups($pagesize = 50, $page = 1) {
-        return $this->client->get($this->apiendpoint.'issuer/all_groups?page_size=' . $pagesize . '&page=' . $page);
+        return $this->client->get($this->apiendpoint . 'issuer/all_groups?page_size=' . $pagesize . '&page=' . $page);
     }
 
     /**
@@ -321,7 +343,6 @@ class apirest {
     public function create_evidence_item_grade($grade, $description, $credentialid, $hidden = false) {
 
         if (is_numeric($grade) && intval($grade) >= 0 && intval($grade) <= 100) {
-
             $evidenceitem = [
                 "evidence_item" => [
                     "description" => $description,

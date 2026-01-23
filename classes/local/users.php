@@ -146,8 +146,10 @@ class users {
     public function get_user_grades($accredible, $userids) {
         global $DB;
 
-        if (!isset($accredible) || !isset($accredible->includegradeattribute) || !$accredible->gradeattributegradeitemid
-            || empty($accredible->gradeattributekeyname) || empty($userids)) {
+        if (
+            !isset($accredible) || !isset($accredible->includegradeattribute) || !$accredible->gradeattributegradeitemid
+            || empty($accredible->gradeattributekeyname) || empty($userids)
+        ) {
             return;
         }
 
@@ -156,9 +158,9 @@ class users {
         $gradeitem = new \grade_item($gradeitemdb);
 
         $queryparams = ['gradeitem' => $gradeitem->id];
-        list($insql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        [$insql, $params] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
         $queryparams += $params;
-        $grades = $DB->get_records_select('grade_grades', 'itemid = :gradeitem AND userid '.$insql, $queryparams);
+        $grades = $DB->get_records_select('grade_grades', 'itemid = :gradeitem AND userid ' . $insql, $queryparams);
 
         foreach ($grades as $grade) {
             if ($grade->finalgrade) {

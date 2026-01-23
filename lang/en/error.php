@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// phpcs:disable moodle.Files.LangFilesOrdering.IncorrectOrder
+
 $string['getissuederror'] = 'An error occured while fetching the certificates with achievement id = {$a}.
 
 Please contact Accredible\'s support';
@@ -44,3 +46,5 @@ $string['evidenceadderror'] = 'An error occured while adding evidence to Accredi
 
 Please contact Accredible\'s support.
 Error Code: Evidence001';
+
+// phpcs:enable moodle.Files.LangFilesOrdering.IncorrectOrder

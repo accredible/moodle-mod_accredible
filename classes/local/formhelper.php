@@ -86,7 +86,7 @@ class formhelper {
             [
                 'value' => '',
                 'name' => 'Select a Moodle course field',
-            ]
+            ],
         ];
         $fields = attributemapping::VALID_COURSE_FIELDS;
         foreach ($fields as $field) {
@@ -113,9 +113,9 @@ class formhelper {
             [
                 'value' => '',
                 'name' => 'Select a Moodle course custom field',
-            ]
+            ],
         ];
-        $customfields = $DB->get_records('customfield_field', array(), '', 'id, name');
+        $customfields = $DB->get_records('customfield_field', [], '', 'id, name');
         foreach ($customfields as $field) {
             $options[] = [
                 'value' => $field->id,
@@ -140,9 +140,9 @@ class formhelper {
             [
                 'value' => '',
                 'name' => 'Select a Moodle user profile field',
-            ]
+            ],
         ];
-        $profilefields = $DB->get_records('user_info_field', array(), '', 'id, name');
+        $profilefields = $DB->get_records('user_info_field', [], '', 'id, name');
         foreach ($profilefields as $field) {
             $options[] = [
                 'value' => $field->id,
