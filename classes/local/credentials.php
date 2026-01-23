@@ -72,6 +72,10 @@ class credentials {
                 throw new \Exception($credential->data ?? 'Unknown error');
             }
 
+            if (isset($credential->success) && $credential->success === false) {
+                throw new \Exception($credential->data ?? 'Unknown error');
+            }
+
             return $credential->credential;
         } catch (\Exception $e) {
             // Throw API exception.
@@ -121,6 +125,10 @@ class credentials {
                 $courselink,
                 $customattributes
             );
+
+            if (isset($credential->success) && $credential->success === false) {
+                throw new \Exception($credential->data ?? 'Unknown error');
+            }
 
             if (isset($credential->success) && $credential->success === false) {
                 throw new \Exception($credential->data ?? 'Unknown error');
