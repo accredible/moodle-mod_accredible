@@ -1,0 +1,155 @@
+#
+# Automates release tagging and develop merge when a release PR is merged to master.
+#
+# Triggers:
+#   1. Automatically when a PR from release/* branch is merged into master
+#   2. Manually via workflow_dispatch for edge cases (hotfixes, etc.)
+#
+# Actions:
+#   1. Extract version from version.php ($plugin->release)
+#   2. Create annotated git tag
+#   3. Merge release branch back into develop with --no-ff
+#   4. Push tag and develop (tag push triggers moodle-release.yml)
+#
+name: Create Release Tag
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - master
+
+  workflow_dispatch:
+    inputs:
+      release_branch:
+        description: 'Release branch to tag (e.g., release/2.4.0)'
+        required: true
+        type: string
+      skip_develop_merge:
+        description: 'Skip merging back to develop (for hotfixes)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  create-release:
+    # Only run if PR was merged (not just closed) and from a release branch
+    # OR if manually triggered
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.merged == true &&
+       startsWith(github.event.pull_request.head.ref, 'release/'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Determine release branch
+        id: branch
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            RELEASE_BRANCH="${{ github.event.inputs.release_branch }}"
+          else
+            RELEASE_BRANCH="${{ github.event.pull_request.head.ref }}"
+          fi
+          echo "release_branch=${RELEASE_BRANCH}" >> $GITHUB_OUTPUT
+          echo "📦 Release branch: ${RELEASE_BRANCH}"
+
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version from version.php
+        id: version
+        run: |
+          # Extract the release version from version.php
+          VERSION=$(grep -oP '\$plugin->release\s*=\s*["\x27]\K[^"\x27]+' version.php)
+          
+          if [[ -z "${VERSION}" ]]; then
+            echo "❌ Could not extract version from version.php"
+            exit 1
+          fi
+          
+          # Ensure version starts with 'v'
+          if [[ ! "${VERSION}" =~ ^v ]]; then
+            VERSION="v${VERSION}"
+          fi
+          
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "📌 Extracted version: ${VERSION}"
+
+      - name: Check if tag already exists
+        id: check-tag
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          if git rev-parse "refs/tags/${VERSION}" >/dev/null 2>&1; then
+            echo "❌ Tag ${VERSION} already exists!"
+            exit 1
+          fi
+          echo "✅ Tag ${VERSION} does not exist, proceeding..."
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create annotated tag
+        id: create-tag
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          RELEASE_BRANCH="${{ steps.branch.outputs.release_branch }}"
+          
+          # Create annotated tag with release branch name as message
+          git tag -a "${VERSION}" -m "Release ${VERSION} from ${RELEASE_BRANCH}"
+          
+          echo "✅ Created tag: ${VERSION}"
+
+      - name: Merge into develop
+        id: merge-develop
+        if: |
+          github.event_name != 'workflow_dispatch' ||
+          github.event.inputs.skip_develop_merge != 'true'
+        run: |
+          RELEASE_BRANCH="${{ steps.branch.outputs.release_branch }}"
+          
+          # Fetch develop branch
+          git fetch origin develop:develop
+          git checkout develop
+          
+          # Merge with --no-ff to preserve branch history (NVIE model)
+          git merge origin/${RELEASE_BRANCH} --no-ff -m "Merge ${RELEASE_BRANCH} into develop"
+          
+          echo "✅ Merged ${RELEASE_BRANCH} into develop with --no-ff"
+
+      - name: Push tag and develop
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          # Push the tag (this triggers moodle-release.yml)
+          git push origin "${VERSION}"
+          echo "✅ Pushed tag: ${VERSION}"
+          
+          # Push develop if we merged
+          if [[ "${{ github.event_name }}" != "workflow_dispatch" ]] || [[ "${{ github.event.inputs.skip_develop_merge }}" != "true" ]]; then
+            git push origin develop
+            echo "✅ Pushed develop branch"
+          fi
+
+      - name: Summary
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          RELEASE_BRANCH="${{ steps.branch.outputs.release_branch }}"
+          
+          echo "## 🎉 Release Created Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Tag** | \`${VERSION}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Release Branch** | \`${RELEASE_BRANCH}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Merged to develop** | ${{ github.event.inputs.skip_develop_merge != 'true' && '✅ Yes' || '⏭️ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The tag push has triggered the **Releasing in the Plugins directory** workflow." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [View release on Moodle.org](https://moodle.org/plugins/mod_accredible)" >> $GITHUB_STEP_SUMMARY
