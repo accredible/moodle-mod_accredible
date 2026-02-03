@@ -26,7 +26,6 @@
  * Structure step to restore one accredible activity
  */
 class restore_accredible_activity_structure_step extends restore_activity_structure_step {
-
     /**
      * Define particular steps this activity can have
      */

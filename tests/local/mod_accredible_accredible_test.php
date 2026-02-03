@@ -25,7 +25,7 @@ namespace mod_accredible\local;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_accredible_test extends \advanced_testcase {
+final class mod_accredible_accredible_test extends \advanced_testcase {
     /**
      * The accredible instance.
      * @var \mod_accredible\local\accredible
@@ -36,6 +36,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
      * Setup before every test.
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         $this->accredible = new accredible();
     }
@@ -44,7 +45,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
      * Test save_record method.
      * @covers ::save_record
      */
-    public function test_save_record() {
+    public function test_save_record(): void {
         global $DB;
 
         // When creating a new record.
@@ -91,7 +92,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
             ->method('insert_record')
             ->with(
                 'accredible',
-                $this->callback(function($subject) {
+                $this->callback(function ($subject) {
                     return $subject->attributemapping === null;
                 })
             )
@@ -125,13 +126,13 @@ class mod_accredible_accredible_test extends \advanced_testcase {
         $DB->expects($this->once())
             ->method('insert_record')
             ->with(
-            'accredible',
-            $this->callback(function($subject) {
-                // Check if attributemapping is a string and is an array afer decoding.
-                return is_string($subject->attributemapping) && is_array(json_decode($subject->attributemapping, true));
-            })
-        )
-        ->willReturn(true);
+                'accredible',
+                $this->callback(function ($subject) {
+                    // Check if attributemapping is a string and is an array afer decoding.
+                    return is_string($subject->attributemapping) && is_array(json_decode($subject->attributemapping, true));
+                })
+            )
+            ->willReturn(true);
 
         $result = $this->accredible->save_record($post);
         $this->assertEquals(1, $result);
@@ -148,7 +149,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
             ->method('insert_record')
             ->with(
                 'accredible',
-                $this->callback(function($subject) {
+                $this->callback(function ($subject) {
                     return $subject->gradeattributegradeitemid === 10 &&
                         $subject->gradeattributekeyname === 'Final Grade';
                 })
@@ -170,7 +171,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
             ->method('insert_record')
             ->with(
                 'accredible',
-                $this->callback(function($subject) {
+                $this->callback(function ($subject) {
                     return $subject->gradeattributegradeitemid === null &&
                         $subject->gradeattributekeyname === null;
                 })
@@ -186,7 +187,7 @@ class mod_accredible_accredible_test extends \advanced_testcase {
      * Test load_credential_custom_attributes method.
      * @covers ::load_credential_custom_attributes
      */
-    public function test_load_credential_custom_attributes() {
+    public function test_load_credential_custom_attributes(): void {
         global $DB;
 
         $course = $this->getDataGenerator()->create_course(
@@ -483,10 +484,10 @@ class mod_accredible_accredible_test extends \advanced_testcase {
     /**
      * Generates a mock $post object for testing.
      *
-     * @param stdClass $overrides An object with properties to override.
+     * @param stdClass|null $overrides An object with properties to override.
      * @return stdClass The generated $post object.
      */
-    private function generatepostobject(\stdClass $overrides = null): \stdClass {
+    private function generatepostobject(?\stdClass $overrides = null): \stdClass {
         $post = (object) [
             'name' => 'New Certificate',
             'instance' => null,

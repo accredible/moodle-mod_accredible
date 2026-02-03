@@ -27,15 +27,19 @@ defined('MOODLE_INTERNAL') || die();
 
 // TODO - language tags.
 $settings->add(
-    new admin_setting_configtext('accredible_api_key',
-                                 get_string('apikeylabel', 'accredible'),
-                                 get_string('apikeyhelp', 'accredible'),
-                                 '')
+    new admin_setting_configtext(
+        'accredible_api_key',
+        get_string('apikeylabel', 'accredible'),
+        get_string('apikeyhelp', 'accredible'),
+        ''
+    )
 );
 
 $settings->add(
-    new admin_setting_configcheckbox('is_eu',
-                                     get_string('eulabel', 'accredible'),
-                                     get_string('euhelp', 'accredible'),
-                                     '')
+    new admin_setting_configcheckbox(
+        'is_eu',
+        get_string('eulabel', 'accredible'),
+        get_string('euhelp', 'accredible'),
+        ''
+    )
 );

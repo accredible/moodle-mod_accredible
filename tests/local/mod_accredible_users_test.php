@@ -29,7 +29,7 @@ use mod_accredible\apirest\apirest;
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_users_test extends \advanced_testcase {
+final class mod_accredible_users_test extends \advanced_testcase {
     /**
      * Mock API response data.
      * @var class $mockapi
@@ -54,6 +54,7 @@ class mod_accredible_users_test extends \advanced_testcase {
      * Setup before every test.
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
 
         // Add plugin settings.
@@ -86,7 +87,7 @@ class mod_accredible_users_test extends \advanced_testcase {
      * Generate list of users with their credentials from a course
      * @covers ::get_users_with_credentials
      */
-    public function test_get_users_with_credentials() {
+    public function test_get_users_with_credentials(): void {
         $userhelper = new users();
 
         // When there are not users.
@@ -100,7 +101,7 @@ class mod_accredible_users_test extends \advanced_testcase {
                              'email'          => $this->user->email,
                              'name'           => $this->user->firstname . ' ' . $this->user->lastname,
                              'credential_url' => null,
-                             'credential_id'  => null];
+                             'credential_id'  => null, ];
         $expectedresponse = ['0' => $userrespone];
         $enrolledusers = get_enrolled_users($this->context, "mod/accredible:view", null, 'u.*', 'id');
         $result = $userhelper->get_users_with_credentials($enrolledusers);
@@ -113,11 +114,11 @@ class mod_accredible_users_test extends \advanced_testcase {
                               'email'          => $user2->email,
                               'name'           => $user2->firstname . ' ' . $user2->lastname,
                               'credential_url' => 'https://www.credential.net/10250012',
-                              'credential_id'  => 10250012];
+                              'credential_id'  => 10250012, ];
         $expectedresponse = ['0' => $userrespone, '1' => $user2respone];
 
-        $mockclient1 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+        $mockclient1 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -127,10 +128,19 @@ class mod_accredible_users_test extends \advanced_testcase {
         // Expect to call the endpoint once with page and page_size.
         $urlpage1 = "https://api.accredible.com/v1/all_credentials?group_id=123&email=&page_size=50&page=1";
         $urlpage2 = "https://api.accredible.com/v1/all_credentials?group_id=123&email=&page_size=50&page=2";
+        $callcount = 0;
         $mockclient1->expects($this->exactly(2))
             ->method('get')
-            ->withConsecutive([$this->equalTo($urlpage1)], [$this->equalTo($urlpage2)])
-            ->will($this->onConsecutiveCalls($resdatapage1, $resdatapage2));
+            ->willReturnCallback(function ($arg1) use (&$callcount, $urlpage1, $urlpage2, $resdatapage1, $resdatapage2) {
+                $callcount++;
+                if ($callcount === 1) {
+                    $this->assertEquals($urlpage1, $arg1);
+                    return $resdatapage1;
+                } else {
+                    $this->assertEquals($urlpage2, $arg1);
+                    return $resdatapage2;
+                }
+            });
 
         $api = new apirest($mockclient1);
         $userhelper = new users($api);
@@ -139,8 +149,8 @@ class mod_accredible_users_test extends \advanced_testcase {
         $this->assertEquals($result, $expectedresponse);
 
         // When apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder('client')
-            ->setMethods(['get'])
+        $mockclient2 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['get'])
             ->getMock();
 
         // Mock API response data.
@@ -164,7 +174,7 @@ class mod_accredible_users_test extends \advanced_testcase {
      * Generate list of users without credential but with requirements for the course pass.
      * @covers ::get_unissued_users
      */
-    public function test_get_unissued_users() {
+    public function test_get_unissued_users(): void {
         $userhelper = new users();
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id);
 
@@ -176,12 +186,12 @@ class mod_accredible_users_test extends \advanced_testcase {
                        'email'          => $this->user->email,
                        'name'           => $this->user->firstname . ' ' . $this->user->lastname,
                        'credential_url' => null,
-                       'credential_id'  => null];
+                       'credential_id'  => null, ];
         $user2 = ['id'             => $generateduser2->id,
                        'email'          => $generateduser2->email,
                        'name'           => $generateduser2->firstname . ' ' . $generateduser2->lastname,
                        'credential_url' => 'https://www.credential.net/10250012',
-                       'credential_id'  => 10250012];
+                       'credential_id'  => 10250012, ];
 
         $users = [$user1, $user2];
 
@@ -220,7 +230,7 @@ class mod_accredible_users_test extends \advanced_testcase {
      * Return list of grades from a grade item.
      * @covers ::get_user_grades
      */
-    public function test_get_user_grades() {
+    public function test_get_user_grades(): void {
         global $DB;
         $userhelper = new users();
 
@@ -317,7 +327,7 @@ class mod_accredible_users_test extends \advanced_testcase {
      * Return list of grades from a grade item.
      * @covers ::load_user_grade_as_custom_attributes
      */
-    public function test_load_user_grade_as_custom_attributes() {
+    public function test_load_user_grade_as_custom_attributes(): void {
         global $DB;
         $userhelper = new users();
 
@@ -349,9 +359,15 @@ class mod_accredible_users_test extends \advanced_testcase {
      * @param int $includegradeattribute
      * @param int $gradeattributegradeitemid
      * @param string $gradeattributekeyname
+     * @return int accredible instance id
      */
-    private function create_accredible_instance($courseid, $finalquizid = 0, $includegradeattribute = 0,
-        $gradeattributegradeitemid = null, $gradeattributekeyname = null) {
+    private function create_accredible_instance(
+        $courseid,
+        $finalquizid = 0,
+        $includegradeattribute = 0,
+        $gradeattributegradeitemid = null,
+        $gradeattributekeyname = null
+    ): int {
 
         global $DB;
         $dbrecord = [
@@ -378,7 +394,7 @@ class mod_accredible_users_test extends \advanced_testcase {
      * @param string $itemmodule
      * @param int $iteminstance
      */
-    private function create_grade_item($courseid, $itemname, $itemmodule, $iteminstance) {
+    private function create_grade_item($courseid, $itemname, $itemmodule, $iteminstance): int {
         global $DB;
         $gradeitem = [
             "courseid" => $courseid,
@@ -396,7 +412,7 @@ class mod_accredible_users_test extends \advanced_testcase {
      *
      * @param int $courseid
      */
-    private function create_quiz_module($courseid) {
+    private function create_quiz_module($courseid): \stdClass {
         $quiz = ["course" => $courseid, "grade" => 10];
         return $this->getDataGenerator()->create_module('quiz', $quiz);
     }
@@ -408,7 +424,7 @@ class mod_accredible_users_test extends \advanced_testcase {
      * @param int $userid
      * @param int $grade
      */
-    private function create_quiz_grades($quizid, $userid, $grade) {
+    private function create_quiz_grades($quizid, $userid, $grade): void {
         global $DB;
         $quizgrade = ["quiz" => $quizid, "userid" => $userid, "grade" => $grade];
         $DB->insert_record('quiz_grades', $quizgrade);
@@ -421,7 +437,7 @@ class mod_accredible_users_test extends \advanced_testcase {
      * @param int $userid
      * @param int $grade
      */
-    private function create_grade_grades($gradeitemid, $userid, $grade) {
+    private function create_grade_grades($gradeitemid, $userid, $grade): void {
         global $DB;
         $quizgrade = [
             "itemid" => $gradeitemid,

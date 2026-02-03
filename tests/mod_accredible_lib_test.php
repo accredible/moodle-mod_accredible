@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_accredible;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -29,13 +30,14 @@ require_once($CFG->dirroot . '/mod/accredible/lib.php');
  * @copyright  Accredible <dev@accredible.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_accredible_lib_test extends \advanced_testcase {
+final class mod_accredible_lib_test extends \advanced_testcase {
     /**
      * Sample test
      * later: remove after adding real tests
      * @coversNothing
      */
-    public function test_sample() {
+    public function test_sample(): void {
+        parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
 

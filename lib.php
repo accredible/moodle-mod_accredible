@@ -54,7 +54,7 @@ function accredible_add_instance($post) {
     $recordid = $accredible->save_record($post);
 
     // Issue certs.
-    if ( isset($post->users) ) {
+    if (isset($post->users)) {
         $record = $DB->get_record('accredible', ['id' => $recordid], '*', MUST_EXIST);
         // Load grade attributes for users who will get a credential issued if need to be added.
         $userids = [];
@@ -82,7 +82,7 @@ function accredible_add_instance($post) {
                     $credentialid = $credential->id;
                     if ($post->finalquiz) {
                         $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
-                        $usersgrade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                        $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
                         $gradeevidence = [
                             'string_object' => (string) $usersgrade,
                             'description' => $quiz->name,
@@ -169,7 +169,7 @@ function accredible_update_instance($post) {
                         // Evidence item posts.
                         if ($post->finalquiz) {
                             $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
-                            $usersgrade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                            $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
                             $gradeevidence = [
                                 'string_object' => (string) $usersgrade,
                                 'description' => $quiz->name,
@@ -190,12 +190,18 @@ function accredible_update_instance($post) {
                 } else if ($existingrecord->achievementid) {
                     if ($post->finalquiz) {
                         $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
-                        $grade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                        $grade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
                     }
-                    // TODO: testing.
-                    $result = accredible_issue_default_certificate($user->id,
-                        $existingrecord->id, fullname($user), $user->email,
-                        $grade, $quiz->name, $completedtimestamp, $customattributes);
+                    $result = accredible_issue_default_certificate(
+                        $user->id,
+                        $existingrecord->id,
+                        fullname($user),
+                        $user->email,
+                        $grade,
+                        $quiz->name,
+                        $completedtimestamp,
+                        $customattributes
+                    );
                     $credentialid = $result->credential->id;
                 }
                 // Log the creation.
@@ -211,7 +217,7 @@ function accredible_update_instance($post) {
     }
 
     // Issue certs.
-    if ( isset($post->users) ) {
+    if (isset($post->users)) {
         // Checklist array from the form comes in the format:
         // Int userid => boolean issuecertificate.
         foreach ($post->users as $userid => $issuecertificate) {
@@ -224,12 +230,18 @@ function accredible_update_instance($post) {
                 $additionalattributemapping = $accredible->load_credential_custom_attributes($existingrecord, $userid);
                 $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
                 if ($existingrecord->achievementid) {
-
                     $courseurl = new moodle_url('/course/view.php', ['id' => $post->course]);
                     $courselink = $courseurl->__toString();
 
-                    $credential = $localcredentials->create_credential_legacy($user, $post->achievementid,
-                        $post->certificatename, $post->description, $courselink, $completeddate, $customattributes);
+                    $credential = $localcredentials->create_credential_legacy(
+                        $user,
+                        $post->achievementid,
+                        $post->certificatename,
+                        $post->description,
+                        $courselink,
+                        $completeddate,
+                        $customattributes
+                    );
                 } else {
                     $credential = $localcredentials->create_credential($user, $post->groupid, $completeddate, $customattributes);
                 }
@@ -239,7 +251,7 @@ function accredible_update_instance($post) {
                     $credentialid = $credential->id;
                     if ($post->finalquiz) {
                         $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
-                        $usersgrade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                        $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
                         $gradeevidence = [
                             'string_object' => (string) $usersgrade,
                             'description' => $quiz->name,
@@ -301,7 +313,7 @@ function accredible_delete_instance($id) {
  *
  * @uses FEATURE_MOD_INTRO
  * @param string $feature FEATURE_xx constant for requested feature
- * @return mixed True if module supports feature, null if doesn't know
+ * @return bool|null True if module supports feature, null if doesn't know
  */
 function accredible_supports($feature) {
     switch ($feature) {

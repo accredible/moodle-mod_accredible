@@ -69,7 +69,7 @@ class evidenceitems {
         global $DB;
 
         // Grab the course quizes.
-        if ($quizes = $DB->get_records_select('quiz', 'course = :course_id', ['course_id' => $courseid]) ) {
+        if ($quizes = $DB->get_records_select('quiz', 'course = :course_id', ['course_id' => $courseid])) {
             foreach ($quizes as $quiz) {
                 $evidenceitem = ['description' => $quiz->name];
                 // Grab quiz attempts.
@@ -105,7 +105,7 @@ class evidenceitems {
 
                             ORDER BY quiza.userid, quiza.attempt, qa.slot";
 
-                    if ( $questions = $DB->get_records_sql($sql, [reset($quizattempt)->id, 'manualgraded']) ) {
+                    if ($questions = $DB->get_records_sql($sql, [reset($quizattempt)->id, 'manualgraded'])) {
                         $questionsoutput = "<style>#main {  max-width: 780px;margin-left: auto;";
                         $questionsoutput .= "margin-right: auto;margin-top: 50px;margin-bottom: 80px; font-family: Arial;} ";
                         $questionsoutput .= "h1, h5 {   text-align: center;} ";
@@ -114,12 +114,12 @@ class evidenceitems {
                         $questionsoutput .= "p {font-size: 14px; line-height: 18px;} </style>";
                         $questionsoutput .= "<div id='main'>";
                         $questionsoutput .= "<h1>" . $quiz->name . "</h1>";
-                        $questionsoutput .= "<h5>Time Taken: ".
-                            seconds_to_str( current($questions)->timefinish - current($questions)->timestart ) ."</h5>";
+                        $questionsoutput .= "<h5>Time Taken: " .
+                            seconds_to_str(current($questions)->timefinish - current($questions)->timestart) . "</h5>";
 
                         foreach ($questions as $questionattempt) {
                             $questionsoutput .= $questionattempt->question;
-                            $questionsoutput .= "<div class='answer'>".$questionattempt->answer."</div>";
+                            $questionsoutput .= "<div class='answer'>" . $questionattempt->answer . "</div>";
                         }
 
                         $questionsoutput .= "</div>";
@@ -158,8 +158,10 @@ class evidenceitems {
                 $completedtimestamp = time();
             }
 
-            if ($enrolmenttimestamp && $enrolmenttimestamp != 0 &&
-                ($enrolmenttimestamp < $completedtimestamp)) {
+            if (
+                $enrolmenttimestamp && $enrolmenttimestamp != 0 &&
+                ($enrolmenttimestamp < $completedtimestamp)
+            ) {
                 $this->apirest->create_evidence_item_duration($enrolmenttimestamp, $completedtimestamp, $credentialid, true);
             }
         }

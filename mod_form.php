@@ -25,16 +25,15 @@
 
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
-require_once($CFG->dirroot.'/course/moodleform_mod.php');
-require_once($CFG->dirroot.'/mod/accredible/lib.php');
-require_once($CFG->dirroot.'/mod/accredible/locallib.php');
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
+require_once($CFG->dirroot . '/mod/accredible/lib.php');
+require_once($CFG->dirroot . '/mod/accredible/locallib.php');
 
 use mod_accredible\Html2Text\Html2Text;
 use mod_accredible\local\credentials;
 use mod_accredible\local\groups;
 use mod_accredible\local\users;
 use mod_accredible\local\formhelper;
-
 
 /**
  * Accredible settings form.
@@ -45,7 +44,6 @@ use mod_accredible\local\formhelper;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_accredible_mod_form extends moodleform_mod {
-
     /**
      * Called to define this moodle form
      *
@@ -163,8 +161,12 @@ class mod_accredible_mod_form extends moodleform_mod {
             $mform->setDefault('groupid', $accrediblecertificate->groupid);
         }
 
-        $mform->addElement('static', 'overview', '',
-            get_string('activitygroupdescription', 'accredible', $dashboardurl));
+        $mform->addElement(
+            'static',
+            'overview',
+            '',
+            get_string('activitygroupdescription', 'accredible', $dashboardurl)
+        );
 
         if ($alreadyexists) {
             $mform->addElement('static', 'additionalactivitiestwo', '', get_string('additionalactivitiestwo', 'accredible'));
@@ -178,11 +180,15 @@ class mod_accredible_mod_form extends moodleform_mod {
         }
         $mform->setType('attributekysnumber', PARAM_INT);
 
-        $mform->addElement('checkbox', 'includegradeattribute', get_string('includegradeattributedescription', 'accredible'),
-            get_string('includegradeattributecheckbox', 'accredible'));
+        $mform->addElement(
+            'checkbox',
+            'includegradeattribute',
+            get_string('includegradeattributedescription', 'accredible'),
+            get_string('includegradeattributecheckbox', 'accredible')
+        );
 
         $mform->setType('includegradeattribute', PARAM_INT);
-        if (isset( $accrediblecertificate->includegradeattribute ) && $accrediblecertificate->includegradeattribute == 1) {
+        if (isset($accrediblecertificate->includegradeattribute) && $accrediblecertificate->includegradeattribute == 1) {
             $mform->setDefault('includegradeattribute', 1);
             $includegradewrapperhtml = '<div id="include-grade-select-container">';
         } else {
@@ -190,13 +196,31 @@ class mod_accredible_mod_form extends moodleform_mod {
         }
 
         $mform->addElement('html', $includegradewrapperhtml);
-        $mform->addElement('select', 'gradeattributegradeitemid', get_string('gradeattributegradeitemselect', 'accredible'),
-            $formhelper->load_grade_item_options($id), $inputstyle);
-        $mform->addElement('select', 'gradeattributekeyname', get_string('gradeattributekeynameselect', 'accredible'),
-            $attributekeyschoices, $inputstyle);
+        $mform->addElement(
+            'select',
+            'gradeattributegradeitemid',
+            get_string('gradeattributegradeitemselect', 'accredible'),
+            $formhelper->load_grade_item_options($id),
+            $inputstyle
+        );
+        $mform->addElement(
+            'select',
+            'gradeattributekeyname',
+            get_string('gradeattributekeynameselect', 'accredible'),
+            $attributekeyschoices,
+            $inputstyle
+        );
         $mform->disabledIf('gradeattributekeyname', 'attributekysnumber', 'eq', 0);
-        $mform->addElement('static', 'emptygradeattributekeyname', '', get_string('emptygradeattributekeyname', 'accredible',
-            $dashboardurl));
+        $mform->addElement(
+            'static',
+            'emptygradeattributekeyname',
+            '',
+            get_string(
+                'emptygradeattributekeyname',
+                'accredible',
+                $dashboardurl
+            )
+        );
         $mform->addElement('html', '</div>');
 
         if ($updatingcert && $accrediblecertificate->achievementid) {
@@ -208,24 +232,39 @@ class mod_accredible_mod_form extends moodleform_mod {
             $mform->setDefault('achievementid', $course->shortname);
 
             if ($alreadyexists) {
-                $mform->addElement('static', 'additionalactivitiesthree', '',
-                    get_string('additionalactivitiesthree', 'accredible'));
+                $mform->addElement(
+                    'static',
+                    'additionalactivitiesthree',
+                    '',
+                    get_string('additionalactivitiesthree', 'accredible')
+                );
             }
-            $mform->addElement('text', 'certificatename',
-                get_string('certificatename', 'accredible'), ['style' => 'width: 399px']);
+            $mform->addElement(
+                'text',
+                'certificatename',
+                get_string('certificatename', 'accredible'),
+                ['style' => 'width: 399px']
+            );
             $mform->addRule('certificatename', null, 'required', null, 'client');
             $mform->setType('certificatename', PARAM_TEXT);
             $mform->setDefault('certificatename', $course->fullname);
 
-            $mform->addElement('textarea', 'description',
+            $mform->addElement(
+                'textarea',
+                'description',
                 get_string('description', 'accredible'),
-                ['cols' => '64', 'rows' => '10', 'wrap' => 'virtual', 'maxlength' => '1000']);
+                ['cols' => '64', 'rows' => '10', 'wrap' => 'virtual', 'maxlength' => '1000']
+            );
             $mform->addRule('description', null, 'required', null, 'client');
             $mform->setType('description', PARAM_RAW);
             $mform->setDefault('description', $description);
             if ($updatingcert) {
-                $mform->addElement('static', 'dashboardlink',
-                    get_string('dashboardlink', 'accredible'), get_string('dashboardlinktext', 'accredible'));
+                $mform->addElement(
+                    'static',
+                    'dashboardlink',
+                    get_string('dashboardlink', 'accredible'),
+                    get_string('dashboardlinktext', 'accredible')
+                );
             }
         }
 
@@ -243,8 +282,13 @@ class mod_accredible_mod_form extends moodleform_mod {
 
             foreach ($unissuedusers as $user) {
                 // No existing certificate, add this user to the unissued users list.
-                $mform->addElement('advcheckbox', 'unissuedusers['.$user['id'].']',
-                    $user['name'] . '    ' . $user['email'], null, ['group' => 2]);
+                $mform->addElement(
+                    'advcheckbox',
+                    'unissuedusers[' . $user['id'] . ']',
+                    $user['name'] . '    ' . $user['email'],
+                    null,
+                    ['group' => 2]
+                );
             }
             $mform->addElement('html', '</div>');
         }
@@ -262,22 +306,41 @@ class mod_accredible_mod_form extends moodleform_mod {
             foreach ($userswithcredential as $user) {
                 // Show the certificate if they have a certificate.
                 if ($user['credential_id']) {
-                    $mform->addElement('static', 'certlink'.$user['id'],
+                    $mform->addElement(
+                        'static',
+                        'certlink' . $user['id'],
                         $user['name'] . '    ' . $user['email'],
-                        'Certificate '. $user['credential_id'].' - <a href='.$user['credential_url'].' target="_blank">link</a>');
+                        'Certificate ' . $user['credential_id'] .
+                            ' - <a href=' . $user['credential_url'] . ' target="_blank">link</a>'
+                    );
                     $mform->addElement('html', '<div class="hidden">');
-                    $mform->addElement('advcheckbox', 'users['.$user['id'].']',
-                        $user['name'] . '    ' . $user['email'], null, ['group' => 1]);
+                    $mform->addElement(
+                        'advcheckbox',
+                        'users[' . $user['id'] . ']',
+                        $user['name'] . '    ' . $user['email'],
+                        null,
+                        ['group' => 1]
+                    );
                     $mform->addElement('html', '</div>');
                 } else { // Show a checkbox if they don't.
-                    $mform->addElement('advcheckbox', 'users['.$user['id'].']',
-                        $user['name'] . '    ' . $user['email'], null, ['group' => 1]);
+                    $mform->addElement(
+                        'advcheckbox',
+                        'users[' . $user['id'] . ']',
+                        $user['name'] . '    ' . $user['email'],
+                        null,
+                        ['group' => 1]
+                    );
                 }
             }
         } else { // For new modules, just list all the users.
             foreach ($users as $user) {
-                $mform->addElement('advcheckbox', 'users['.$user->id.']',
-                    $user->firstname . ' ' . $user->lastname . '    ' . $user->email, null, ['group' => 1]);
+                $mform->addElement(
+                    'advcheckbox',
+                    'users[' . $user->id . ']',
+                    $user->firstname . ' ' . $user->lastname . '    ' . $user->email,
+                    null,
+                    ['group' => 1]
+                );
             }
         }
         $mform->addElement('html', '</div>');
@@ -334,7 +397,8 @@ class mod_accredible_mod_form extends moodleform_mod {
         $mform->addElement('html', $OUTPUT->render_from_template('mod_accredible/mappings', $coursecustomfieldmappingcontent));
 
         // Attribute mapping: user profile fields.
-        $mform->addElement('header',
+        $mform->addElement(
+            'header',
             'attributemappinguserprofilefields',
             get_string('attributemappinguserprofilefields', 'accredible')
         );
@@ -360,7 +424,7 @@ class mod_accredible_mod_form extends moodleform_mod {
      * Called right before form submission.
      * We use it to include missing form data from mustache templates.
      *
-     * @param stdClass $data passed by reference
+     * @param  stdClass $data passed by reference
      * @return void
      */
     public function data_postprocessing($data) {
@@ -379,11 +443,11 @@ class mod_accredible_mod_form extends moodleform_mod {
     /**
      * Sets the default value for a mapping field in the form.
      *
-     * @param MoodleQuickForm $mform The form instance to modify.
-     * @param array $defaultvalues The default values for the form fields.
-     * @param string $mappingname The name of the mapping field.
-     * @param string $fieldname The specific field within the mapping to set.
-     * @param int $num The index of the field in case of multiple fields with the same name.
+     * @param MoodleQuickForm $mform         The form instance to modify.
+     * @param array           $defaultvalues The default values for the form fields.
+     * @param string          $mappingname   The name of the mapping field.
+     * @param string          $fieldname     The specific field within the mapping to set.
+     * @param int             $num           The index of the field in case of multiple fields with the same name.
      */
     private function set_mapping_field_default($mform, $defaultvalues, $mappingname, $fieldname, $num = 0) {
         $value = '';

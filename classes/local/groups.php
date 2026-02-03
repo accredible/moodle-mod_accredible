@@ -75,6 +75,11 @@ class groups {
             // Query the Accredible API and loop until it returns that there is no next page.
             for ($i = 0; $i <= 100; $i++) {
                 $response = $this->apirest->get_groups($pagesize, $page);
+
+                if (isset($response->success) && $response->success === false) {
+                    throw new \Exception($response->data ?? 'Unknown error');
+                }
+
                 foreach ($response->groups as $group) {
                     $groups[$group->id] = $group->name;
                 }
@@ -108,6 +113,11 @@ class groups {
             // Query the Accredible API and loop until it returns that there is no next page.
             for ($i = 0; $i <= 100; $i++) {
                 $response = $this->apirest->search_groups($pagesize, $page);
+
+                if (isset($response->success) && $response->success === false) {
+                    throw new \Exception($response->data ?? 'Unknown error');
+                }
+
                 foreach ($response->groups as $group) {
                     $templates[$group->name] = $group->name;
                 }
