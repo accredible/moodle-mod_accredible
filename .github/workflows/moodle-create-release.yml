@@ -7,9 +7,10 @@
 #
 # Actions:
 #   1. Extract version from version.php ($plugin->release)
-#   2. Create annotated git tag
-#   3. Merge release branch back into develop with --no-ff
-#   4. Push tag and develop (tag push triggers moodle-release.yml)
+#   2. Create and push annotated git tag
+#   3. Merge master back into develop with --no-ff
+#   4. Push develop
+#   5. Trigger moodle-release.yml via workflow_call
 #
 name: Create Release Tag
 
@@ -41,6 +42,8 @@ jobs:
       (github.event.pull_request.merged == true &&
        startsWith(github.event.pull_request.head.ref, 'release/'))
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
 
     steps:
       - name: Determine release branch
@@ -95,7 +98,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Create annotated tag
+      - name: Create and push tag
         id: create-tag
         run: |
           VERSION="${{ steps.version.outputs.version }}"
@@ -103,8 +106,11 @@ jobs:
           
           # Create annotated tag with release branch name as message
           git tag -a "${VERSION}" -m "Release ${VERSION} from ${RELEASE_BRANCH}"
-          
           echo "✅ Created tag: ${VERSION}"
+          
+          # Push the tag immediately
+          git push origin "${VERSION}"
+          echo "✅ Pushed tag: ${VERSION}"
 
       - name: Merge into develop
         id: merge-develop
@@ -118,24 +124,19 @@ jobs:
           git fetch origin develop:develop
           git checkout develop
           
-          # Merge with --no-ff to preserve branch history (NVIE model)
-          git merge origin/${RELEASE_BRANCH} --no-ff -m "Merge ${RELEASE_BRANCH} into develop"
+          # Merge master (which contains the release) into develop with --no-ff
+          # This is more robust than merging the release branch which may be auto-deleted
+          git merge origin/master --no-ff -m "Merge ${RELEASE_BRANCH} into develop"
           
-          echo "✅ Merged ${RELEASE_BRANCH} into develop with --no-ff"
+          echo "✅ Merged master into develop with --no-ff"
 
-      - name: Push tag and develop
+      - name: Push develop
+        if: |
+          github.event_name != 'workflow_dispatch' ||
+          github.event.inputs.skip_develop_merge != 'true'
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          
-          # Push the tag (this triggers moodle-release.yml)
-          git push origin "${VERSION}"
-          echo "✅ Pushed tag: ${VERSION}"
-          
-          # Push develop if we merged
-          if [[ "${{ github.event_name }}" != "workflow_dispatch" ]] || [[ "${{ github.event.inputs.skip_develop_merge }}" != "true" ]]; then
-            git push origin develop
-            echo "✅ Pushed develop branch"
-          fi
+          git push origin develop
+          echo "✅ Pushed develop branch"
 
       - name: Summary
         run: |
@@ -150,6 +151,15 @@ jobs:
           echo "| **Release Branch** | \`${RELEASE_BRANCH}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| **Merged to develop** | ${{ github.event.inputs.skip_develop_merge != 'true' && '✅ Yes' || '⏭️ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "The tag push has triggered the **Releasing in the Plugins directory** workflow." >> $GITHUB_STEP_SUMMARY
+          echo "The **Releasing in the Plugins directory** workflow will run next." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "🔗 [View release on Moodle.org](https://moodle.org/plugins/mod_accredible)" >> $GITHUB_STEP_SUMMARY
+
+  # Trigger the release workflow to publish to Moodle.org
+  trigger-release:
+    needs: create-release
+    uses: ./.github/workflows/moodle-release.yml
+    with:
+      tag: ${{ needs.create-release.outputs.version }}
+    secrets:
+      MOODLE_ORG_TOKEN: ${{ secrets.MOODLE_ORG_TOKEN }}
