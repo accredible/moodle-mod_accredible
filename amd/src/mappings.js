@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
+define(['jquery', 'core/ajax', 'core/templates', 'core/notification'], function($, Ajax, Templates, Notification) {
     const element = {
         mappingSelects: '[id*="mapping_line"] select',
         addButton: '[id*="_add_new_line"]',
@@ -33,7 +33,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
     const mappings = {
         init: function() {
             mappings.setSelectValues();
-            mappings.listenToAddAction();            
+            mappings.listenToAddAction();
             mappings.listenToDeleteAction();
             mappings.listenToSelectChanges();
         },
@@ -41,8 +41,8 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
         listenToAddAction: function() {
             const addButton = $(element.addButton);
             addButton.on('click', mappings.addNewLine);
-            // enable/disable add button after max attributes added
-            addButton.each((_,element) => {
+            // Enable/disable add button after max attributes added.
+            addButton.each((_, element) => {
                 const section = $(element).attr("data-section");
                 mappings.toggleAddButton(section);
             });
@@ -53,14 +53,14 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
         },
 
         listenToSelectChanges: function() {
-            $(element.list).on('change', element.mappingSelects, (event) => {
+            $(element.list).on('change', element.mappingSelects, () => {
                 mappings.checkForDuplicates();
             });
         },
 
         getAttributeValuesCount: function() {
             const valuesCount = new Map();
-            $(element.mappingSelects).each((_,select) => {
+            $(element.mappingSelects).each((_, select) => {
                 const value = $(select).val();
                 if (!value) {
                     return;
@@ -79,7 +79,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             const rowHasError = {};
             let hasDuplicate = false;
 
-            $(element.mappingSelects).each((_,select) => {
+            $(element.mappingSelects).each((_, select) => {
                 const id = $(select).attr('id');
                 const rowId = new RegExp(/(id_\w+_\d)_\w+/g).exec(id)[1]; // Get "id_{{section}}_{{index}}" part.
                 const deleteIconWrapper = $(`#${rowId}_delete_action`);
@@ -92,7 +92,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
 
                 if (duplicateCount.get(key) > 1) {
                     $(select).addClass('is-invalid');
-                    deleteIconWrapper.addClass('pb-xl-4');  // Applies padding to align delete icon.
+                    deleteIconWrapper.addClass('pb-xl-4'); // Applies padding to align delete icon.
                     hasDuplicate = true;
                     rowHasError[rowId] = true;
                 }
@@ -109,13 +109,13 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             const section = $(this).attr('data-section');
             const options = mappings.getOptionsFromTemplate(section);
             const data = {
-                index: mappings.countLines(section)+1,
+                index: mappings.countLines(section) + 1,
                 section: section,
                 accredibleoptions: options.accredibleoptions,
                 moodleoptions: options.moodleoptions,
                 hasid: requiresId.includes(section)
             };
-            mappings.renderMappingLine(data,`#${section}_content`);
+            mappings.renderMappingLine(data, `#${section}_content`);
             // Wait for line to be rendered then show/hide the button.
             setTimeout(() => {
                 mappings.toggleAddButton(section);
@@ -165,7 +165,7 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
         getOptionsFromTemplate: function(section) {
             const template = $(`#template_${section}`)[0];
             if (!template) {
-                return { accredibleoptions: [], moodleoptions: [] };
+                return {accredibleoptions: [], moodleoptions: []};
             }
 
             const accredibleselect = template.content.querySelector('#accredibleoptions_select');
@@ -206,11 +206,19 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
             });
         },
 
+        /**
+         * Render a mapping line template.
+         *
+         * @param {Object} context - data for template.
+         * @param {string} containerid - id of the html element where the template will be appended.
+         * @returns {Promise} Resolves when template is rendered.
+         */
         renderMappingLine: function(context, containerid) {
-            Templates.renderForPromise('mod_accredible/mapping_line', context).then(function (_ref) {
-              Templates.appendNodeContents(containerid, _ref.html, _ref.js);
-            });
+            return Templates.renderForPromise('mod_accredible/mapping_line', context).then(function(_ref) {
+                Templates.appendNodeContents(containerid, _ref.html, _ref.js);
+                return true;
+            }).catch(Notification.exception);
         },
     };
-    return mappings; 
+    return mappings;
 });

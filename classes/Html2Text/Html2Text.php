@@ -53,8 +53,11 @@ class Html2Text {
         }
 
         $html = static::fix_new_lines($html);
+
+        // Ensure proper UTF-8 handling for DOMDocument across PHP versions.
         if (mb_detect_encoding($html, "UTF-8", true)) {
-            $html = mb_convert_encoding($html, "HTML-ENTITIES", "UTF-8");
+            // Prepend XML encoding declaration to ensure DOMDocument handles UTF-8 correctly.
+            $html = '<?xml encoding="UTF-8">' . $html;
         }
 
         $doc = static::get_document($html, $ignoreerror);
@@ -296,18 +299,18 @@ class Html2Text {
         }
 
         if (isset($node->childNodes)) {
-
             $n = $node->childNodes->item(0);
             $previoussiblingname = null;
 
             while ($n != null) {
-
                 $text = static::iterate_over_node($n, $previoussiblingname, $inpre || $name == 'pre', $isofficedocument);
 
                 // Pass current node name to next child, as previousSibling does not appear to get populated.
-                if (!$n instanceof \DOMDocumentType
+                if (
+                    !$n instanceof \DOMDocumentType
                     && !$n instanceof \DOMProcessingInstruction
-                    && !($n instanceof \DOMText && static::is_whitespace($text))) {
+                    && !($n instanceof \DOMText && static::is_whitespace($text))
+                ) {
                     $previoussiblingname = strtolower($n->nodeName);
                 }
 

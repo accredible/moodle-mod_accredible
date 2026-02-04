@@ -45,12 +45,11 @@ function accredible_check_if_cert_earned($record, $user) {
     $earned = false;
 
     // Check for the existence of an activity instance and an auto-issue rule.
-    if ( $record && ($record->finalquiz || $record->completionactivities) ) {
-
+    if ($record && ($record->finalquiz || $record->completionactivities)) {
         if ($record->finalquiz) {
             $quiz = $DB->get_record('quiz', ['id' => $record->finalquiz], '*', MUST_EXIST);
             // Create that credential if it doesn't exist.
-            $usersgrade = min( ( quiz_get_best_grade($quiz, $user['id']) / $quiz->grade ) * 100, 100);
+            $usersgrade = min(( quiz_get_best_grade($quiz, $user['id']) / $quiz->grade ) * 100, 100);
             $gradeishighenough = ($usersgrade >= $record->passinggrade);
 
             // Check for pass.
@@ -64,16 +63,16 @@ function accredible_check_if_cert_earned($record, $user) {
 
         if (!empty($quiz)) {
             // If this quiz is in the completion activities.
-            if ( isset($completionactivities[$quiz->id]) ) {
+            if (isset($completionactivities[$quiz->id])) {
                 $completionactivities[$quiz->id] = true;
                 $quizattempts = $DB->get_records('quiz_attempts', ['userid' => $user['id'], 'state' => 'finished']);
                 foreach ($quizattempts as $quizattempt) {
                     // If this quiz was already attempted, then we shouldn't be issuing a certificate.
-                    if ( $quizattempt->quiz == $quiz->id && $quizattempt->attempt > 1 ) {
+                    if ($quizattempt->quiz == $quiz->id && $quizattempt->attempt > 1) {
                         return null;
                     }
                     // Otherwise, set this quiz as completed.
-                    if ( isset($completionactivities[$quizattempt->quiz]) ) {
+                    if (isset($completionactivities[$quizattempt->quiz])) {
                         $completionactivities[$quizattempt->quiz] = true;
                     }
                 }
@@ -110,7 +109,6 @@ function accredible_get_recipient_sso_linik($groupid, $email) {
         $response = $apirest->recipient_sso_link(null, null, $email, null, $groupid, null);
 
         return $response->link;
-
     } catch (Exception $e) {
         return null;
     }
@@ -130,8 +128,16 @@ function accredible_get_recipient_sso_linik($groupid, $email) {
  * @param date|null $completedtimestamp
  * @param array $customattributes
  */
-function accredible_issue_default_certificate($userid, $certificateid, $name, $email, $grade,
-    $quizname, $completedtimestamp = null, $customattributes = null) {
+function accredible_issue_default_certificate(
+    $userid,
+    $certificateid,
+    $name,
+    $email,
+    $grade,
+    $quizname,
+    $completedtimestamp = null,
+    $customattributes = null
+) {
     global $DB, $CFG;
 
     if (!isset($completedtimestamp)) {
@@ -146,8 +152,17 @@ function accredible_issue_default_certificate($userid, $certificateid, $name, $e
     $courselink = $courseurl->__toString();
 
     $restapi = new apirest();
-    $credential = $restapi->create_credential_legacy($name, $email, $accrediblecertificate->achievementid, $issuedon, null,
-        $accrediblecertificate->certificatename, $accrediblecertificate->description, $courselink, $customattributes);
+    $credential = $restapi->create_credential_legacy(
+        $name,
+        $email,
+        $accrediblecertificate->achievementid,
+        $issuedon,
+        null,
+        $accrediblecertificate->certificatename,
+        $accrediblecertificate->description,
+        $courselink,
+        $customattributes
+    );
 
     // Evidence item posts.
     $credentialid = $credential->credential->id;
@@ -222,7 +237,7 @@ function accredible_quiz_submission_handler($event) {
     if ($accrediblecertificaterecords = $DB->get_records('accredible', ['course' => $event->courseid])) {
         foreach ($accrediblecertificaterecords as $record) {
             // Check for the existence of an activity instance and an auto-issue rule.
-            if ( $record && ($record->finalquiz || $record->completionactivities) ) {
+            if ($record && ($record->finalquiz || $record->completionactivities)) {
                 // Load user grade to attach in the credential.
                 $gradeattributes = $usersclient->get_user_grades($record, $user->id);
                 // Later: refactor the attribute mapping generation into a class function.
@@ -239,7 +254,7 @@ function accredible_quiz_submission_handler($event) {
 
                         // Create that credential if it doesn't exist.
                         if (!$existingcertificate) {
-                            $usersgrade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                            $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
                             $gradeishighenough = ($usersgrade >= $record->passinggrade);
 
                             // Check for pass.
@@ -252,11 +267,14 @@ function accredible_quiz_submission_handler($event) {
                             $credential = $api->get_credential($existingcertificate->id)->credential;
                             foreach ($credential->evidence_items as $evidenceitem) {
                                 if ($evidenceitem->type == "grade") {
-                                    $highestgrade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                                    $highestgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
                                     $apigrade = intval($evidenceitem->string_object->grade);
                                     if ($apigrade < $highestgrade) {
-                                        $api->update_evidence_item_grade($existingcertificate->id,
-                                            $evidenceitem->id, $highestgrade);
+                                        $api->update_evidence_item_grade(
+                                            $existingcertificate->id,
+                                            $evidenceitem->id,
+                                            $highestgrade
+                                        );
                                     }
                                 }
                             }
@@ -265,16 +283,16 @@ function accredible_quiz_submission_handler($event) {
 
                     $completionactivities = unserialize_completion_array($record->completionactivities);
                     // If this quiz is in the completion activities.
-                    if ( isset($completionactivities[$quiz->id]) ) {
+                    if (isset($completionactivities[$quiz->id])) {
                         $completionactivities[$quiz->id] = true;
                         $quizattempts = $DB->get_records('quiz_attempts', ['userid' => $user->id, 'state' => 'finished']);
                         foreach ($quizattempts as $quizattempt) {
                             // If this quiz was already attempted, then we shouldn't be issuing a certificate.
-                            if ( $quizattempt->quiz == $quiz->id && $quizattempt->attempt > 1 ) {
+                            if ($quizattempt->quiz == $quiz->id && $quizattempt->attempt > 1) {
                                 return null;
                             }
                             // Otherwise, set this quiz as completed.
-                            if ( isset($completionactivities[$quizattempt->quiz]) ) {
+                            if (isset($completionactivities[$quizattempt->quiz])) {
                                 $completionactivities[$quizattempt->quiz] = true;
                             }
                         }
@@ -296,24 +314,32 @@ function accredible_quiz_submission_handler($event) {
                             }
                         }
                     }
-
                 } else {
                     // Check which quiz is used as the deciding factor in this course.
                     if ($quiz->id == $record->finalquiz) {
-                        $existingcertificate = $localcredentials->check_for_existing_certificate (
-                            $record->achievementid, $user
+                        $existingcertificate = $localcredentials->check_for_existing_certificate(
+                            $record->achievementid,
+                            $user
                         );
 
                         // Check for an existing certificate.
                         if (!$existingcertificate) {
-                            $usersgrade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                            $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
                             $gradeishighenough = ($usersgrade >= $record->passinggrade);
 
                             // Check for pass.
                             if ($gradeishighenough) {
                                 // Issue a ceritificate.
-                                $apiresponse = accredible_issue_default_certificate( $user->id,
-                                    $record->id, fullname($user), $user->email, $usersgrade, $quiz->name, null, $customattributes);
+                                $apiresponse = accredible_issue_default_certificate(
+                                    $user->id,
+                                    $record->id,
+                                    fullname($user),
+                                    $user->email,
+                                    $usersgrade,
+                                    $quiz->name,
+                                    null,
+                                    $customattributes
+                                );
                                 $certificateevent = \mod_accredible\event\certificate_created::create([
                                   'objectid' => $apiresponse->credential->id,
                                   'context' => context_module::instance($event->contextinstanceid),
@@ -326,11 +352,14 @@ function accredible_quiz_submission_handler($event) {
                             $credential = $api->get_credential($existingcertificate->id)->credential;
                             foreach ($credential->evidence_items as $evidenceitem) {
                                 if ($evidenceitem->type == "grade") {
-                                    $highestgrade = min( ( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                                    $highestgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
                                     $apigrade = intval($evidenceitem->string_object->grade);
                                     if ($apigrade < $highestgrade) {
-                                        $api->update_evidence_item_grade($existingcertificate->id,
-                                            $evidenceitem->id, $highestgrade);
+                                        $api->update_evidence_item_grade(
+                                            $existingcertificate->id,
+                                            $evidenceitem->id,
+                                            $highestgrade
+                                        );
                                     }
                                 }
                             }
@@ -339,16 +368,16 @@ function accredible_quiz_submission_handler($event) {
 
                     $completionactivities = unserialize_completion_array($record->completionactivities);
                     // If this quiz is in the completion activities.
-                    if ( isset($completionactivities[$quiz->id]) ) {
+                    if (isset($completionactivities[$quiz->id])) {
                         $completionactivities[$quiz->id] = true;
                         $quizattempts = $DB->get_records('quiz_attempts', ['userid' => $user->id, 'state' => 'finished']);
                         foreach ($quizattempts as $quizattempt) {
                             // If this quiz was already attempted, then we shouldn't be issuing a certificate.
-                            if ( $quizattempt->quiz == $quiz->id && $quizattempt->attempt > 1 ) {
+                            if ($quizattempt->quiz == $quiz->id && $quizattempt->attempt > 1) {
                                 return null;
                             }
                             // Otherwise, set this quiz as completed.
-                            if ( isset($completionactivities[$quizattempt->quiz]) ) {
+                            if (isset($completionactivities[$quizattempt->quiz])) {
                                 $completionactivities[$quizattempt->quiz] = true;
                             }
                         }
@@ -362,14 +391,23 @@ function accredible_quiz_submission_handler($event) {
                         }
                         // If it was the final activity.
                         if ($coursecomplete) {
-                            $existingcertificate = $localcredentials->check_for_existing_certificate (
-                                $record->achievementid, $user
+                            $existingcertificate = $localcredentials->check_for_existing_certificate(
+                                $record->achievementid,
+                                $user
                             );
                             // Make sure there isn't already a certificate.
                             if (!$existingcertificate) {
                                 // And issue a ceritificate.
-                                $apiresponse = accredible_issue_default_certificate( $user->id,
-                                    $record->id, fullname($user), $user->email, null, null, null, $customattributes);
+                                $apiresponse = accredible_issue_default_certificate(
+                                    $user->id,
+                                    $record->id,
+                                    fullname($user),
+                                    $user->email,
+                                    null,
+                                    null,
+                                    null,
+                                    $customattributes
+                                );
                                 $certificateevent = \mod_accredible\event\certificate_created::create([
                                   'objectid' => $apiresponse->credential->id,
                                   'context' => context_module::instance($event->contextinstanceid),
@@ -380,7 +418,6 @@ function accredible_quiz_submission_handler($event) {
                         }
                     }
                 }
-
             }
         }
     }
@@ -405,7 +442,7 @@ function accredible_course_completed_handler($event) {
     if ($accrediblecertificaterecords = $DB->get_records('accredible', ['course' => $event->courseid])) {
         foreach ($accrediblecertificaterecords as $record) {
             // Check for the existence of an activity instance and an auto-issue rule.
-            if ( $record && ($record->completionactivities && $record->completionactivities != 0) ) {
+            if ($record && ($record->completionactivities && $record->completionactivities != 0)) {
                 // Load user grade to attach in the credential.
                 $gradeattributes = $usersclient->get_user_grades($record, $user->id);
                 // Later: refactor the attribute mapping generation into a class function.
@@ -417,10 +454,17 @@ function accredible_course_completed_handler($event) {
                 if ($record->groupid) {
                     // Create the credential.
                     $localcredentials->create_credential($user, $record->groupid, null, $customattributes);
-
                 } else {
-                    $apiresponse = accredible_issue_default_certificate( $user->id, $record->id,
-                        fullname($user), $user->email, null, null, null, $customattributes);
+                    $apiresponse = accredible_issue_default_certificate(
+                        $user->id,
+                        $record->id,
+                        fullname($user),
+                        $user->email,
+                        null,
+                        null,
+                        null,
+                        $customattributes
+                    );
                     $certificateevent = \mod_accredible\event\certificate_created::create([
                       'objectid' => $apiresponse->credential->id,
                       'context' => context_module::instance($event->contextinstanceid),
@@ -428,7 +472,6 @@ function accredible_course_completed_handler($event) {
                     ]);
                     $certificateevent->trigger();
                 }
-
             }
         }
     }
@@ -459,9 +502,9 @@ function accredible_get_transcript($courseid, $userid, $finalquizid) {
                 $itemscompleted += 1;
                 array_push($transcriptitems, [
                     'category' => $quiz->name,
-                    'percent' => min( ( $highestgrade / $quiz->grade ) * 100, 100 ),
+                    'percent' => min(( $highestgrade / $quiz->grade ) * 100, 100),
                 ]);
-                $totalscore += min( ( $highestgrade / $quiz->grade ) * 100, 100);
+                $totalscore += min(( $highestgrade / $quiz->grade ) * 100, 100);
             }
             $totalitems += 1;
         }
@@ -469,8 +512,10 @@ function accredible_get_transcript($courseid, $userid, $finalquizid) {
 
     // If they've completed over 2/3 of items
     // and have a passing average, make a transcript.
-    if ( $totalitems !== 0 && $itemscompleted !== 0 && $itemscompleted / $totalitems >= 0.66 &&
-        $totalscore / $itemscompleted > 50 ) {
+    if (
+        $totalitems !== 0 && $itemscompleted !== 0 && $itemscompleted / $totalitems >= 0.66 &&
+        $totalscore / $itemscompleted > 50
+    ) {
         return [
             'description' => 'Course Transcript',
             'string_object' => json_encode($transcriptitems),
@@ -489,7 +534,7 @@ function accredible_get_transcript($courseid, $userid, $finalquizid) {
  * @param Array $completionarray
  */
 function serialize_completion_array($completionarray) {
-    return base64_encode(serialize( (array)$completionarray ));
+    return base64_encode(serialize((array)$completionarray));
 }
 
 /**
@@ -498,7 +543,7 @@ function serialize_completion_array($completionarray) {
  * @param stdObject $completionobject
  */
 function unserialize_completion_array($completionobject) {
-    return is_null($completionobject) ? [] : (array)unserialize(base64_decode( $completionobject ));
+    return is_null($completionobject) ? [] : (array)unserialize(base64_decode($completionobject));
 }
 
 /**
@@ -553,7 +598,6 @@ function accredible_manual_issue_completion_timestamp($accrediblerecord, $user) 
                 $completedtimestamp = $highestattempt->timefinish;
             }
         }
-
     }
 
     // TODO: When is the completion if there are completion activities set?
@@ -572,7 +616,7 @@ function accredible_manual_issue_completion_timestamp($accrediblerecord, $user) 
  * @param int $number
  * @return string
  */
-function number_ending ($number) {
+function number_ending($number) {
     return ($number > 1) ? 's' : '';
 }
 
@@ -582,7 +626,7 @@ function number_ending ($number) {
  * @param int $seconds
  * @return string
  */
-function seconds_to_str ($seconds) {
+function seconds_to_str($seconds) {
     $hours = floor(($seconds %= 86400) / 3600);
     if ($hours) {
         return $hours . ' hour' . number_ending($hours);
