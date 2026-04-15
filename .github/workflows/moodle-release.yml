@@ -10,6 +10,16 @@ on:
     tags:
       - v*
 
+  workflow_call:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+        type: string
+    secrets:
+      MOODLE_ORG_TOKEN:
+        required: true
+
   workflow_dispatch:
     inputs:
       tag:
@@ -34,8 +44,13 @@ jobs:
       - name: Call the service function
         id: add-version
         run: |
+          # workflow_dispatch input
           if [[ ! -z "${{ github.event.inputs.tag }}" ]]; then
             TAGNAME="${{ github.event.inputs.tag }}"
+          # workflow_call input
+          elif [[ ! -z "${{ inputs.tag }}" ]]; then
+            TAGNAME="${{ inputs.tag }}"
+          # tag push trigger
           elif [[ $GITHUB_REF = refs/tags/* ]]; then
             TAGNAME="${GITHUB_REF##*/}"
           fi
