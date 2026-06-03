@@ -19,9 +19,8 @@ namespace mod_accredible\event;
 /**
  * The credential_issue_skipped event class.
  *
- * Fired when an issuance handler runs for a relevant event but the eligibility
- * check declines to issue a credential. Carries a stable reason code in
- * other['reason'] so admins can diagnose why a user was not issued.
+ * Fired when an eligibility check declines to issue a credential.
+ * Carries a reason code in other['reason'].
  *
  * @package    mod_accredible
  * @subpackage accredible
@@ -33,7 +32,7 @@ class credential_issue_skipped extends \core\event\base {
      * Init function to assign variables.
      */
     protected function init() {
-        $this->data['crud'] = 'r'; // ... read (an evaluation that did not create anything).
+        $this->data['crud'] = 'r'; // ... read.
         $this->data['edulevel'] = self::LEVEL_OTHER;
         $this->data['objecttable'] = 'accredible';
     }

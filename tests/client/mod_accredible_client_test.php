@@ -48,7 +48,6 @@ final class mod_accredible_client_test extends \advanced_testcase {
         $url = 'https://api.accredible.com/v1/all_credentials';
         $options = [
             'CURLOPT_RETURNTRANSFER' => true,
-            'CURLOPT_FAILONERROR'    => true,
             'CURLOPT_HTTPHEADER'     => [
                 'Authorization: Token sometestapikey',
                 'Content-Type: application/json; charset=utf-8',
@@ -82,7 +81,6 @@ final class mod_accredible_client_test extends \advanced_testcase {
         $url = 'https://api.accredible.com/v1/all_credentials';
         $options = [
             'CURLOPT_RETURNTRANSFER' => true,
-            'CURLOPT_FAILONERROR'    => true,
             'CURLOPT_HTTPHEADER'     => [
                 'Authorization: Token sometestapikey',
                 'Content-Type: application/json; charset=utf-8',
@@ -117,7 +115,6 @@ final class mod_accredible_client_test extends \advanced_testcase {
         $url = 'https://api.accredible.com/v1/all_credentials';
         $options = [
             'CURLOPT_RETURNTRANSFER' => true,
-            'CURLOPT_FAILONERROR'    => true,
             'CURLOPT_HTTPHEADER'     => [
                 'Authorization: Token sometestapikey',
                 'Content-Type: application/json; charset=utf-8',
@@ -152,7 +149,6 @@ final class mod_accredible_client_test extends \advanced_testcase {
         $url = 'https://api.accredible.com/v1/all_credentials';
         $options = [
             'CURLOPT_RETURNTRANSFER' => true,
-            'CURLOPT_FAILONERROR'    => true,
             'CURLOPT_HTTPHEADER'     => [
                 'Authorization: Token sometestapikey',
                 'Content-Type: application/json; charset=utf-8',

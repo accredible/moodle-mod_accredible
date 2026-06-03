@@ -19,10 +19,7 @@ namespace mod_accredible\event;
 /**
  * The api_request_failed event class.
  *
- * Fired when an HTTP request to the Accredible API fails at the transport layer
- * (curl error, non-2xx status, or an error-shaped response body). This is the
- * technical counterpart to credential_issue_failed and the two often fire
- * together.
+ * Fired when an Accredible API request fails (curl error, non-2xx, or error body).
  *
  * @package    mod_accredible
  * @subpackage accredible
@@ -34,7 +31,7 @@ class api_request_failed extends \core\event\base {
      * Init function to assign variables.
      */
     protected function init() {
-        $this->data['crud'] = 'r'; // ... read (no object created).
+        $this->data['crud'] = 'r'; // ... read.
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 

@@ -19,8 +19,7 @@ namespace mod_accredible\event;
 /**
  * The credential_issue_failed event class.
  *
- * Fired when an exception is caught while attempting to issue a credential
- * (the business-level "we tried, it didn't happen" event).
+ * Fired when an attempt to issue a credential throws.
  *
  * @package    mod_accredible
  * @subpackage accredible
@@ -32,7 +31,7 @@ class credential_issue_failed extends \core\event\base {
      * Init function to assign variables.
      */
     protected function init() {
-        $this->data['crud'] = 'c'; // ... create (an attempted create that failed).
+        $this->data['crud'] = 'c'; // ... create.
         $this->data['edulevel'] = self::LEVEL_OTHER;
         $this->data['objecttable'] = 'accredible';
     }

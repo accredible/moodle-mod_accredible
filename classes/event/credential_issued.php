@@ -19,9 +19,7 @@ namespace mod_accredible\event;
 /**
  * The credential_issued event class.
  *
- * Fired when the modern group-based create_credential path successfully issues
- * a credential, giving the modern path parity with the legacy
- * certificate_created event.
+ * Fired when the modern create_credential path issues a credential.
  *
  * @package    mod_accredible
  * @subpackage accredible
