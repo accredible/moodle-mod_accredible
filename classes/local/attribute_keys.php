@@ -62,8 +62,9 @@ class attribute_keys {
             for ($i = 0; $i <= 100; $i++) {
                 $response = $this->apirest->search_attribute_keys($pagesize, $page, $kind);
 
-                if (isset($response->success) && $response->success === false) {
-                    throw new \Exception($response->data ?? 'Unknown error');
+                $errmsg = $this->apirest->detect_error($response);
+                if ($errmsg !== null) {
+                    throw new \Exception($errmsg);
                 }
 
                 foreach ($response->attribute_keys as $attributekey) {

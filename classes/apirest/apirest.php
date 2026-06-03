@@ -377,6 +377,54 @@ class apirest {
     }
 
     /**
+     * Detect an API error from the last response.
+     * Returns a normalized error message if the response signals an error, null otherwise.
+     * Checks transport-level error first, then HTTP status, then body shape.
+     * @param \stdClass|null $response decoded API response
+     * @return string|null
+     */
+    public function detect_error($response) {
+        // Transport-level failure (curl error, empty body, malformed JSON).
+        if ($this->client->error) {
+            return (string) $this->client->error;
+        }
+        $respcode = $this->client->resp_code;
+        if ($respcode === null || $respcode < 400) {
+            return null;
+        }
+        if ($response === null) {
+            return "HTTP {$respcode}";
+        }
+        // {"success": false, "data": "..."} — 401/404 shape.
+        if (isset($response->success) && $response->success === false && isset($response->data)) {
+            return (string) $response->data;
+        }
+        // {"errors": "..."} — 403 string form.
+        if (isset($response->errors) && is_string($response->errors)) {
+            return $response->errors;
+        }
+        // {"errors": {field: [msg]}} — 422 validation object form.
+        if (isset($response->errors) && is_object($response->errors)) {
+            $parts = [];
+            foreach ($response->errors as $field => $messages) {
+                if (is_array($messages)) {
+                    $parts[] = "{$field}: " . implode(', ', $messages);
+                } else {
+                    $parts[] = "{$field}: {$messages}";
+                }
+            }
+            if ($parts) {
+                return implode('; ', $parts);
+            }
+        }
+        // {"code": ..., "message": "...", "status": "..."} — 400 shape.
+        if (isset($response->message)) {
+            return (string) $response->message;
+        }
+        return "HTTP {$respcode}";
+    }
+
+    /**
      * Strip out keys with a null value from an object http://stackoverflow.com/a/15953991
      * @param stdObject $object
      * @return stdObject

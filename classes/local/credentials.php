@@ -68,12 +68,9 @@ class credentials {
                 $customattributes
             );
 
-            if (isset($credential->success) && $credential->success === false) {
-                throw new \Exception($credential->data ?? 'Unknown error');
-            }
-
-            if (isset($credential->success) && $credential->success === false) {
-                throw new \Exception($credential->data ?? 'Unknown error');
+            $errmsg = $this->apirest->detect_error($credential);
+            if ($errmsg !== null) {
+                throw new \Exception($errmsg);
             }
 
             return $credential->credential;
@@ -126,12 +123,9 @@ class credentials {
                 $customattributes
             );
 
-            if (isset($credential->success) && $credential->success === false) {
-                throw new \Exception($credential->data ?? 'Unknown error');
-            }
-
-            if (isset($credential->success) && $credential->success === false) {
-                throw new \Exception($credential->data ?? 'Unknown error');
+            $errmsg = $this->apirest->detect_error($credential);
+            if ($errmsg !== null) {
+                throw new \Exception($errmsg);
             }
 
             return $credential->credential;
@@ -171,8 +165,9 @@ class credentials {
             while ($loop === true) {
                 $credentialspage = $this->apirest->get_credentials($groupid, $email, $pagesize, $page);
 
-                if (isset($credentialspage->success) && $credentialspage->success === false) {
-                    throw new \Exception($credentialspage->data ?? 'Unknown error');
+                $errmsg = $this->apirest->detect_error($credentialspage);
+                if ($errmsg !== null) {
+                    throw new \Exception($errmsg);
                 }
 
                 foreach ($credentialspage->credentials as $credential) {
@@ -219,8 +214,9 @@ class credentials {
         try {
             $credentials = $this->apirest->get_credentials($groupid, $email);
 
-            if (isset($credentials->success) && $credentials->success === false) {
-                throw new \Exception($credentials->data ?? 'Unknown error');
+            $errmsg = $this->apirest->detect_error($credentials);
+            if ($errmsg !== null) {
+                throw new \Exception($errmsg);
             }
 
             if ($credentials->credentials && $credentials->credentials[0]) {
