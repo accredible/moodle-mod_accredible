@@ -93,7 +93,7 @@ class credentials {
                 $customattributes
             );
 
-            $errmsg = $this->apirest->detect_error($credential, '/v1/credentials', $user->id);
+            $errmsg = $this->apirest->detect_error($credential, $user->id);
             if ($errmsg !== null) {
                 throw new \Exception($errmsg);
             }
@@ -151,7 +151,7 @@ class credentials {
                 $customattributes
             );
 
-            $errmsg = $this->apirest->detect_error($credential, '/v1/credentials', $user->id);
+            $errmsg = $this->apirest->detect_error($credential, $user->id);
             if ($errmsg !== null) {
                 throw new \Exception($errmsg);
             }
@@ -196,7 +196,7 @@ class credentials {
             while ($loop === true) {
                 $credentialspage = $this->apirest->get_credentials($groupid, $email, $pagesize, $page);
 
-                $errmsg = $this->apirest->detect_error($credentialspage, '/v1/all_credentials');
+                $errmsg = $this->apirest->detect_error($credentialspage);
                 if ($errmsg !== null) {
                     throw new \Exception($errmsg);
                 }
@@ -245,7 +245,7 @@ class credentials {
         try {
             $credentials = $this->apirest->get_credentials($groupid, $email);
 
-            $errmsg = $this->apirest->detect_error($credentials, '/v1/all_credentials');
+            $errmsg = $this->apirest->detect_error($credentials);
             if ($errmsg !== null) {
                 throw new \Exception($errmsg);
             }

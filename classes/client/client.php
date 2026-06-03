@@ -56,6 +56,12 @@ class client {
     public $latencyms;
 
     /**
+     * URL of the last request, or null if none has been made.
+     * @var string|null $last_url
+     */
+    public $last_url;
+
+    /**
      * Constructor method
      *
      * @param stdObject $curl a mock curl for testing
@@ -128,6 +134,7 @@ class client {
         $this->error = null;
         $this->resp_code = null;
         $this->latencyms = null;
+        $this->last_url = $url;
 
         $starttime = microtime(true);
         $response = $curl->$method($url, $reqdata, $this->curloptions);

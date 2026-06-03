@@ -381,11 +381,10 @@ class apirest {
      * Returns a normalized error message if the response signals an error, null otherwise.
      * Fires api_request_failed when an error is detected.
      * @param \stdClass|null $response decoded API response
-     * @param string|null $endpoint descriptive endpoint label for the log event
      * @param int|null $userid related user id for the log event
      * @return string|null
      */
-    public function detect_error($response, $endpoint = null, $userid = null) {
+    public function detect_error($response, $userid = null) {
         // Transport-level error (curl error, empty body, malformed JSON) takes priority.
         if ($this->client->error) {
             $errmsg = (string) $this->client->error;
@@ -399,7 +398,7 @@ class apirest {
             'context' => \context_system::instance(),
             'relateduserid' => $userid ?: null,
             'other' => [
-                'endpoint' => $endpoint,
+                'endpoint' => $this->client->last_url,
                 'http_status' => $this->client->resp_code,
                 'error' => $errmsg,
                 'latencyms' => $this->client->latencyms,

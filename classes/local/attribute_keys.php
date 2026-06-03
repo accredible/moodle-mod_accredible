@@ -62,7 +62,7 @@ class attribute_keys {
             for ($i = 0; $i <= 100; $i++) {
                 $response = $this->apirest->search_attribute_keys($pagesize, $page, $kind);
 
-                $errmsg = $this->apirest->detect_error($response, '/v1/attribute_keys/search');
+                $errmsg = $this->apirest->detect_error($response);
                 if ($errmsg !== null) {
                     throw new \Exception($errmsg);
                 }
