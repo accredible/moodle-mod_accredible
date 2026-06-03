@@ -109,7 +109,15 @@ function accredible_get_recipient_sso_linik($groupid, $email) {
         $response = $apirest->recipient_sso_link(null, null, $email, null, $groupid, null);
 
         return $response->link;
-    } catch (Exception $e) {
+    } catch (\Throwable $e) {
+        \mod_accredible\event\api_request_failed::create([
+            'context' => \context_system::instance(),
+            'other' => [
+                'endpoint' => 'sso/generate_link',
+                'http_status' => null,
+                'error' => $e->getMessage(),
+            ],
+        ])->trigger();
         return null;
     }
 }

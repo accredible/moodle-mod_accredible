@@ -76,7 +76,7 @@ class groups {
             for ($i = 0; $i <= 100; $i++) {
                 $response = $this->apirest->get_groups($pagesize, $page);
 
-                $errmsg = $this->apirest->detect_error($response);
+                $errmsg = $this->apirest->detect_error($response, '/v1/issuer/all_groups');
                 if ($errmsg !== null) {
                     throw new \Exception($errmsg);
                 }
@@ -115,7 +115,7 @@ class groups {
             for ($i = 0; $i <= 100; $i++) {
                 $response = $this->apirest->search_groups($pagesize, $page);
 
-                $errmsg = $this->apirest->detect_error($response);
+                $errmsg = $this->apirest->detect_error($response, '/v1/issuer/groups/search');
                 if ($errmsg !== null) {
                     throw new \Exception($errmsg);
                 }

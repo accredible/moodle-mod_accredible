@@ -379,17 +379,45 @@ class apirest {
     /**
      * Detect an API error from the last response.
      * Returns a normalized error message if the response signals an error, null otherwise.
-     * Checks transport-level error first, then HTTP status, then body shape.
+     * Fires api_request_failed when an error is detected.
      * @param \stdClass|null $response decoded API response
+     * @param string|null $endpoint descriptive endpoint label for the log event
+     * @param int|null $userid related user id for the log event
      * @return string|null
      */
-    public function detect_error($response) {
-        // Transport-level failure (curl error, empty body, malformed JSON).
+    public function detect_error($response, $endpoint = null, $userid = null) {
+        // Transport-level error (curl error, empty body, malformed JSON) takes priority.
         if ($this->client->error) {
-            return (string) $this->client->error;
+            $errmsg = (string) $this->client->error;
+        } else {
+            $errmsg = self::normalize_error($response, $this->client->resp_code);
         }
-        $respcode = $this->client->resp_code;
-        if ($respcode === null || $respcode < 400) {
+        if ($errmsg === null) {
+            return null;
+        }
+        \mod_accredible\event\api_request_failed::create([
+            'context' => \context_system::instance(),
+            'relateduserid' => $userid ?: null,
+            'other' => [
+                'endpoint' => $endpoint,
+                'http_status' => $this->client->resp_code,
+                'error' => $errmsg,
+                'latencyms' => $this->client->latencyms,
+            ],
+        ])->trigger();
+        return $errmsg;
+    }
+
+    /**
+     * Normalize an API response into an error message, or null if no error.
+     * Transport-level errors are handled separately in detect_error().
+     * @param \stdClass|null $response decoded API response
+     * @param int|null $respcode HTTP status code
+     * @return string|null
+     */
+    public static function normalize_error($response, $respcode) {
+        $iserrorcode = $respcode !== null && $respcode >= 400;
+        if (!$iserrorcode) {
             return null;
         }
         if ($response === null) {

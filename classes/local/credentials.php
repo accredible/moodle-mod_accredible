@@ -53,10 +53,35 @@ class credentials {
      * @param int $groupid
      * @param date|null $issuedon
      * @param array $customattributes
-     * @return stdObject
+     * @param \context|null $context Moodle context for log events; defaults to system context.
+     * @param int $instanceid accredible activity instance id for log events (objectid).
+     * @return stdObject|null null when pre-flight rejects issuance; caller should treat as skip.
      */
-    public function create_credential($user, $groupid, $issuedon = null, $customattributes = null) {
+    public function create_credential($user, $groupid, $issuedon = null, $customattributes = null,
+            $context = null, $instanceid = 0) {
         global $CFG;
+
+        $ctx = $context ?? \context_system::instance();
+
+        if (empty($user->email)) {
+            \mod_accredible\event\credential_issue_skipped::create([
+                'objectid' => $instanceid,
+                'context'  => $ctx,
+                'relateduserid' => $user->id,
+                'other' => ['reason' => 'missing_email', 'groupid' => $groupid],
+            ])->trigger();
+            return null;
+        }
+
+        if (empty($groupid)) {
+            \mod_accredible\event\credential_issue_skipped::create([
+                'objectid' => $instanceid,
+                'context'  => $ctx,
+                'relateduserid' => $user->id,
+                'other' => ['reason' => 'missing_groupid'],
+            ])->trigger();
+            return null;
+        }
 
         try {
             $credential = $this->apirest->create_credential(
@@ -68,17 +93,20 @@ class credentials {
                 $customattributes
             );
 
-            $errmsg = $this->apirest->detect_error($credential);
+            $errmsg = $this->apirest->detect_error($credential, '/v1/credentials', $user->id);
             if ($errmsg !== null) {
                 throw new \Exception($errmsg);
             }
 
+            \mod_accredible\event\credential_issued::create([
+                'objectid' => (int) $credential->credential->id,
+                'context'  => $ctx,
+                'relateduserid' => $user->id,
+                'other' => ['credentialid' => $credential->credential->id, 'groupid' => $groupid],
+            ])->trigger();
+
             return $credential->credential;
         } catch (\Exception $e) {
-            // Throw API exception.
-            // Include the achievement id that triggered the error.
-            // Direct the user to accredible's support.
-            // Dump the achievement id to debug_info.
             throw new \moodle_exception(
                 'credentialcreateerror',
                 'accredible',
@@ -123,17 +151,20 @@ class credentials {
                 $customattributes
             );
 
-            $errmsg = $this->apirest->detect_error($credential);
+            $errmsg = $this->apirest->detect_error($credential, '/v1/credentials', $user->id);
             if ($errmsg !== null) {
                 throw new \Exception($errmsg);
             }
 
+            \mod_accredible\event\credential_issued::create([
+                'objectid' => (int) $credential->credential->id,
+                'context'  => \context_system::instance(),
+                'relateduserid' => $user->id,
+                'other' => ['credentialid' => $credential->credential->id, 'groupid' => $achievementname],
+            ])->trigger();
+
             return $credential->credential;
         } catch (\Exception $e) {
-            // Throw API exception.
-            // Include the achievement id that triggered the error.
-            // Direct the user to accredible's support.
-            // Dump the achievement id to debug_info.
             throw new \moodle_exception(
                 'credentialcreateerror',
                 'accredible',
@@ -165,7 +196,7 @@ class credentials {
             while ($loop === true) {
                 $credentialspage = $this->apirest->get_credentials($groupid, $email, $pagesize, $page);
 
-                $errmsg = $this->apirest->detect_error($credentialspage);
+                $errmsg = $this->apirest->detect_error($credentialspage, '/v1/all_credentials');
                 if ($errmsg !== null) {
                     throw new \Exception($errmsg);
                 }
@@ -214,7 +245,7 @@ class credentials {
         try {
             $credentials = $this->apirest->get_credentials($groupid, $email);
 
-            $errmsg = $this->apirest->detect_error($credentials);
+            $errmsg = $this->apirest->detect_error($credentials, '/v1/all_credentials');
             if ($errmsg !== null) {
                 throw new \Exception($errmsg);
             }
