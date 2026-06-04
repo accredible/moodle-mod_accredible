@@ -100,7 +100,7 @@ function accredible_check_if_cert_earned($record, $user) {
  * @param int $groupid
  * @param string $email
  */
-function accredible_get_recipient_sso_linik($groupid, $email) {
+function accredible_get_recipient_sso_link($groupid, $email) {
     global $CFG;
 
     $apirest = new apirest();
@@ -108,6 +108,11 @@ function accredible_get_recipient_sso_linik($groupid, $email) {
     try {
         $response = $apirest->recipient_sso_link(null, null, $email, null, $groupid, null);
 
+        // detect_error fires api_request_failed when the call failed; recipient_sso_link
+        // returns null/an error body without throwing, so check explicitly.
+        if ($apirest->detect_error($response) !== null || empty($response->link)) {
+            return null;
+        }
         return $response->link;
     } catch (\Throwable $e) {
         \mod_accredible\event\api_request_failed::create([
