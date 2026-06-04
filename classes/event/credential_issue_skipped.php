@@ -34,7 +34,6 @@ class credential_issue_skipped extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'r'; // ... read.
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'accredible';
     }
 
     /**

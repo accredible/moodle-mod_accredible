@@ -33,7 +33,6 @@ class credential_issued extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'c'; // ... create.
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'accredible';
     }
 
     /**

@@ -33,7 +33,6 @@ class credential_issue_failed extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'c'; // ... create.
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'accredible';
     }
 
     /**

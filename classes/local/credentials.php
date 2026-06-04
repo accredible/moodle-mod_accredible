@@ -54,18 +54,16 @@ class credentials {
      * @param date|null $issuedon
      * @param array $customattributes
      * @param \context|null $context Moodle context for log events; defaults to system context.
-     * @param int $instanceid accredible activity instance id for log events (objectid).
      * @return stdObject|null null when pre-flight rejects issuance; caller should treat as skip.
      */
     public function create_credential($user, $groupid, $issuedon = null, $customattributes = null,
-            $context = null, $instanceid = 0) {
+            $context = null) {
         global $CFG;
 
         $ctx = $context ?? \context_system::instance();
 
         if (empty($user->email)) {
             \mod_accredible\event\credential_issue_skipped::create([
-                'objectid' => $instanceid,
                 'context'  => $ctx,
                 'relateduserid' => $user->id,
                 'other' => ['reason' => 'missing_email', 'groupid' => $groupid],
@@ -75,7 +73,6 @@ class credentials {
 
         if (empty($groupid)) {
             \mod_accredible\event\credential_issue_skipped::create([
-                'objectid' => $instanceid,
                 'context'  => $ctx,
                 'relateduserid' => $user->id,
                 'other' => ['reason' => 'missing_groupid'],
@@ -99,7 +96,6 @@ class credentials {
             }
 
             \mod_accredible\event\credential_issued::create([
-                'objectid' => (int) $credential->credential->id,
                 'context'  => $ctx,
                 'relateduserid' => $user->id,
                 'other' => ['credentialid' => $credential->credential->id, 'groupid' => $groupid],
@@ -157,7 +153,6 @@ class credentials {
             }
 
             \mod_accredible\event\credential_issued::create([
-                'objectid' => (int) $credential->credential->id,
                 'context'  => \context_system::instance(),
                 'relateduserid' => $user->id,
                 'other' => ['credentialid' => $credential->credential->id, 'groupid' => $achievementname],
