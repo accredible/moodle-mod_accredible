@@ -178,4 +178,95 @@ final class mod_accredible_client_test extends \advanced_testcase {
         // Expect to return an error message.
         $this->assertEquals($client->error, $error);
     }
+
+    /**
+     * The error property is reset at the start of each request on a reused client.
+     * @coversNothing
+     */
+    public function test_error_is_reset_between_requests(): void {
+        $url = 'https://api.accredible.com/v1/all_credentials';
+
+        $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
+        $mockcurl->method('get')->willReturn('{"ok":true}');
+        $client = new client($mockcurl);
+
+        // First request fails at the transport layer.
+        $mockcurl->error = 'Network down';
+        $client->get($url);
+        $this->assertEquals('Network down', $client->error);
+        $this->assertDebuggingCalled();
+
+        // Second request succeeds; the stale error must not leak through.
+        $mockcurl->error = '';
+        $client->get($url);
+        $this->assertNull($client->error);
+    }
+
+    /**
+     * The HTTP status code is captured into resp_code from the curl info.
+     * @coversNothing
+     */
+    public function test_resp_code_is_captured(): void {
+        $url = 'https://api.accredible.com/v1/all_credentials';
+
+        $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
+        $mockcurl->info = ['http_code' => 404];
+        $mockcurl->method('get')->willReturn('{"success":false,"data":"Group does not exist"}');
+        $client = new client($mockcurl);
+
+        $client->get($url);
+        $this->assertEquals(404, $client->resp_code);
+        // A 4xx body is preserved (no FAILONERROR) and is not a transport error.
+        $this->assertNull($client->error);
+    }
+
+    /**
+     * Null-return case 1: a curl transport error returns null and sets error.
+     * @coversNothing
+     */
+    public function test_curl_error_returns_null_with_error(): void {
+        $url = 'https://api.accredible.com/v1/all_credentials';
+
+        $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
+        $mockcurl->error = 'Could not resolve host';
+        $mockcurl->method('get')->willReturn(false);
+        $client = new client($mockcurl);
+
+        $result = $client->get($url);
+        $this->assertNull($result);
+        $this->assertEquals('Could not resolve host', $client->error);
+        $this->assertDebuggingCalled();
+    }
+
+    /**
+     * Null-return case 2: an empty body returns null without flagging an error.
+     * @coversNothing
+     */
+    public function test_empty_body_returns_null_without_error(): void {
+        $url = 'https://api.accredible.com/v1/all_credentials';
+
+        $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
+        $mockcurl->method('get')->willReturn('');
+        $client = new client($mockcurl);
+
+        $result = $client->get($url);
+        $this->assertNull($result);
+        $this->assertNull($client->error);
+    }
+
+    /**
+     * Null-return case 3: malformed JSON returns null and sets a distinct error.
+     * @coversNothing
+     */
+    public function test_malformed_json_returns_null_with_error(): void {
+        $url = 'https://api.accredible.com/v1/all_credentials';
+
+        $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
+        $mockcurl->method('get')->willReturn('<html>Bad Gateway</html>');
+        $client = new client($mockcurl);
+
+        $result = $client->get($url);
+        $this->assertNull($result);
+        $this->assertStringContainsString('Malformed JSON', $client->error);
+    }
 }
