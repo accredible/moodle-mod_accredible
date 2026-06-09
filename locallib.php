@@ -167,22 +167,27 @@ function accredible_evaluate_completion_eligibility($user, $record, $quiz, $ctx)
  * @param string $email
  */
 function accredible_get_recipient_sso_link($groupid, $email) {
-    global $CFG;
+    global $CFG, $DB;
 
     $apirest = new apirest();
+
+    // Resolve the recipient so the logged api_request_failed event has a related user.
+    $recipient = $DB->get_record('user', ['email' => $email], 'id', IGNORE_MULTIPLE);
+    $userid = $recipient ? $recipient->id : null;
 
     try {
         $response = $apirest->recipient_sso_link(null, null, $email, null, $groupid, null);
 
         // The detect_error() call fires api_request_failed when the call failed; recipient_sso_link
         // returns null or an error body without throwing, so check explicitly.
-        if ($apirest->detect_error($response) !== null || empty($response->link)) {
+        if ($apirest->detect_error($response, $userid) !== null || empty($response->link)) {
             return null;
         }
         return $response->link;
     } catch (\Throwable $e) {
         \mod_accredible\event\api_request_failed::create([
             'context' => \context_system::instance(),
+            'relateduserid' => $userid ?: null,
             'other' => [
                 'endpoint' => 'sso/generate_link',
                 'http_status' => null,

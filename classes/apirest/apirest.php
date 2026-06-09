@@ -426,6 +426,10 @@ class apirest {
         if (isset($response->success) && $response->success === false && isset($response->data)) {
             return (string) $response->data;
         }
+        // Shape: a single error string under "error" (e.g. the SSO endpoints).
+        if (isset($response->error) && is_string($response->error)) {
+            return $response->error;
+        }
         // Shape: errors as a single string (HTTP 403).
         if (isset($response->errors) && is_string($response->errors)) {
             return $response->errors;

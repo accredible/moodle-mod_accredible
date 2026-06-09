@@ -70,6 +70,12 @@ final class mod_accredible_apirest_error_test extends \advanced_testcase {
             '403 errors-string shape' => [
                 (object)['errors' => 'Private Certificate, use key'], 403, 'Private Certificate, use key',
             ],
+            // HTTP 404: a single error string under "error" (SSO endpoints).
+            '404 single-error string shape' => [
+                (object)['error' => 'No Published Credential with this attribute'],
+                404,
+                'No Published Credential with this attribute',
+            ],
             // HTTP 422: errors as a field-keyed object of messages.
             '422 errors-object shape' => [
                 (object)['errors' => (object)[
