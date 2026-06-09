@@ -299,14 +299,15 @@ function accredible_log_creation($certificateid, $userid, $courseid, $cmid) {
  * Quiz submission handler (checks for a completed course)
  *
  * @param core/event $event quiz mod attempt_submitted event
+ * @param credentials|null $localcredentials injectable credentials client for testing
  */
-function accredible_quiz_submission_handler($event) {
+function accredible_quiz_submission_handler($event, $localcredentials = null) {
     global $DB, $CFG;
     require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
     $ctx = context_module::instance($event->contextinstanceid);
     $api = new apirest();
-    $localcredentials = new credentials();
+    $localcredentials = $localcredentials ?? new credentials();
     $usersclient = new users();
     $accredible = new accredible();
 
@@ -494,12 +495,13 @@ function accredible_quiz_submission_handler($event) {
  * Course completion handler
  *
  * @param core/event $event
+ * @param credentials|null $localcredentials injectable credentials client for testing
  */
-function accredible_course_completed_handler($event) {
+function accredible_course_completed_handler($event, $localcredentials = null) {
     global $DB, $CFG;
 
     $ctx = context_course::instance($event->courseid);
-    $localcredentials = new credentials();
+    $localcredentials = $localcredentials ?? new credentials();
     $usersclient = new users();
     $accredible = new accredible();
 

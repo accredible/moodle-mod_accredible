@@ -37,16 +37,18 @@ use mod_accredible\local\accredible;
  * Add certificate instance.
  *
  * @param stdObject $post
+ * @param \MoodleQuickForm|null $mform the module form (passed by core; unused here)
+ * @param credentials|null $localcredentials injectable credentials client for testing
  * @return array $certificate new certificate object
  */
-function accredible_add_instance($post) {
+function accredible_add_instance($post, $mform = null, $localcredentials = null) {
     global $DB;
 
     $post->groupid = isset($post->groupid) ? $post->groupid : null;
 
     $post->instance = isset($post->instance) ? $post->instance : null;
 
-    $localcredentials = new credentials();
+    $localcredentials = $localcredentials ?? new credentials();
     $evidenceitems = new evidenceitems();
     $usersclient = new users();
     $accredible = new accredible();
@@ -134,13 +136,15 @@ function accredible_add_instance($post) {
  * Update certificate instance.
  *
  * @param stdClass $post
+ * @param \MoodleQuickForm|null $mform the module form (passed by core; unused here)
+ * @param credentials|null $localcredentials injectable credentials client for testing
  * @return stdClass $certificate updated
  */
-function accredible_update_instance($post) {
+function accredible_update_instance($post, $mform = null, $localcredentials = null) {
     // To update your certificate details, go to accredible.com.
     global $DB;
 
-    $localcredentials = new credentials();
+    $localcredentials = $localcredentials ?? new credentials();
     $evidenceitems = new evidenceitems();
     $usersclient = new users();
     $accredible = new accredible();
