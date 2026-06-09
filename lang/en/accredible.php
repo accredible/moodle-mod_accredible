@@ -65,7 +65,6 @@ $string['eventcredentialissueskipped'] = 'An Accredible credential issuance was 
 $string['eventapirequestfailed'] = 'An Accredible API request failed';
 $string['reason_completion_not_met'] = 'Required completion activities were not all complete';
 $string['reason_grade_below_threshold'] = 'The grade was below the passing threshold';
-$string['reason_final_quiz_not_passed'] = 'The final quiz was not passed';
 $string['reason_missing_email'] = 'The user has no email address';
 $string['reason_missing_groupid'] = 'No Accredible group id is configured';
 $string['reason_nothing_to_check'] = 'The activity has no final quiz or completion activities configured';
