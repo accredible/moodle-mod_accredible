@@ -50,7 +50,7 @@ class credential_issue_failed extends \core\event\base {
     public function get_description() {
         $reason = $this->other['reason'] ?? 'unknown';
         $message = $this->other['message'] ?? '';
-        return "Accredible credential issuance failed (reason: {$reason}) for user " .
-            "{$this->relateduserid}. {$message}";
+        return "Accredible credential issuance failed (reason: {$reason}) for user with id " .
+            "'{$this->relateduserid}'. {$message}";
     }
 }

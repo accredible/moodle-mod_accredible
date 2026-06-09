@@ -49,6 +49,6 @@ class credential_issued extends \core\event\base {
      */
     public function get_description() {
         $credentialid = $this->other['credentialid'] ?? '';
-        return "An Accredible credential (id '{$credentialid}') was issued for user {$this->relateduserid}.";
+        return "An Accredible credential (id '{$credentialid}') was issued for user with id '{$this->relateduserid}'.";
     }
 }

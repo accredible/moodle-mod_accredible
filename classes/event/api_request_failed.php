@@ -52,6 +52,6 @@ class api_request_failed extends \core\event\base {
         $status = $this->other['http_status'] ?? '';
         $error = $this->other['error'] ?? '';
         return "An Accredible API request to '{$endpoint}' failed " .
-            "(HTTP status: '{$status}') for user {$this->relateduserid}. {$error}";
+            "(HTTP status: '{$status}') for user with id '{$this->relateduserid}'. {$error}";
     }
 }
