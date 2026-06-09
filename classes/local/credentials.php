@@ -48,6 +48,20 @@ class credentials {
     }
 
     /**
+     * Resolve a user id from an email so log events have a related user. Null when unknown.
+     * @param string|null $email
+     * @return int|null
+     */
+    private function userid_from_email($email) {
+        global $DB;
+        if (empty($email)) {
+            return null;
+        }
+        $user = $DB->get_record('user', ['email' => $email], 'id', IGNORE_MULTIPLE);
+        return $user ? $user->id : null;
+    }
+
+    /**
      * Create a credential given a user and an existing group
      * @param stdObject $user
      * @param int $groupid
@@ -184,6 +198,7 @@ class credentials {
 
         // Maximum number of pages to request to avoid possible infinite loop.
         $looplimit = 100;
+        $userid = $this->userid_from_email($email);
         try {
             $loop = true;
             $count = 0;
@@ -192,7 +207,7 @@ class credentials {
             while ($loop === true) {
                 $credentialspage = $this->apirest->get_credentials($groupid, $email, $pagesize, $page);
 
-                $errmsg = $this->apirest->detect_error($credentialspage);
+                $errmsg = $this->apirest->detect_error($credentialspage, $userid);
                 if ($errmsg !== null) {
                     throw new \Exception($errmsg);
                 }
@@ -238,10 +253,11 @@ class credentials {
      */
     public function check_for_existing_credential($groupid, $email) {
         global $CFG;
+        $userid = $this->userid_from_email($email);
         try {
             $credentials = $this->apirest->get_credentials($groupid, $email);
 
-            $errmsg = $this->apirest->detect_error($credentials);
+            $errmsg = $this->apirest->detect_error($credentials, $userid);
             if ($errmsg !== null) {
                 throw new \Exception($errmsg);
             }
