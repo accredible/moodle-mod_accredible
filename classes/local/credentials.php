@@ -152,12 +152,8 @@ class credentials {
                 throw new \Exception($errmsg);
             }
 
-            \mod_accredible\event\credential_issued::create([
-                'context'  => \context_system::instance(),
-                'relateduserid' => $user->id,
-                'other' => ['credentialid' => $credential->credential->id, 'groupid' => $achievementname],
-            ])->trigger();
-
+            // The legacy (achievement-name) path emits certificate_created from its
+            // callers, not credential_issued (which is the modern group-based event).
             return $credential->credential;
         } catch (\Exception $e) {
             throw new \moodle_exception(

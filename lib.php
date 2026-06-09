@@ -230,15 +230,16 @@ function accredible_update_instance($post) {
                             $customattributes
                         );
                         $credentialid = $result->credential->id;
+                        // Legacy path: emit certificate_created (the modern group path
+                        // emits credential_issued from inside create_credential instead).
+                        $event = accredible_log_creation(
+                            $credentialid,
+                            $user->id,
+                            null,
+                            $post->coursemodule
+                        );
+                        $event->trigger();
                     }
-                    // Log the creation.
-                    $event = accredible_log_creation(
-                        $credentialid,
-                        $user->id,
-                        null,
-                        $post->coursemodule
-                    );
-                    $event->trigger();
                 } catch (\Throwable $e) {
                     \mod_accredible\event\credential_issue_failed::create([
                         'context' => $context,
@@ -311,14 +312,17 @@ function accredible_update_instance($post) {
                         $evidenceitems->post_essay_answers($userid, $post->course, $credentialid);
                         $evidenceitems->course_duration_evidence($userid, $post->course, $credentialid, $completedtimestamp);
 
-                        // Log the creation.
-                        $event = accredible_log_creation(
-                            $credentialid,
-                            $userid,
-                            null,
-                            $post->coursemodule
-                        );
-                        $event->trigger();
+                        // Legacy path: emit certificate_created (the modern group path
+                        // emits credential_issued from inside create_credential instead).
+                        if ($existingrecord->achievementid) {
+                            $event = accredible_log_creation(
+                                $credentialid,
+                                $userid,
+                                null,
+                                $post->coursemodule
+                            );
+                            $event->trigger();
+                        }
                     }
                 } catch (\Throwable $e) {
                     \mod_accredible\event\credential_issue_failed::create([
