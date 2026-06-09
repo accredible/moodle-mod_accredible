@@ -335,29 +335,11 @@ function accredible_quiz_submission_handler($event) {
 
                 // Check if we have a group mapping - if not use the old logic.
                 if ($record->groupid) {
-                    // Check which quiz is used as the deciding factor in this course.
-                    if ($quiz->id == $record->finalquiz) {
-                        // Check for an existing certificate.
-                        $existingcertificate = $localcredentials->check_for_existing_credential($record->groupid, $user->email);
+                    $existingcertificate = $localcredentials->check_for_existing_credential($record->groupid, $user->email);
 
-                        // Create that credential if it doesn't exist.
-                        if (!$existingcertificate) {
-                            $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-                            $gradeishighenough = ($usersgrade >= $record->passinggrade);
-
-                            // Check for pass.
-                            if ($gradeishighenough) {
-                                // Issue a certificate.
-                                $localcredentials->create_credential($user, $record->groupid, null, $customattributes, $ctx);
-                            } else {
-                                \mod_accredible\event\credential_issue_skipped::create([
-                                    'context' => $ctx,
-                                    'relateduserid' => $user->id,
-                                    'other' => ['reason' => 'grade_below_threshold', 'groupid' => $record->groupid],
-                                ])->trigger();
-                            }
-                        } else {
-                            // Check the existing grade to see if this one is higher and update the credential if so.
+                    if ($existingcertificate) {
+                        // Already issued: stay silent (Decision 1), but keep the grade evidence current.
+                        if ($quiz->id == $record->finalquiz) {
                             $credential = $api->get_credential($existingcertificate->id)->credential;
                             foreach ($credential->evidence_items as $evidenceitem) {
                                 if ($evidenceitem->type == "grade") {
@@ -373,32 +355,68 @@ function accredible_quiz_submission_handler($event) {
                                 }
                             }
                         }
-                    }
+                    } else {
+                        $gradetoolow = false;
 
-                    $eligibility = accredible_evaluate_completion_eligibility($user, $record, $quiz, $ctx);
-                    if (isset($eligibility['eligible']) && $eligibility['eligible']) {
-                        $existingcertificate = $localcredentials->check_for_existing_credential($record->groupid, $user->email);
-                        // Make sure there isn't already a certificate.
+                        // Final-quiz grade rule. Defer the skip so the completion rule can be the
+                        // single terminal decision when this quiz belongs to both rules.
+                        if ($quiz->id == $record->finalquiz) {
+                            $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                            if ($usersgrade >= $record->passinggrade) {
+                                $localcredentials->create_credential($user, $record->groupid, null, $customattributes, $ctx);
+                                $existingcertificate = true;
+                            } else {
+                                $gradetoolow = true;
+                            }
+                        }
+
+                        // Completion-activities rule (skipped once the grade rule has issued).
                         if (!$existingcertificate) {
-                            // Issue a certificate.
-                            $localcredentials->create_credential($user, $record->groupid, null, $customattributes, $ctx);
+                            $eligibility = accredible_evaluate_completion_eligibility($user, $record, $quiz, $ctx);
+                            if (isset($eligibility['eligible']) && $eligibility['eligible']) {
+                                $localcredentials->create_credential($user, $record->groupid, null, $customattributes, $ctx);
+                            } else if ($gradetoolow && isset($eligibility['relevant'])) {
+                                // Grade too low and the completion rule didn't apply to this quiz.
+                                \mod_accredible\event\credential_issue_skipped::create([
+                                    'context' => $ctx,
+                                    'relateduserid' => $user->id,
+                                    'other' => ['reason' => 'grade_below_threshold', 'groupid' => $record->groupid],
+                                ])->trigger();
+                            }
                         }
                     }
                 } else {
-                    // Check which quiz is used as the deciding factor in this course.
-                    if ($quiz->id == $record->finalquiz) {
-                        $existingcertificate = $localcredentials->check_for_existing_certificate(
-                            $record->achievementid,
-                            $user
-                        );
+                    $existingcertificate = $localcredentials->check_for_existing_certificate(
+                        $record->achievementid,
+                        $user
+                    );
 
-                        // Check for an existing certificate.
-                        if (!$existingcertificate) {
+                    if ($existingcertificate) {
+                        // Already issued: stay silent (Decision 1), but keep the grade evidence current.
+                        if ($quiz->id == $record->finalquiz) {
+                            $credential = $api->get_credential($existingcertificate->id)->credential;
+                            foreach ($credential->evidence_items as $evidenceitem) {
+                                if ($evidenceitem->type == "grade") {
+                                    $highestgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                                    $apigrade = intval($evidenceitem->string_object->grade);
+                                    if ($apigrade < $highestgrade) {
+                                        $api->update_evidence_item_grade(
+                                            $existingcertificate->id,
+                                            $evidenceitem->id,
+                                            $highestgrade
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        $gradetoolow = false;
+
+                        // Final-quiz grade rule. Defer the skip so the completion rule can be the
+                        // single terminal decision when this quiz belongs to both rules.
+                        if ($quiz->id == $record->finalquiz) {
                             $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-                            $gradeishighenough = ($usersgrade >= $record->passinggrade);
-
-                            // Check for pass.
-                            if ($gradeishighenough) {
+                            if ($usersgrade >= $record->passinggrade) {
                                 // Issue a certificate.
                                 $apiresponse = accredible_issue_default_certificate(
                                     $user->id,
@@ -416,57 +434,41 @@ function accredible_quiz_submission_handler($event) {
                                   'relateduserid' => $event->relateduserid,
                                 ]);
                                 $certificateevent->trigger();
+                                $existingcertificate = true;
                             } else {
+                                $gradetoolow = true;
+                            }
+                        }
+
+                        // Completion-activities rule (skipped once the grade rule has issued).
+                        if (!$existingcertificate) {
+                            $eligibility = accredible_evaluate_completion_eligibility($user, $record, $quiz, $ctx);
+                            if (isset($eligibility['eligible']) && $eligibility['eligible']) {
+                                // And issue a certificate.
+                                $apiresponse = accredible_issue_default_certificate(
+                                    $user->id,
+                                    $record->id,
+                                    fullname($user),
+                                    $user->email,
+                                    null,
+                                    null,
+                                    null,
+                                    $customattributes
+                                );
+                                $certificateevent = \mod_accredible\event\certificate_created::create([
+                                  'objectid' => $apiresponse->credential->id,
+                                  'context' => $ctx,
+                                  'relateduserid' => $event->relateduserid,
+                                ]);
+                                $certificateevent->trigger();
+                            } else if ($gradetoolow && isset($eligibility['relevant'])) {
+                                // Grade too low and the completion rule didn't apply to this quiz.
                                 \mod_accredible\event\credential_issue_skipped::create([
                                     'context' => $ctx,
                                     'relateduserid' => $user->id,
                                     'other' => ['reason' => 'grade_below_threshold'],
                                 ])->trigger();
                             }
-                        } else {
-                            // Check the existing grade to see if this one is higher.
-                            $credential = $api->get_credential($existingcertificate->id)->credential;
-                            foreach ($credential->evidence_items as $evidenceitem) {
-                                if ($evidenceitem->type == "grade") {
-                                    $highestgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-                                    $apigrade = intval($evidenceitem->string_object->grade);
-                                    if ($apigrade < $highestgrade) {
-                                        $api->update_evidence_item_grade(
-                                            $existingcertificate->id,
-                                            $evidenceitem->id,
-                                            $highestgrade
-                                        );
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    $eligibility = accredible_evaluate_completion_eligibility($user, $record, $quiz, $ctx);
-                    if (isset($eligibility['eligible']) && $eligibility['eligible']) {
-                        $existingcertificate = $localcredentials->check_for_existing_certificate(
-                            $record->achievementid,
-                            $user
-                        );
-                        // Make sure there isn't already a certificate.
-                        if (!$existingcertificate) {
-                            // And issue a certificate.
-                            $apiresponse = accredible_issue_default_certificate(
-                                $user->id,
-                                $record->id,
-                                fullname($user),
-                                $user->email,
-                                null,
-                                null,
-                                null,
-                                $customattributes
-                            );
-                            $certificateevent = \mod_accredible\event\certificate_created::create([
-                              'objectid' => $apiresponse->credential->id,
-                              'context' => $ctx,
-                              'relateduserid' => $event->relateduserid,
-                            ]);
-                            $certificateevent->trigger();
                         }
                     }
                 }
