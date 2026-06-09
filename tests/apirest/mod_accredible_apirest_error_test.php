@@ -62,15 +62,15 @@ final class mod_accredible_apirest_error_test extends \advanced_testcase {
             'no status code means no error' => [
                 (object)['success' => false, 'data' => 'ignored'], null, null,
             ],
-            // 401/404 — {"success": false, "data": "..."}.
+            // HTTP 401/404: a success flag with a data message.
             '401 success/data shape' => [
                 (object)['success' => false, 'data' => 'issuer_token not valid'], 401, 'issuer_token not valid',
             ],
-            // 403 — {"errors": "..."} as a string.
+            // HTTP 403: errors as a single string.
             '403 errors-string shape' => [
                 (object)['errors' => 'Private Certificate, use key'], 403, 'Private Certificate, use key',
             ],
-            // 422 — {"errors": {field: [messages]}} validation object.
+            // HTTP 422: errors as a field-keyed object of messages.
             '422 errors-object shape' => [
                 (object)['errors' => (object)[
                     'course_name' => ["can't be blank"],
@@ -79,7 +79,7 @@ final class mod_accredible_apirest_error_test extends \advanced_testcase {
                 422,
                 "course_name: can't be blank; recipient_email: is invalid",
             ],
-            // 400 — {"code", "message", "status", "errors": {}}.
+            // HTTP 400: code, message and status fields.
             '400 code/message/status shape' => [
                 (object)['code' => 400, 'message' => 'invalid_search_query', 'status' => 'Bad Request', 'errors' => (object)[]],
                 400,

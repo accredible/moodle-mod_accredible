@@ -63,7 +63,11 @@ final class mod_accredible_eligibility_test extends \advanced_testcase {
      */
     private function evaluate($record, $quizid): array {
         return accredible_evaluate_completion_eligibility(
-            $this->user, $record, (object)['id' => $quizid], \context_system::instance());
+            $this->user,
+            $record,
+            (object)['id' => $quizid],
+            \context_system::instance()
+        );
     }
 
     /**

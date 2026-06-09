@@ -389,7 +389,7 @@ class apirest {
         if ($this->client->error) {
             $errmsg = (string) $this->client->error;
         } else {
-            $errmsg = self::normalize_error($response, $this->client->resp_code);
+            $errmsg = self::normalize_error($response, $this->client->respcode);
         }
         if ($errmsg === null) {
             return null;
@@ -398,8 +398,8 @@ class apirest {
             'context' => \context_system::instance(),
             'relateduserid' => $userid ?: null,
             'other' => [
-                'endpoint' => $this->client->last_url,
-                'http_status' => $this->client->resp_code,
+                'endpoint' => $this->client->lasturl,
+                'http_status' => $this->client->respcode,
                 'error' => $errmsg,
                 'latencyms' => $this->client->latencyms,
             ],
@@ -422,15 +422,15 @@ class apirest {
         if ($response === null) {
             return "HTTP {$respcode}";
         }
-        // {"success": false, "data": "..."} — 401/404 shape.
+        // Shape: a success flag with a data message (HTTP 401, 404).
         if (isset($response->success) && $response->success === false && isset($response->data)) {
             return (string) $response->data;
         }
-        // {"errors": "..."} — 403 string form.
+        // Shape: errors as a single string (HTTP 403).
         if (isset($response->errors) && is_string($response->errors)) {
             return $response->errors;
         }
-        // {"errors": {field: [msg]}} — 422 validation object form.
+        // Shape: errors as a field-keyed object of messages (HTTP 422 validation).
         if (isset($response->errors) && is_object($response->errors)) {
             $parts = [];
             foreach ($response->errors as $field => $messages) {
@@ -444,7 +444,7 @@ class apirest {
                 return implode('; ', $parts);
             }
         }
-        // {"code": ..., "message": "...", "status": "..."} — 400 shape.
+        // Shape: code, message and status fields (HTTP 400).
         if (isset($response->message)) {
             return (string) $response->message;
         }

@@ -174,8 +174,8 @@ function accredible_get_recipient_sso_link($groupid, $email) {
     try {
         $response = $apirest->recipient_sso_link(null, null, $email, null, $groupid, null);
 
-        // detect_error fires api_request_failed when the call failed; recipient_sso_link
-        // returns null/an error body without throwing, so check explicitly.
+        // The detect_error() call fires api_request_failed when the call failed; recipient_sso_link
+        // returns null or an error body without throwing, so check explicitly.
         if ($apirest->detect_error($response) !== null || empty($response->link)) {
             return null;
         }
@@ -516,7 +516,8 @@ function accredible_course_completed_handler($event, $localcredentials = null) {
                     // Load user grade to attach in the credential.
                     $gradeattributes = $usersclient->get_user_grades($record, $user->id);
                     // Later: refactor the attribute mapping generation into a class function.
-                    $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($record, $gradeattributes, $user->id);
+                    $gradeattributemapping =
+                        $usersclient->load_user_grade_as_custom_attributes($record, $gradeattributes, $user->id);
                     $additionalattributemapping = $accredible->load_credential_custom_attributes($record, $user->id);
                     $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
 
@@ -687,7 +688,7 @@ function accredible_manual_issue_completion_timestamp($accrediblerecord, $user) 
         }
     }
 
-    // TODO: When is the completion if there are completion activities set?
+    // Later: when is the completion if there are completion activities set?
 
     // Set timestamp to now if no good timestamp was found.
     if ($completedtimestamp === false) {

@@ -67,7 +67,7 @@ final class mod_accredible_batch_resilience_test extends \advanced_testcase {
             'users' => [$user1->id => 1, $user2->id => 1, $user3->id => 1],
         ];
 
-        // create_credential throws for the second user, and is a no-op (skip) for the others
+        // The mock throws for the second user and is a no-op (skip) for the others,
         // so the success path does not reach the evidence-item API calls.
         $mockcreds = $this->getMockBuilder(credentials::class)
             ->onlyMethods(['create_credential'])
@@ -75,8 +75,13 @@ final class mod_accredible_batch_resilience_test extends \advanced_testcase {
             ->getMock();
         $mockcreds->expects($this->exactly(3))
             ->method('create_credential')
-            ->willReturnCallback(function($user, $groupid = null, $issuedon = null,
-                    $customattributes = null, $context = null) use ($user2) {
+            ->willReturnCallback(function (
+                $user,
+                $groupid = null,
+                $issuedon = null,
+                $customattributes = null,
+                $context = null
+            ) use ($user2) {
                 if ($user->id == $user2->id) {
                     throw new \moodle_exception('error');
                 }
@@ -89,7 +94,7 @@ final class mod_accredible_batch_resilience_test extends \advanced_testcase {
         $this->assertNotEmpty($recordid);
 
         // The failing user is logged once, with the right reason and user.
-        $failed = array_values(array_filter($sink->get_events(), function($e) {
+        $failed = array_values(array_filter($sink->get_events(), function ($e) {
             return $e instanceof credential_issue_failed;
         }));
         $this->assertCount(1, $failed);

@@ -203,10 +203,10 @@ final class mod_accredible_client_test extends \advanced_testcase {
     }
 
     /**
-     * The HTTP status code is captured into resp_code from the curl info.
+     * The HTTP status code is captured into respcode from the curl info.
      * @coversNothing
      */
-    public function test_resp_code_is_captured(): void {
+    public function test_respcode_is_captured(): void {
         $url = 'https://api.accredible.com/v1/all_credentials';
 
         $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
@@ -215,7 +215,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
         $client = new client($mockcurl);
 
         $client->get($url);
-        $this->assertEquals(404, $client->resp_code);
+        $this->assertEquals(404, $client->respcode);
         // A 4xx body is preserved (no FAILONERROR) and is not a transport error.
         $this->assertNull($client->error);
     }

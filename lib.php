@@ -123,8 +123,11 @@ function accredible_add_instance($post, $mform = null, $localcredentials = null)
 
         if (!empty($failures)) {
             \core\notification::warning(
-                get_string('manualissuefailures', 'accredible',
-                    (object)['count' => count($failures), 'users' => implode(', ', $failures)])
+                get_string(
+                    'manualissuefailures',
+                    'accredible',
+                    (object)['count' => count($failures), 'users' => implode(', ', $failures)]
+                )
             );
         }
     }
@@ -194,7 +197,13 @@ function accredible_update_instance($post, $mform = null, $localcredentials = nu
                     $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
                     if ($existingrecord->groupid) {
                         // Create the credential.
-                        $credential = $localcredentials->create_credential($user, $groupid, $completeddate, $customattributes, $context);
+                        $credential = $localcredentials->create_credential(
+                            $user,
+                            $groupid,
+                            $completeddate,
+                            $customattributes,
+                            $context
+                        );
                         if ($credential) {
                             $credentialid = $credential->id;
                             // Evidence item posts.
@@ -290,7 +299,13 @@ function accredible_update_instance($post, $mform = null, $localcredentials = nu
                             $customattributes
                         );
                     } else {
-                        $credential = $localcredentials->create_credential($user, $post->groupid, $completeddate, $customattributes, $context);
+                        $credential = $localcredentials->create_credential(
+                            $user,
+                            $post->groupid,
+                            $completeddate,
+                            $customattributes,
+                            $context
+                        );
                     }
 
                     // Evidence item posts.
@@ -347,8 +362,11 @@ function accredible_update_instance($post, $mform = null, $localcredentials = nu
 
     if (!empty($failures)) {
         \core\notification::warning(
-            get_string('manualissuefailures', 'accredible',
-                (object)['count' => count($failures), 'users' => implode(', ', $failures)])
+            get_string(
+                'manualissuefailures',
+                'accredible',
+                (object)['count' => count($failures), 'users' => implode(', ', $failures)]
+            )
         );
     }
 

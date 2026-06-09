@@ -56,8 +56,13 @@ class credentials {
      * @param \context|null $context Moodle context for log events; defaults to system context.
      * @return stdObject|null null when pre-flight rejects issuance; caller should treat as skip.
      */
-    public function create_credential($user, $groupid, $issuedon = null, $customattributes = null,
-            $context = null) {
+    public function create_credential(
+        $user,
+        $groupid,
+        $issuedon = null,
+        $customattributes = null,
+        $context = null
+    ) {
         global $CFG;
 
         $ctx = $context ?? \context_system::instance();

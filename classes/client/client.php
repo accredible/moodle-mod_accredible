@@ -45,9 +45,9 @@ class client {
 
     /**
      * HTTP status code of the last response, or null if none completed.
-     * @var int|null $resp_code
+     * @var int|null $respcode
      */
-    public $resp_code;
+    public $respcode;
 
     /**
      * Latency of the last request in milliseconds.
@@ -57,9 +57,9 @@ class client {
 
     /**
      * URL of the last request, or null if none has been made.
-     * @var string|null $last_url
+     * @var string|null $lasturl
      */
-    public $last_url;
+    public $lasturl;
 
     /**
      * Constructor method
@@ -132,9 +132,9 @@ class client {
 
         // Reset per-request state; the client instance is reused across calls.
         $this->error = null;
-        $this->resp_code = null;
+        $this->respcode = null;
         $this->latencyms = null;
-        $this->last_url = $url;
+        $this->lasturl = $url;
 
         $starttime = microtime(true);
         $response = $curl->$method($url, $reqdata, $this->curloptions);
@@ -142,7 +142,7 @@ class client {
 
         // Capture the HTTP status for callers and events.
         if (isset($curl->info['http_code'])) {
-            $this->resp_code = (int) $curl->info['http_code'];
+            $this->respcode = (int) $curl->info['http_code'];
         }
 
         // Transport-level (curl) error.
@@ -153,7 +153,7 @@ class client {
             return null;
         }
 
-        // Empty body: return null without flagging an error (resp_code disambiguates).
+        // Empty body: return null without flagging an error (respcode disambiguates).
         if ($response === false || is_null($response) || $response === '') {
             return null;
         }

@@ -299,7 +299,7 @@ final class mod_accredible_credentials_test extends \advanced_testcase {
             ->getMock();
 
         // Mock API response data.
-        $mockclient2->resp_code = 401;
+        $mockclient2->respcode = 401;
         $resdata = $this->mockapi->resdata('unauthorized_error.json');
 
         // Expect to call the endpoint once with page and page_size.

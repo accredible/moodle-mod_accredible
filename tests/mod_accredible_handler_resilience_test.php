@@ -169,7 +169,7 @@ final class mod_accredible_handler_resilience_test extends \advanced_testcase {
      * @return array
      */
     private function filter_events($events, $class): array {
-        return array_values(array_filter($events, function($e) use ($class) {
+        return array_values(array_filter($events, function ($e) use ($class) {
             return $e instanceof $class;
         }));
     }
