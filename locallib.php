@@ -269,7 +269,7 @@ function accredible_issue_default_certificate(
     $evidenceitem->post_essay_answers($userid, $accrediblecertificate->course, $credentialid);
     $evidenceitem->course_duration_evidence($userid, $accrediblecertificate->course, $credentialid, $completedtimestamp);
 
-    return json_decode($result);
+    return $credential;
 }
 
 /**
