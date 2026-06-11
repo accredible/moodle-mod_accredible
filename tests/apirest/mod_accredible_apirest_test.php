@@ -586,6 +586,77 @@ final class mod_accredible_apirest_test extends \advanced_testcase {
     }
 
     /**
+     * A 4xx/5xx with a valid JSON body (no transport error) is detected by HTTP
+     * status: it throws when $throwerror is true and always logs api_request_failed.
+     * @covers  ::create_evidence_item
+     */
+    public function test_create_evidence_item_http_error(): void {
+        $url = 'https://api.accredible.com/v1/credentials/1/evidence_items';
+        $evidenceitem = [
+            'evidence_item' => [
+                "string_object" => "100",
+                "description" => "Quiz",
+                "custom" => true,
+                "category" => "grade",
+            ],
+        ];
+        $reqdata = json_encode($evidenceitem);
+
+        // GIVEN a 422 response with a valid JSON body and no transport-level error.
+        $mockclient1 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['post'])
+            ->getMock();
+        $mockclient1->respcode = 422;
+        $resdata = $this->mockapi->resdata('errors/validation_object.json');
+        $mockclient1->expects($this->once())
+            ->method('post')
+            ->with($this->equalTo($url), $this->equalTo($reqdata))
+            ->willReturn($resdata);
+
+        // WHEN $throwerror is TRUE.
+        $api = new apirest($mockclient1);
+        $sink = $this->redirectEvents();
+        $foundexception = false;
+        try {
+            $api->create_evidence_item($evidenceitem, 1, true);
+        } catch (\moodle_exception $error) {
+            $foundexception = true;
+        }
+
+        // THEN it throws and logs an api_request_failed event.
+        $this->assertTrue($foundexception);
+        $failed = array_values(array_filter($sink->get_events(), function ($e) {
+            return $e instanceof \mod_accredible\event\api_request_failed;
+        }));
+        $this->assertCount(1, $failed);
+        $sink->close();
+
+        // GIVEN the same 422 response.
+        $mockclient2 = $this->getMockBuilder(client::class)
+            ->onlyMethods(['post'])
+            ->getMock();
+        $mockclient2->respcode = 422;
+        $resdata = $this->mockapi->resdata('errors/validation_object.json');
+        $mockclient2->expects($this->once())
+            ->method('post')
+            ->with($this->equalTo($url), $this->equalTo($reqdata))
+            ->willReturn($resdata);
+
+        // WHEN $throwerror is FALSE.
+        $api = new apirest($mockclient2);
+        $sink = $this->redirectEvents();
+        $result = $api->create_evidence_item($evidenceitem, 1, false);
+
+        // THEN it does not throw, returns the body, and still logs api_request_failed.
+        $this->assertEquals($resdata, $result);
+        $failed = array_values(array_filter($sink->get_events(), function ($e) {
+            return $e instanceof \mod_accredible\event\api_request_failed;
+        }));
+        $this->assertCount(1, $failed);
+        $sink->close();
+    }
+
+    /**
      * Tests if `POST /v1/credentials/:credential_id/evidence_items`
      * is properly called when sending duration items.
      * @covers  ::create_evidence_item_duration

@@ -193,13 +193,15 @@ class apirest {
     public function create_evidence_item($evidenceitem, $credentialid, $throwerror = false) {
         $data = json_encode($evidenceitem);
         $result = $this->client->post("{$this->apiendpoint}credentials/{$credentialid}/evidence_items", $data);
-        if ($throwerror && $this->client->error) {
+
+        $errmsg = $this->detect_error($result);
+        if ($throwerror && $errmsg !== null) {
             throw new \moodle_exception(
                 'evidenceadderror',
                 'accredible',
                 'https://help.accredible.com/hc/en-us',
                 $credentialid,
-                $this->client->error
+                $errmsg
             );
         }
         return $result;
