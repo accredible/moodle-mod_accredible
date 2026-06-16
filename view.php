@@ -49,11 +49,17 @@ $localcredentials = new credentials();
 
 // User has admin privileges, show table of certificates.
 if (has_capability('mod/accredible:manage', $context)) {
-    // Get array of certificates.
-    if ($accrediblecertificate->achievementid) { // Legacy achievment ID.
-        $certificates = $localcredentials->get_credentials($accrediblecertificate->achievementid);
-    } else { // Group id.
-        $certificates = $localcredentials->get_credentials($accrediblecertificate->groupid);
+    // Get array of certificates. The API failure is already logged (api_request_failed),
+    // so degrade to an empty list with a notice instead of fataling the page.
+    try {
+        if ($accrediblecertificate->achievementid) { // Legacy achievment ID.
+            $certificates = $localcredentials->get_credentials($accrediblecertificate->achievementid);
+        } else { // Group id.
+            $certificates = $localcredentials->get_credentials($accrediblecertificate->groupid);
+        }
+    } catch (\Throwable $e) {
+        $certificates = [];
+        \core\notification::warning(get_string('credentialloaderror', 'accredible'));
     }
 
     $table = new html_table();
@@ -96,14 +102,20 @@ if (has_capability('mod/accredible:manage', $context)) {
     // Regular user, Check for this user's certificate.
     $userscertificatelink = null;
 
-    if ($accrediblecertificate->achievementid) { // Legacy achievment ID.
-        $certificates = $localcredentials->get_credentials($accrediblecertificate->achievementid, $USER->email);
-    } else { // Group id.
-        $certificates = $localcredentials->get_credentials($accrediblecertificate->groupid, $USER->email);
+    // The API failure is already logged (api_request_failed); degrade to "in progress"
+    // instead of fataling the page for the student.
+    try {
+        if ($accrediblecertificate->achievementid) { // Legacy achievment ID.
+            $certificates = $localcredentials->get_credentials($accrediblecertificate->achievementid, $USER->email);
+        } else { // Group id.
+            $certificates = $localcredentials->get_credentials($accrediblecertificate->groupid, $USER->email);
+        }
+    } catch (\Throwable $e) {
+        $certificates = [];
     }
 
     if ($accrediblecertificate->groupid) {
-        $userscertificatelink = accredible_get_recipient_sso_linik($accrediblecertificate->groupid, $USER->email);
+        $userscertificatelink = accredible_get_recipient_sso_link($accrediblecertificate->groupid, $USER->email);
     } else { // Legacy achievment ID.
         foreach ($certificates as $certificate) {
             if ($certificate->recipient->email == $USER->email) {

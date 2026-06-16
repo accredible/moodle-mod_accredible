@@ -153,7 +153,8 @@ final class mod_accredible_users_test extends \advanced_testcase {
             ->onlyMethods(['get'])
             ->getMock();
 
-        // Mock API response data.
+        // Mock API response data. The error is detected by HTTP status, so set respcode.
+        $mockclient2->respcode = 401;
         $resdata = $this->mockapi->resdata('unauthorized_error.json');
 
         // Expect to call the endpoint once with page and page_size.

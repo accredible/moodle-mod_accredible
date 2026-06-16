@@ -1,0 +1,6 @@
+{
+    "errors": {
+        "course_name": ["can't be blank"],
+        "recipient_email": ["is invalid"]
+    }
+}
