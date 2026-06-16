@@ -81,7 +81,10 @@ final class mod_accredible_event_test extends \advanced_testcase {
         $this->assertEquals(\core\event\base::LEVEL_OTHER, $data['edulevel']);
         $this->assertNull($data['objecttable']);
         $this->assertEquals(get_string('eventcredentialissueskipped', 'mod_accredible'), credential_issue_skipped::get_name());
-        $this->assertStringContainsString('completion_not_met', $event->get_description());
+        $this->assertStringContainsString(
+            get_string('reason_completion_not_met', 'mod_accredible'),
+            $event->get_description()
+        );
     }
 
     /**
@@ -105,7 +108,12 @@ final class mod_accredible_event_test extends \advanced_testcase {
         $this->assertEquals(\core\event\base::LEVEL_OTHER, $data['edulevel']);
         $this->assertNull($data['objecttable']);
         $this->assertEquals(get_string('eventcredentialissuefailed', 'mod_accredible'), credential_issue_failed::get_name());
-        $this->assertStringContainsString('exception', $event->get_description());
+        $this->assertStringContainsString(
+            get_string('reason_exception', 'mod_accredible'),
+            $event->get_description()
+        );
+        // The raw exception message is still appended verbatim.
+        $this->assertStringContainsString('boom', $event->get_description());
     }
 
     /**

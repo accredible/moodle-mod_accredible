@@ -49,8 +49,11 @@ class credential_issue_failed extends \core\event\base {
      */
     public function get_description() {
         $reason = $this->other['reason'] ?? 'unknown';
+        $reasontext = get_string_manager()->string_exists('reason_' . $reason, 'mod_accredible')
+            ? get_string('reason_' . $reason, 'mod_accredible')
+            : $reason;
         $message = $this->other['message'] ?? '';
-        return "Accredible credential issuance failed (reason: {$reason}) for user with id " .
+        return "Accredible credential issuance failed (reason: {$reasontext}) for user with id " .
             "'{$this->relateduserid}'. {$message}";
     }
 }

@@ -64,6 +64,7 @@ $string['eventcredentialissuefailed'] = 'Accredible Credential issuance failed';
 $string['eventcredentialissueskipped'] = 'Accredible Credential issuance skipped';
 $string['eventapirequestfailed'] = 'Accredible API request failed';
 $string['reason_completion_not_met'] = 'Required completion activities were not all complete';
+$string['reason_exception'] = 'An unexpected error occurred during issuance';
 $string['reason_grade_below_threshold'] = 'The grade was below the passing threshold';
 $string['reason_missing_email'] = 'The user has no email address';
 $string['reason_missing_groupid'] = 'No Accredible group id is configured';

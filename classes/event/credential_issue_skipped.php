@@ -50,7 +50,11 @@ class credential_issue_skipped extends \core\event\base {
      */
     public function get_description() {
         $reason = $this->other['reason'] ?? 'unknown';
-        return "Accredible credential issuance was skipped (reason: {$reason}) for user with id " .
+        $reasontext = get_string_manager()->string_exists('reason_' . $reason, 'mod_accredible')
+            ? get_string('reason_' . $reason, 'mod_accredible')
+            : $reason;
+        $description = "Accredible credential issuance was skipped (reason: {$reasontext}) for user with id " .
             "'{$this->relateduserid}'.";
+        return $description;
     }
 }
