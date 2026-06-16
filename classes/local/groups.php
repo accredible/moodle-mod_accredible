@@ -76,8 +76,9 @@ class groups {
             for ($i = 0; $i <= 100; $i++) {
                 $response = $this->apirest->get_groups($pagesize, $page);
 
-                if (isset($response->success) && $response->success === false) {
-                    throw new \Exception($response->data ?? 'Unknown error');
+                $errmsg = $this->apirest->detect_error($response);
+                if ($errmsg !== null) {
+                    throw new \Exception($errmsg);
                 }
 
                 foreach ($response->groups as $group) {
@@ -114,8 +115,9 @@ class groups {
             for ($i = 0; $i <= 100; $i++) {
                 $response = $this->apirest->search_groups($pagesize, $page);
 
-                if (isset($response->success) && $response->success === false) {
-                    throw new \Exception($response->data ?? 'Unknown error');
+                $errmsg = $this->apirest->detect_error($response);
+                if ($errmsg !== null) {
+                    throw new \Exception($errmsg);
                 }
 
                 foreach ($response->groups as $group) {

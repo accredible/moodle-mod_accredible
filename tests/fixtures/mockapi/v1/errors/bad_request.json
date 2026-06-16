@@ -1,0 +1,6 @@
+{
+    "code": 400,
+    "message": "invalid_search_query",
+    "status": "Bad Request",
+    "errors": {}
+}

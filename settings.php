@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-// TODO - language tags.
+// Later: language tags.
 $settings->add(
     new admin_setting_configtext(
         'accredible_api_key',

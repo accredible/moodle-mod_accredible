@@ -37,16 +37,18 @@ use mod_accredible\local\accredible;
  * Add certificate instance.
  *
  * @param stdObject $post
+ * @param \MoodleQuickForm|null $mform the module form (passed by core; unused here)
+ * @param credentials|null $localcredentials injectable credentials client for testing
  * @return array $certificate new certificate object
  */
-function accredible_add_instance($post) {
+function accredible_add_instance($post, $mform = null, $localcredentials = null) {
     global $DB;
 
     $post->groupid = isset($post->groupid) ? $post->groupid : null;
 
     $post->instance = isset($post->instance) ? $post->instance : null;
 
-    $localcredentials = new credentials();
+    $localcredentials = $localcredentials ?? new credentials();
     $evidenceitems = new evidenceitems();
     $usersclient = new users();
     $accredible = new accredible();
@@ -56,6 +58,8 @@ function accredible_add_instance($post) {
     // Issue certs.
     if (isset($post->users)) {
         $record = $DB->get_record('accredible', ['id' => $recordid], '*', MUST_EXIST);
+        $context = context_course::instance($post->course);
+        $failures = [];
         // Load grade attributes for users who will get a credential issued if need to be added.
         $userids = [];
         foreach ($post->users as $userid => $issuecertificate) {
@@ -71,36 +75,60 @@ function accredible_add_instance($post) {
             if ($issuecertificate) {
                 $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
 
-                // Later: refactor the attribute mapping generation into a class function.
-                $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
-                $additionalattributemapping = $accredible->load_credential_custom_attributes($record, $userid);
-                $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
-                $credential = $localcredentials->create_credential($user, $post->groupid, null, $customattributes);
+                try {
+                    // Later: refactor the attribute mapping generation into a class function.
+                    $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
+                    $additionalattributemapping = $accredible->load_credential_custom_attributes($record, $userid);
+                    $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
+                    $credential = $localcredentials->create_credential($user, $post->groupid, null, $customattributes, $context);
 
-                if ($credential) {
-                    // Evidence item posts.
-                    $credentialid = $credential->id;
-                    if ($post->finalquiz) {
-                        $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
-                        $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-                        $gradeevidence = [
-                            'string_object' => (string) $usersgrade,
-                            'description' => $quiz->name,
-                            'custom' => true,
-                            'category' => 'grade',
-                        ];
-                        if ($usersgrade < 50) {
-                            $gradeevidence['hidden'] = true;
+                    if ($credential) {
+                        // Evidence item posts.
+                        $credentialid = $credential->id;
+                        if ($post->finalquiz) {
+                            $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
+                            $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                            $gradeevidence = [
+                                'string_object' => (string) $usersgrade,
+                                'description' => $quiz->name,
+                                'custom' => true,
+                                'category' => 'grade',
+                            ];
+                            if ($usersgrade < 50) {
+                                $gradeevidence['hidden'] = true;
+                            }
+                            $evidenceitems->post_evidence($credentialid, $gradeevidence, true);
                         }
-                        $evidenceitems->post_evidence($credentialid, $gradeevidence, true);
+                        if ($transcript = accredible_get_transcript($post->course, $userid, $post->finalquiz)) {
+                            $evidenceitems->post_evidence($credentialid, $transcript, true);
+                        }
+                        $evidenceitems->post_essay_answers($userid, $post->course, $credentialid);
+                        $evidenceitems->course_duration_evidence($userid, $post->course, $credentialid);
                     }
-                    if ($transcript = accredible_get_transcript($post->course, $userid, $post->finalquiz)) {
-                        $evidenceitems->post_evidence($credentialid, $transcript, true);
-                    }
-                    $evidenceitems->post_essay_answers($userid, $post->course, $credentialid);
-                    $evidenceitems->course_duration_evidence($userid, $post->course, $credentialid);
+                } catch (\Throwable $e) {
+                    \mod_accredible\event\credential_issue_failed::create([
+                        'context' => $context,
+                        'relateduserid' => $user->id,
+                        'other' => [
+                            'reason' => 'exception',
+                            'message' => $e->getMessage(),
+                            'class' => get_class($e),
+                            'groupid' => $post->groupid,
+                        ],
+                    ])->trigger();
+                    $failures[] = fullname($user);
                 }
             }
+        }
+
+        if (!empty($failures)) {
+            \core\notification::warning(
+                get_string(
+                    'manualissuefailures',
+                    'accredible',
+                    (object)['count' => count($failures), 'users' => implode(', ', $failures)]
+                )
+            );
         }
     }
 
@@ -111,13 +139,15 @@ function accredible_add_instance($post) {
  * Update certificate instance.
  *
  * @param stdClass $post
+ * @param \MoodleQuickForm|null $mform the module form (passed by core; unused here)
+ * @param credentials|null $localcredentials injectable credentials client for testing
  * @return stdClass $certificate updated
  */
-function accredible_update_instance($post) {
+function accredible_update_instance($post, $mform = null, $localcredentials = null) {
     // To update your certificate details, go to accredible.com.
     global $DB;
 
-    $localcredentials = new credentials();
+    $localcredentials = $localcredentials ?? new credentials();
     $evidenceitems = new evidenceitems();
     $usersclient = new users();
     $accredible = new accredible();
@@ -142,6 +172,8 @@ function accredible_update_instance($post) {
     $gradeattributes = $usersclient->get_user_grades($post, array_unique($userids));
 
     $existingrecord = $DB->get_record('accredible', ['id' => $post->instance], '*', MUST_EXIST);
+    $context = context_module::instance($post->coursemodule);
+    $failures = [];
 
     // Issue certs for unissued users.
     if (isset($post->unissuedusers)) {
@@ -155,18 +187,130 @@ function accredible_update_instance($post) {
         foreach ($post->unissuedusers as $userid => $issuecertificate) {
             if ($issuecertificate) {
                 $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
-                $completedtimestamp = accredible_manual_issue_completion_timestamp($existingrecord, $user);
-                $completeddate = date('Y-m-d', (int) $completedtimestamp);
-                // Later: refactor the attribute mapping generation into a class function.
-                $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
-                $additionalattributemapping = $accredible->load_credential_custom_attributes($existingrecord, $userid);
-                $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
-                if ($existingrecord->groupid) {
-                    // Create the credential.
-                    $credential = $localcredentials->create_credential($user, $groupid, $completeddate, $customattributes);
+
+                try {
+                    $completedtimestamp = accredible_manual_issue_completion_timestamp($existingrecord, $user);
+                    $completeddate = date('Y-m-d', (int) $completedtimestamp);
+                    // Later: refactor the attribute mapping generation into a class function.
+                    $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
+                    $additionalattributemapping = $accredible->load_credential_custom_attributes($existingrecord, $userid);
+                    $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
+                    if ($existingrecord->groupid) {
+                        // Create the credential.
+                        $credential = $localcredentials->create_credential(
+                            $user,
+                            $groupid,
+                            $completeddate,
+                            $customattributes,
+                            $context
+                        );
+                        if ($credential) {
+                            $credentialid = $credential->id;
+                            // Evidence item posts.
+                            if ($post->finalquiz) {
+                                $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
+                                $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                                $gradeevidence = [
+                                    'string_object' => (string) $usersgrade,
+                                    'description' => $quiz->name,
+                                    'custom' => true,
+                                    'category' => 'grade',
+                                ];
+                                if ($usersgrade < 50) {
+                                    $gradeevidence['hidden'] = true;
+                                }
+                                $evidenceitems->post_evidence($credentialid, $gradeevidence, true);
+                            }
+                            if ($transcript = accredible_get_transcript($post->course, $userid, $post->finalquiz)) {
+                                $evidenceitems->post_evidence($credentialid, $transcript, true);
+                            }
+                            $evidenceitems->post_essay_answers($userid, $post->course, $credentialid);
+                            $evidenceitems->course_duration_evidence($userid, $post->course, $credentialid, $completedtimestamp);
+                        }
+                    } else if ($existingrecord->achievementid) {
+                        if ($post->finalquiz) {
+                            $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
+                            $grade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
+                        }
+                        $result = accredible_issue_default_certificate(
+                            $user->id,
+                            $existingrecord->id,
+                            fullname($user),
+                            $user->email,
+                            $grade,
+                            $quiz->name,
+                            $completedtimestamp,
+                            $customattributes
+                        );
+                        $credentialid = $result->credential->id;
+                        // Legacy path: emit certificate_created (the modern group path
+                        // emits credential_issued from inside create_credential instead).
+                        $event = accredible_log_creation(
+                            $credentialid,
+                            $user->id,
+                            null,
+                            $post->coursemodule
+                        );
+                        $event->trigger();
+                    }
+                } catch (\Throwable $e) {
+                    \mod_accredible\event\credential_issue_failed::create([
+                        'context' => $context,
+                        'relateduserid' => $user->id,
+                        'other' => [
+                            'reason' => 'exception',
+                            'message' => $e->getMessage(),
+                            'class' => get_class($e),
+                            'groupid' => $existingrecord->groupid ?? null,
+                        ],
+                    ])->trigger();
+                    $failures[] = fullname($user);
+                }
+            }
+        }
+    }
+
+    // Issue certs.
+    if (isset($post->users)) {
+        // Checklist array from the form comes in the format:
+        // Int userid => boolean issuecertificate.
+        foreach ($post->users as $userid => $issuecertificate) {
+            if ($issuecertificate) {
+                $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
+
+                try {
+                    $completedtimestamp = accredible_manual_issue_completion_timestamp($existingrecord, $user);
+                    $completeddate = date('Y-m-d', (int) $completedtimestamp);
+                    // Later: refactor the attribute mapping generation into a class function.
+                    $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
+                    $additionalattributemapping = $accredible->load_credential_custom_attributes($existingrecord, $userid);
+                    $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
+                    if ($existingrecord->achievementid) {
+                        $courseurl = new moodle_url('/course/view.php', ['id' => $post->course]);
+                        $courselink = $courseurl->__toString();
+
+                        $credential = $localcredentials->create_credential_legacy(
+                            $user,
+                            $post->achievementid,
+                            $post->certificatename,
+                            $post->description,
+                            $courselink,
+                            $completeddate,
+                            $customattributes
+                        );
+                    } else {
+                        $credential = $localcredentials->create_credential(
+                            $user,
+                            $post->groupid,
+                            $completeddate,
+                            $customattributes,
+                            $context
+                        );
+                    }
+
+                    // Evidence item posts.
                     if ($credential) {
                         $credentialid = $credential->id;
-                        // Evidence item posts.
                         if ($post->finalquiz) {
                             $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
                             $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
@@ -186,100 +330,44 @@ function accredible_update_instance($post) {
                         }
                         $evidenceitems->post_essay_answers($userid, $post->course, $credentialid);
                         $evidenceitems->course_duration_evidence($userid, $post->course, $credentialid, $completedtimestamp);
+
+                        // Legacy path: emit certificate_created (the modern group path
+                        // emits credential_issued from inside create_credential instead).
+                        if ($existingrecord->achievementid) {
+                            $event = accredible_log_creation(
+                                $credentialid,
+                                $userid,
+                                null,
+                                $post->coursemodule
+                            );
+                            $event->trigger();
+                        }
                     }
-                } else if ($existingrecord->achievementid) {
-                    if ($post->finalquiz) {
-                        $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
-                        $grade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-                    }
-                    $result = accredible_issue_default_certificate(
-                        $user->id,
-                        $existingrecord->id,
-                        fullname($user),
-                        $user->email,
-                        $grade,
-                        $quiz->name,
-                        $completedtimestamp,
-                        $customattributes
-                    );
-                    $credentialid = $result->credential->id;
+                } catch (\Throwable $e) {
+                    \mod_accredible\event\credential_issue_failed::create([
+                        'context' => $context,
+                        'relateduserid' => $user->id,
+                        'other' => [
+                            'reason' => 'exception',
+                            'message' => $e->getMessage(),
+                            'class' => get_class($e),
+                            'groupid' => $existingrecord->groupid ?? null,
+                        ],
+                    ])->trigger();
+                    $failures[] = fullname($user);
                 }
-                // Log the creation.
-                $event = accredible_log_creation(
-                    $credentialid,
-                    $user->id,
-                    null,
-                    $post->coursemodule
-                );
-                $event->trigger();
             }
         }
     }
 
-    // Issue certs.
-    if (isset($post->users)) {
-        // Checklist array from the form comes in the format:
-        // Int userid => boolean issuecertificate.
-        foreach ($post->users as $userid => $issuecertificate) {
-            if ($issuecertificate) {
-                $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
-                $completedtimestamp = accredible_manual_issue_completion_timestamp($existingrecord, $user);
-                $completeddate = date('Y-m-d', (int) $completedtimestamp);
-                // Later: refactor the attribute mapping generation into a class function.
-                $gradeattributemapping = $usersclient->load_user_grade_as_custom_attributes($post, $gradeattributes, $userid);
-                $additionalattributemapping = $accredible->load_credential_custom_attributes($existingrecord, $userid);
-                $customattributes = array_merge($gradeattributemapping, $additionalattributemapping);
-                if ($existingrecord->achievementid) {
-                    $courseurl = new moodle_url('/course/view.php', ['id' => $post->course]);
-                    $courselink = $courseurl->__toString();
-
-                    $credential = $localcredentials->create_credential_legacy(
-                        $user,
-                        $post->achievementid,
-                        $post->certificatename,
-                        $post->description,
-                        $courselink,
-                        $completeddate,
-                        $customattributes
-                    );
-                } else {
-                    $credential = $localcredentials->create_credential($user, $post->groupid, $completeddate, $customattributes);
-                }
-
-                // Evidence item posts.
-                if ($credential) {
-                    $credentialid = $credential->id;
-                    if ($post->finalquiz) {
-                        $quiz = $DB->get_record('quiz', ['id' => $post->finalquiz], '*', MUST_EXIST);
-                        $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
-                        $gradeevidence = [
-                            'string_object' => (string) $usersgrade,
-                            'description' => $quiz->name,
-                            'custom' => true,
-                            'category' => 'grade',
-                        ];
-                        if ($usersgrade < 50) {
-                            $gradeevidence['hidden'] = true;
-                        }
-                        $evidenceitems->post_evidence($credentialid, $gradeevidence, true);
-                    }
-                    if ($transcript = accredible_get_transcript($post->course, $userid, $post->finalquiz)) {
-                        $evidenceitems->post_evidence($credentialid, $transcript, true);
-                    }
-                    $evidenceitems->post_essay_answers($userid, $post->course, $credentialid);
-                    $evidenceitems->course_duration_evidence($userid, $post->course, $credentialid, $completedtimestamp);
-
-                    // Log the creation.
-                    $event = accredible_log_creation(
-                        $credentialid,
-                        $userid,
-                        null,
-                        $post->coursemodule
-                    );
-                    $event->trigger();
-                }
-            }
-        }
+    if (!empty($failures)) {
+        \core\notification::warning(
+            get_string(
+                'manualissuefailures',
+                'accredible',
+                (object)['count' => count($failures), 'users' => implode(', ', $failures)]
+            )
+        );
     }
 
     // Set completion activitied to 0 if unchecked.

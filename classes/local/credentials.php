@@ -48,15 +48,56 @@ class credentials {
     }
 
     /**
+     * Resolve a user id from an email so log events have a related user. Null when unknown.
+     * @param string|null $email
+     * @return int|null
+     */
+    private function userid_from_email($email) {
+        global $DB;
+        if (empty($email)) {
+            return null;
+        }
+        $user = $DB->get_record('user', ['email' => $email], 'id', IGNORE_MULTIPLE);
+        return $user ? $user->id : null;
+    }
+
+    /**
      * Create a credential given a user and an existing group
      * @param stdObject $user
      * @param int $groupid
      * @param date|null $issuedon
      * @param array $customattributes
-     * @return stdObject
+     * @param \context|null $context Moodle context for log events; defaults to system context.
+     * @return stdObject|null null when pre-flight rejects issuance; caller should treat as skip.
      */
-    public function create_credential($user, $groupid, $issuedon = null, $customattributes = null) {
+    public function create_credential(
+        $user,
+        $groupid,
+        $issuedon = null,
+        $customattributes = null,
+        $context = null
+    ) {
         global $CFG;
+
+        $ctx = $context ?? \context_system::instance();
+
+        if (empty($user->email)) {
+            \mod_accredible\event\credential_issue_skipped::create([
+                'context'  => $ctx,
+                'relateduserid' => $user->id,
+                'other' => ['reason' => 'missing_email', 'groupid' => $groupid],
+            ])->trigger();
+            return null;
+        }
+
+        if (empty($groupid)) {
+            \mod_accredible\event\credential_issue_skipped::create([
+                'context'  => $ctx,
+                'relateduserid' => $user->id,
+                'other' => ['reason' => 'missing_groupid'],
+            ])->trigger();
+            return null;
+        }
 
         try {
             $credential = $this->apirest->create_credential(
@@ -68,20 +109,19 @@ class credentials {
                 $customattributes
             );
 
-            if (isset($credential->success) && $credential->success === false) {
-                throw new \Exception($credential->data ?? 'Unknown error');
+            $errmsg = $this->apirest->detect_error($credential, $user->id);
+            if ($errmsg !== null) {
+                throw new \Exception($errmsg);
             }
 
-            if (isset($credential->success) && $credential->success === false) {
-                throw new \Exception($credential->data ?? 'Unknown error');
-            }
+            \mod_accredible\event\credential_issued::create([
+                'context'  => $ctx,
+                'relateduserid' => $user->id,
+                'other' => ['credentialid' => $credential->credential->id, 'groupid' => $groupid],
+            ])->trigger();
 
             return $credential->credential;
         } catch (\Exception $e) {
-            // Throw API exception.
-            // Include the achievement id that triggered the error.
-            // Direct the user to accredible's support.
-            // Dump the achievement id to debug_info.
             throw new \moodle_exception(
                 'credentialcreateerror',
                 'accredible',
@@ -126,20 +166,15 @@ class credentials {
                 $customattributes
             );
 
-            if (isset($credential->success) && $credential->success === false) {
-                throw new \Exception($credential->data ?? 'Unknown error');
+            $errmsg = $this->apirest->detect_error($credential, $user->id);
+            if ($errmsg !== null) {
+                throw new \Exception($errmsg);
             }
 
-            if (isset($credential->success) && $credential->success === false) {
-                throw new \Exception($credential->data ?? 'Unknown error');
-            }
-
+            // The legacy (achievement-name) path emits certificate_created from its
+            // callers, not credential_issued (which is the modern group-based event).
             return $credential->credential;
         } catch (\Exception $e) {
-            // Throw API exception.
-            // Include the achievement id that triggered the error.
-            // Direct the user to accredible's support.
-            // Dump the achievement id to debug_info.
             throw new \moodle_exception(
                 'credentialcreateerror',
                 'accredible',
@@ -163,6 +198,7 @@ class credentials {
 
         // Maximum number of pages to request to avoid possible infinite loop.
         $looplimit = 100;
+        $userid = $this->userid_from_email($email);
         try {
             $loop = true;
             $count = 0;
@@ -171,8 +207,9 @@ class credentials {
             while ($loop === true) {
                 $credentialspage = $this->apirest->get_credentials($groupid, $email, $pagesize, $page);
 
-                if (isset($credentialspage->success) && $credentialspage->success === false) {
-                    throw new \Exception($credentialspage->data ?? 'Unknown error');
+                $errmsg = $this->apirest->detect_error($credentialspage, $userid);
+                if ($errmsg !== null) {
+                    throw new \Exception($errmsg);
                 }
 
                 foreach ($credentialspage->credentials as $credential) {
@@ -216,11 +253,13 @@ class credentials {
      */
     public function check_for_existing_credential($groupid, $email) {
         global $CFG;
+        $userid = $this->userid_from_email($email);
         try {
             $credentials = $this->apirest->get_credentials($groupid, $email);
 
-            if (isset($credentials->success) && $credentials->success === false) {
-                throw new \Exception($credentials->data ?? 'Unknown error');
+            $errmsg = $this->apirest->detect_error($credentials, $userid);
+            if ($errmsg !== null) {
+                throw new \Exception($errmsg);
             }
 
             if ($credentials->credentials && $credentials->credentials[0]) {

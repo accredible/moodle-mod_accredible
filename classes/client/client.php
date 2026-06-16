@@ -38,10 +38,28 @@ class client {
     private $curloptions;
 
     /**
-     * The options object for the requests.
+     * Last transport-level error message, or null. Reset each request.
      * @var string|null $error
      */
     public $error;
+
+    /**
+     * HTTP status code of the last response, or null if none completed.
+     * @var int|null $respcode
+     */
+    public $respcode;
+
+    /**
+     * Latency of the last request in milliseconds.
+     * @var int|null $latencyms
+     */
+    public $latencyms;
+
+    /**
+     * URL of the last request, or null if none has been made.
+     * @var string|null $lasturl
+     */
+    public $lasturl;
 
     /**
      * Constructor method
@@ -60,9 +78,9 @@ class client {
         }
 
         $token = $CFG->accredible_api_key;
+        // No CURLOPT_FAILONERROR: keep 4xx/5xx bodies so apirest can read them.
         $this->curloptions = [
             'CURLOPT_RETURNTRANSFER' => true,
-            'CURLOPT_FAILONERROR'    => true,
             'CURLOPT_HTTPHEADER'     => [
                 'Authorization: Token ' . $token,
                 'Content-Type: application/json; charset=utf-8',
@@ -70,7 +88,7 @@ class client {
             ],
         ];
 
-        $error = null;
+        $this->error = null;
     }
 
     /**
@@ -111,18 +129,42 @@ class client {
      */
     private function send_req($url, $method, $reqdata = null) {
         $curl = $this->curl;
-        $response = $curl->$method($url, $reqdata, $this->curloptions);
 
+        // Reset per-request state; the client instance is reused across calls.
+        $this->error = null;
+        $this->respcode = null;
+        $this->latencyms = null;
+        $this->lasturl = $url;
+
+        $starttime = microtime(true);
+        $response = $curl->$method($url, $reqdata, $this->curloptions);
+        $this->latencyms = (int) round((microtime(true) - $starttime) * 1000);
+
+        // Capture the HTTP status for callers and events.
+        if (isset($curl->info['http_code'])) {
+            $this->respcode = (int) $curl->info['http_code'];
+        }
+
+        // Transport-level (curl) error.
         if ($curl->error) {
             $this->error = $curl->error;
             debugging('<div style="padding-top: 70px; font-size: 0.9rem;"><b>ACCREDIBLE API ERROR</b> ' .
                 $curl->error . '<br />' . $method . ' ' . $url . '</div>', DEBUG_DEVELOPER);
-        };
+            return null;
+        }
 
+        // Empty body: return null without flagging an error (respcode disambiguates).
         if ($response === false || is_null($response) || $response === '') {
             return null;
         }
 
-        return json_decode($response);
+        // Malformed JSON: record distinctly so it isn't mistaken for an empty body.
+        $decoded = json_decode($response);
+        if (is_null($decoded) && json_last_error() !== JSON_ERROR_NONE) {
+            $this->error = 'Malformed JSON response: ' . json_last_error_msg();
+            return null;
+        }
+
+        return $decoded;
     }
 }

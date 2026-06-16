@@ -193,13 +193,15 @@ class apirest {
     public function create_evidence_item($evidenceitem, $credentialid, $throwerror = false) {
         $data = json_encode($evidenceitem);
         $result = $this->client->post("{$this->apiendpoint}credentials/{$credentialid}/evidence_items", $data);
-        if ($throwerror && $this->client->error) {
+
+        $errmsg = $this->detect_error($result);
+        if ($throwerror && $errmsg !== null) {
             throw new \moodle_exception(
                 'evidenceadderror',
                 'accredible',
                 'https://help.accredible.com/hc/en-us',
                 $credentialid,
-                $this->client->error
+                $errmsg
             );
         }
         return $result;
@@ -374,6 +376,85 @@ class apirest {
         } else {
             throw new \InvalidArgumentException("$grade must be a numeric value between 0 and 100.");
         }
+    }
+
+    /**
+     * Detect an API error from the last response.
+     * Returns a normalized error message if the response signals an error, null otherwise.
+     * Fires api_request_failed when an error is detected.
+     * @param \stdClass|null $response decoded API response
+     * @param int|null $userid related user id for the log event
+     * @return string|null
+     */
+    public function detect_error($response, $userid = null) {
+        // Transport-level error (curl error, empty body, malformed JSON) takes priority.
+        if ($this->client->error) {
+            $errmsg = (string) $this->client->error;
+        } else {
+            $errmsg = self::normalize_error($response, $this->client->respcode);
+        }
+        if ($errmsg === null) {
+            return null;
+        }
+        \mod_accredible\event\api_request_failed::create([
+            'context' => \context_system::instance(),
+            'relateduserid' => $userid ?: null,
+            'other' => [
+                'endpoint' => $this->client->lasturl,
+                'http_status' => $this->client->respcode,
+                'error' => $errmsg,
+                'latencyms' => $this->client->latencyms,
+            ],
+        ])->trigger();
+        return $errmsg;
+    }
+
+    /**
+     * Normalize an API response into an error message, or null if no error.
+     * Transport-level errors are handled separately in detect_error().
+     * @param \stdClass|null $response decoded API response
+     * @param int|null $respcode HTTP status code
+     * @return string|null
+     */
+    public static function normalize_error($response, $respcode) {
+        $iserrorcode = $respcode !== null && $respcode >= 400;
+        if (!$iserrorcode) {
+            return null;
+        }
+        if ($response === null) {
+            return "HTTP {$respcode}";
+        }
+        // Shape: a success flag with a data message (HTTP 401, 404).
+        if (isset($response->success) && $response->success === false && isset($response->data)) {
+            return (string) $response->data;
+        }
+        // Shape: a single error string under "error" (e.g. the SSO endpoints).
+        if (isset($response->error) && is_string($response->error)) {
+            return $response->error;
+        }
+        // Shape: errors as a single string (HTTP 403).
+        if (isset($response->errors) && is_string($response->errors)) {
+            return $response->errors;
+        }
+        // Shape: errors as a field-keyed object of messages (HTTP 422 validation).
+        if (isset($response->errors) && is_object($response->errors)) {
+            $parts = [];
+            foreach ($response->errors as $field => $messages) {
+                if (is_array($messages)) {
+                    $parts[] = "{$field}: " . implode(', ', $messages);
+                } else {
+                    $parts[] = "{$field}: {$messages}";
+                }
+            }
+            if ($parts) {
+                return implode('; ', $parts);
+            }
+        }
+        // Shape: code, message and status fields (HTTP 400).
+        if (isset($response->message)) {
+            return (string) $response->message;
+        }
+        return "HTTP {$respcode}";
     }
 
     /**
