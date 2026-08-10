@@ -93,6 +93,94 @@ class brand_keys {
     }
 
     /**
+     * The brand a course belongs to, derived from its category tree.
+     *
+     * Brands are delimited by the root categories: the root category's
+     * idnumber is the brand name. Subcategories are internal organisation and
+     * carry no idnumber of their own, so a course several levels deep resolves
+     * through its path up to depth 1.
+     *
+     * Returns the configured brand name (in its configured casing) so the
+     * result can be used directly as a form value, or null when the root has
+     * no idnumber or names a brand that is not configured. Null means "use the
+     * global account", which is the safe default in both cases.
+     *
+     * @param \stdClass|int|null $courseorid a course record or its id
+     * @return string|null
+     */
+    public static function brand_from_course($courseorid) {
+        $idnumber = self::root_idnumber_for_course($courseorid);
+
+        if ($idnumber === '') {
+            return null;
+        }
+
+        foreach (self::all() as $configured) {
+            if (strcasecmp($configured['name'], $idnumber) === 0) {
+                return $configured['name'];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The idnumber of the root category a course hangs from, verbatim.
+     *
+     * Kept separate from brand_from_course() so callers can tell "no idnumber
+     * set" apart from "idnumber set but matching no configured brand", which
+     * is the difference between an unconfigured category and a typo.
+     *
+     * @param \stdClass|int|null $courseorid a course record or its id
+     * @return string empty when it cannot be resolved
+     */
+    public static function root_idnumber_for_course($courseorid) {
+        global $DB;
+
+        if (empty($courseorid)) {
+            return '';
+        }
+
+        if (is_object($courseorid)) {
+            $categoryid = (int) ($courseorid->category ?? 0);
+        } else {
+            $categoryid = (int) $DB->get_field('course', 'category', ['id' => (int) $courseorid]);
+        }
+
+        // The site course lives outside the category tree.
+        if ($categoryid <= 0) {
+            return '';
+        }
+
+        $category = $DB->get_record('course_categories', ['id' => $categoryid], 'id, idnumber, path');
+        if (!$category) {
+            return '';
+        }
+
+        $rootid = self::root_id_from_path($category->path, (int) $category->id);
+        if ($rootid === (int) $category->id) {
+            $root = $category;
+        } else {
+            $root = $DB->get_record('course_categories', ['id' => $rootid], 'id, idnumber');
+        }
+
+        return $root ? trim((string) $root->idnumber) : '';
+    }
+
+    /**
+     * First id in a category path, which is the root of that branch.
+     *
+     * @param string $path a category path such as /2/5/6
+     * @param int $fallback returned when the path is unusable
+     * @return int
+     */
+    private static function root_id_from_path($path, $fallback) {
+        $segments = array_values(array_filter(explode('/', (string) $path), 'strlen'));
+
+        return empty($segments) ? $fallback : (int) $segments[0];
+    }
+
+    /**
      * Brand names for a form select, keyed by the value stored on the activity.
      *
      * @return array<string, string>
