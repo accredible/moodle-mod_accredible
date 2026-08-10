@@ -65,8 +65,9 @@ class client {
      * Constructor method
      *
      * @param stdObject $curl a mock curl for testing
+     * @param string|null $apikey the brand API key; null falls back to the global setting
      */
-    public function __construct($curl = null) {
+    public function __construct($curl = null, $apikey = null) {
         global $CFG;
         require_once($CFG->libdir . '/filelib.php');
 
@@ -77,7 +78,9 @@ class client {
             $this->curl = new \curl();
         }
 
-        $token = $CFG->accredible_api_key;
+        // The header is frozen here for the life of the client, so one client
+        // instance always speaks to exactly one Accredible account.
+        $token = $apikey ?? (string) ($CFG->accredible_api_key ?? '');
         // No CURLOPT_FAILONERROR: keep 4xx/5xx bodies so apirest can read them.
         $this->curloptions = [
             'CURLOPT_RETURNTRANSFER' => true,
