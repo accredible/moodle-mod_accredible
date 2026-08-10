@@ -215,5 +215,21 @@ function xmldb_accredible_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2024053100, 'accredible');
     }
 
+    if ($oldversion < 2026061601) {
+        $table = new xmldb_table('accredible');
+
+        // Define field brand to be added to accredible. Left nullable on purpose:
+        // existing activities keep issuing against the global API key.
+        $field = new xmldb_field('brand', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'attributemapping');
+
+        // Conditionally launch add field brand.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Accredible savepoint reached.
+        upgrade_mod_savepoint(true, 2026061601, 'accredible');
+    }
+
     return true;
 }
