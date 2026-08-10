@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+// Global account. Kept as the fallback for activities with no brand set, and
+// for installs that never configure brands at all.
 // Later: language tags.
 $settings->add(
     new admin_setting_configtext(
@@ -43,3 +45,42 @@ $settings->add(
         ''
     )
 );
+
+// Brands. Each slot is one Accredible account; activities pick a brand by name
+// and the plugin authenticates against that account instead of the global one.
+$settings->add(
+    new admin_setting_heading(
+        'accredible_brands_heading',
+        get_string('brandsheading', 'accredible'),
+        get_string('brandsheadinghelp', 'accredible')
+    )
+);
+
+for ($brandslot = 1; $brandslot <= \mod_accredible\local\brand_keys::SLOTS; $brandslot++) {
+    $settings->add(
+        new admin_setting_configtext(
+            "accredible_brand{$brandslot}_name",
+            get_string('brandnamelabel', 'accredible', $brandslot),
+            get_string('brandnamehelp', 'accredible'),
+            ''
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configpasswordunmask(
+            "accredible_brand{$brandslot}_api_key",
+            get_string('brandapikeylabel', 'accredible', $brandslot),
+            get_string('brandapikeyhelp', 'accredible'),
+            ''
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configcheckbox(
+            "accredible_brand{$brandslot}_is_eu",
+            get_string('brandeulabel', 'accredible', $brandslot),
+            get_string('brandeuhelp', 'accredible'),
+            0
+        )
+    );
+}
