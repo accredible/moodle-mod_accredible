@@ -30,6 +30,8 @@ require_once($CFG->dirroot . '/mod/accredible/lib.php');
 require_once($CFG->dirroot . '/mod/accredible/locallib.php');
 
 use mod_accredible\Html2Text\Html2Text;
+use mod_accredible\apirest\apirest;
+use mod_accredible\local\brand_keys;
 use mod_accredible\local\credentials;
 use mod_accredible\local\groups;
 use mod_accredible\local\users;
@@ -52,11 +54,8 @@ class mod_accredible_mod_form extends moodleform_mod {
     public function definition() {
         global $DB, $COURSE, $CFG, $PAGE, $OUTPUT;
 
-        $credentialsclient = new credentials();
-        $groupsclient = new groups();
-        $usersclient = new users();
-        $formhelper = new formhelper();
-
+        // The clients are built further down, once the course is known: which
+        // Accredible account they talk to depends on the activity's brand.
         $updatingcert = false;
         $alreadyexists = false;
 
@@ -97,6 +96,16 @@ class mod_accredible_mod_form extends moodleform_mod {
             // See if other accredible certificates already exist for this course.
             $alreadyexists = $DB->record_exists('accredible', ['course' => $id]);
         }
+
+        // Resolve the brand before anything talks to the API: every client below
+        // must be bound to the selected brand's account, not to the global one.
+        $selectedbrand = self::resolve_selected_brand($accrediblecertificate ?? null, $course);
+        $brandapi = apirest::for_brand($selectedbrand);
+
+        $credentialsclient = new credentials($brandapi);
+        $groupsclient = new groups($brandapi);
+        $usersclient = new users($brandapi);
+        $formhelper = new formhelper($brandapi);
 
         // Load user data.
         $context = context_course::instance($course->id);
@@ -153,7 +162,25 @@ class mod_accredible_mod_form extends moodleform_mod {
             $mform->addElement('static', 'additionalactivitiesone', '', get_string('additionalactivitiesone', 'accredible'));
         }
 
-        // Load available groups.
+        // Brand selector. It governs which Accredible account the group list
+        // below and the credential issuing talk to. The element is not rendered
+        // at all when no brand is configured, so installs that never set one up
+        // keep exactly the form they had before.
+        if (brand_keys::is_configured()) {
+            $brandoptions = ['' => get_string('brandglobal', 'accredible')] + brand_keys::menu();
+            $mform->addElement('select', 'brand', get_string('brandlabel', 'accredible'), $brandoptions, $inputstyle);
+            $mform->setType('brand', PARAM_TEXT);
+            $mform->setDefault('brand', $selectedbrand);
+            $mform->addElement('static', 'branddescription', '', get_string('branddescription', 'accredible'));
+
+            // No-submit button: reposts the form so the group list is rebuilt
+            // against the newly selected brand, without any JavaScript.
+            $mform->registerNoSubmitButton('reloadbrand');
+            $mform->addElement('submit', 'reloadbrand', get_string('brandreload', 'accredible'));
+        }
+
+        // Load available groups. These come from the selected brand's account,
+        // so a group belonging to another brand is simply not offered.
         $templates = ['' => 'Select a Group'] + $groupsclient->get_groups();
         $mform->addElement('select', 'groupid', get_string('accrediblegroup', 'accredible'), $templates, $inputstyle);
         $mform->addRule('groupid', null, 'required', null, 'client');
@@ -418,6 +445,74 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
+    }
+
+    /**
+     * Which brand the form works against.
+     *
+     * Priority: what the user just picked (a no-submit repost carries it in the
+     * request), then what the activity has stored, then the brand its course
+     * category implies. A brand that is no longer configured degrades to the
+     * global account rather than offering a value the select cannot show.
+     *
+     * @param stdClass|null $record the existing activity record when editing
+     * @param stdClass $course
+     * @return string the brand name, or an empty string meaning the global account
+     */
+    private static function resolve_selected_brand($record, $course) {
+        if (!brand_keys::is_configured()) {
+            return '';
+        }
+
+        $configured = brand_keys::menu();
+
+        $submitted = optional_param('brand', null, PARAM_TEXT);
+        if ($submitted !== null) {
+            return isset($configured[$submitted]) ? $submitted : '';
+        }
+
+        if ($record && !empty($record->brand)) {
+            return isset($configured[$record->brand]) ? $record->brand : '';
+        }
+
+        return brand_keys::brand_from_course($course) ?? '';
+    }
+
+    /**
+     * Server-side guard against saving a group that belongs to another brand.
+     *
+     * The group select is rebuilt whenever the brand changes, so a stale pair
+     * can only arrive from a hand-crafted post. Checked without calling the
+     * API: if the brand changed and the group did not, the group is stale.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
+    public function validation($data, $files) {
+        global $DB;
+
+        $errors = parent::validation($data, $files);
+
+        if (empty($this->_instance) || !brand_keys::is_configured()) {
+            return $errors;
+        }
+
+        $existing = $DB->get_record('accredible', ['id' => $this->_instance], 'id, brand, groupid');
+        if (!$existing) {
+            return $errors;
+        }
+
+        $newbrand = isset($data['brand']) ? (string) $data['brand'] : '';
+        $oldbrand = (string) ($existing->brand ?? '');
+
+        if ($newbrand !== $oldbrand
+            && !empty($data['groupid'])
+            && (string) $data['groupid'] === (string) $existing->groupid) {
+            $errors['groupid'] = get_string('brandgroupmismatch', 'accredible');
+        }
+
+        return $errors;
     }
 
     /**
