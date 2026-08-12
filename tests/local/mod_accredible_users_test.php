@@ -58,8 +58,6 @@ final class mod_accredible_users_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         // Add plugin settings.
-        set_config('accredible_api_key', 'sometestapikey');
-        set_config('is_eu', 0);
 
         // Unset the devlopment environment variable.
         putenv('ACCREDIBLE_DEV_API_ENDPOINT');
@@ -88,7 +86,7 @@ final class mod_accredible_users_test extends \advanced_testcase {
      * @covers ::get_users_with_credentials
      */
     public function test_get_users_with_credentials(): void {
-        $userhelper = new users();
+        $userhelper = new users(new apirest(new \stdClass(), 'sometestapikey', false));
 
         // When there are not users.
         $result = $userhelper->get_users_with_credentials([]);
@@ -176,7 +174,7 @@ final class mod_accredible_users_test extends \advanced_testcase {
      * @covers ::get_unissued_users
      */
     public function test_get_unissued_users(): void {
-        $userhelper = new users();
+        $userhelper = new users(new apirest(new \stdClass(), 'sometestapikey', false));
         $accredibleinstanceid = $this->create_accredible_instance($this->course->id);
 
         $generateduser2 = $this->getDataGenerator()->create_user(['email' => 'person3@example.com']);
@@ -233,7 +231,7 @@ final class mod_accredible_users_test extends \advanced_testcase {
      */
     public function test_get_user_grades(): void {
         global $DB;
-        $userhelper = new users();
+        $userhelper = new users(new apirest(new \stdClass(), 'sometestapikey', false));
 
         $generateduser2 = $this->getDataGenerator()->create_user(['email' => 'person3@example.com']);
         $this->getDataGenerator()->enrol_user($this->user->id, $this->course->id);
@@ -330,7 +328,7 @@ final class mod_accredible_users_test extends \advanced_testcase {
      */
     public function test_load_user_grade_as_custom_attributes(): void {
         global $DB;
-        $userhelper = new users();
+        $userhelper = new users(new apirest(new \stdClass(), 'sometestapikey', false));
 
         $this->getDataGenerator()->enrol_user($this->user->id, $this->course->id);
 

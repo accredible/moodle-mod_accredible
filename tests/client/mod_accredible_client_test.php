@@ -37,7 +37,6 @@ final class mod_accredible_client_test extends \advanced_testcase {
         $this->setAdminUser();
 
         // Add plugin settings.
-        set_config('accredible_api_key', 'sometestapikey');
     }
 
     /**
@@ -69,7 +68,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
             );
 
         // Expect to call curl get.
-        $client = new client($mockcurl);
+        $client = new client($mockcurl, 'sometestapikey');
         $client->get($url);
     }
 
@@ -103,7 +102,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
             );
 
         // Expect to call curl post.
-        $client = new client($mockcurl);
+        $client = new client($mockcurl, 'sometestapikey');
         $client->post($url, $reqdata);
     }
 
@@ -137,7 +136,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
             );
 
         // Expect to call curl put.
-        $client = new client($mockcurl);
+        $client = new client($mockcurl, 'sometestapikey');
         $client->put($url, $reqdata);
     }
 
@@ -172,7 +171,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
             );
 
         // Expect to call debugging.
-        $client = new client($mockcurl);
+        $client = new client($mockcurl, 'sometestapikey');
         $this->assertDebuggingCalled($client->get($url));
 
         // Expect to return an error message.
@@ -188,7 +187,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
 
         $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
         $mockcurl->method('get')->willReturn('{"ok":true}');
-        $client = new client($mockcurl);
+        $client = new client($mockcurl, 'sometestapikey');
 
         // First request fails at the transport layer.
         $mockcurl->error = 'Network down';
@@ -212,7 +211,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
         $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
         $mockcurl->info = ['http_code' => 404];
         $mockcurl->method('get')->willReturn('{"success":false,"data":"Group does not exist"}');
-        $client = new client($mockcurl);
+        $client = new client($mockcurl, 'sometestapikey');
 
         $client->get($url);
         $this->assertEquals(404, $client->respcode);
@@ -230,7 +229,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
         $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
         $mockcurl->error = 'Could not resolve host';
         $mockcurl->method('get')->willReturn(false);
-        $client = new client($mockcurl);
+        $client = new client($mockcurl, 'sometestapikey');
 
         $result = $client->get($url);
         $this->assertNull($result);
@@ -247,7 +246,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
 
         $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
         $mockcurl->method('get')->willReturn('');
-        $client = new client($mockcurl);
+        $client = new client($mockcurl, 'sometestapikey');
 
         $result = $client->get($url);
         $this->assertNull($result);
@@ -263,7 +262,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
 
         $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
         $mockcurl->method('get')->willReturn('<html>Bad Gateway</html>');
-        $client = new client($mockcurl);
+        $client = new client($mockcurl, 'sometestapikey');
 
         $result = $client->get($url);
         $this->assertNull($result);

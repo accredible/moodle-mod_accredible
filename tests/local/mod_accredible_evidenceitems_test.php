@@ -52,8 +52,6 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         // Add plugin settings.
-        set_config('accredible_api_key', 'sometestapikey');
-        set_config('is_eu', 0);
 
         // Unset the devlopment environment variable.
         putenv('ACCREDIBLE_DEV_API_ENDPOINT');
@@ -172,7 +170,7 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
     public function test_post_essay_answers(): void {
         global $DB;
 
-        $evidenceitems = new evidenceitems();
+        $evidenceitems = new evidenceitems(new apirest(new \stdClass(), 'sometestapikey', false));
 
         // When there are not quizes.
         $result = $evidenceitems->post_essay_answers(1, 1, 1);
@@ -249,7 +247,7 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
      * @covers ::course_duration_evidence
      */
     public function test_course_duration_evidence(): void {
-        $evidenceitems = new evidenceitems();
+        $evidenceitems = new evidenceitems(new apirest(new \stdClass(), 'sometestapikey', false));
 
         // When there are not enrolments.
         $result = $evidenceitems->course_duration_evidence(1, 1, 1);

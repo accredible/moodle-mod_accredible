@@ -37,9 +37,6 @@ final class mod_accredible_brand_wiring_test extends \advanced_testcase {
         parent::setUp();
         $this->resetAfterTest();
 
-        set_config('accredible_api_key', 'globaltestapikey');
-        set_config('is_eu', 0);
-
         set_config('accredible_brand1_name', 'CEAC');
         set_config('accredible_brand1_api_key', 'ceacapikey');
         set_config('accredible_brand1_is_eu', 1);
@@ -90,28 +87,8 @@ final class mod_accredible_brand_wiring_test extends \advanced_testcase {
     }
 
     /**
-     * Choosing the global account explicitly stores null, which is the value
-     * every activity created before multi-brand support carries.
-     *
-     * @covers \mod_accredible\local\accredible::save_record
-     */
-    public function test_global_account_is_stored_as_null(): void {
-        global $DB;
-
-        $course = $this->getDataGenerator()->create_course();
-
-        $emptybrand = (new accredible())->save_record($this->post_for($course->id, ''));
-        $this->assertNull($DB->get_field('accredible', 'brand', ['id' => $emptybrand]));
-
-        // A post with no brand key at all, which is what an install with no
-        // brands configured submits.
-        $nobrand = (new accredible())->save_record($this->post_for($course->id, null));
-        $this->assertNull($DB->get_field('accredible', 'brand', ['id' => $nobrand]));
-    }
-
-    /**
-     * A stored brand resolves to its own account, and the global one keeps
-     * working when it is the stored value.
+     * A stored brand resolves to its own account, even when the course
+     * category names a different one.
      *
      * @covers \mod_accredible\local\brand_keys::for_brand
      */
@@ -126,15 +103,29 @@ final class mod_accredible_brand_wiring_test extends \advanced_testcase {
 
         // The manual override wins over the category, which says CEAC.
         $this->assertSame('deustosaludapikey', brand_keys::for_brand($record->brand)['api_key']);
-
-        $globalrecordid = (new accredible())->save_record($this->post_for($course->id, ''));
-        $globalrecord = $DB->get_record('accredible', ['id' => $globalrecordid]);
-        $this->assertSame('globaltestapikey', brand_keys::for_brand($globalrecord->brand)['api_key']);
     }
 
     /**
-     * The three brands never resolve to each other's account, and none of them
-     * resolves to the global one.
+     * An activity saved without a brand has no account to reach, so resolving
+     * it fails instead of quietly using someone else's.
+     *
+     * @covers \mod_accredible\local\brand_keys::for_brand
+     */
+    public function test_activity_without_brand_has_no_account(): void {
+        global $DB;
+
+        $course = $this->getDataGenerator()->create_course();
+        $recordid = (new accredible())->save_record($this->post_for($course->id, ''));
+        $record = $DB->get_record('accredible', ['id' => $recordid]);
+
+        $this->assertNull($record->brand);
+
+        $this->expectException(\moodle_exception::class);
+        brand_keys::for_brand($record->brand);
+    }
+
+    /**
+     * The three brands never resolve to each other's account.
      *
      * @covers \mod_accredible\local\brand_keys::for_brand
      */
@@ -149,8 +140,15 @@ final class mod_accredible_brand_wiring_test extends \advanced_testcase {
         foreach ($expected as $brand => $key) {
             $resolved = brand_keys::for_brand($brand);
             $this->assertSame($key, $resolved['api_key'], "brand {$brand} resolved to the wrong key");
-            $this->assertNotSame('globaltestapikey', $resolved['api_key']);
+            $this->assertTrue($resolved['is_eu']);
             $seen[] = $resolved['api_key'];
+
+            // No other brand's key can answer for this one.
+            foreach ($expected as $otherbrand => $otherkey) {
+                if ($otherbrand !== $brand) {
+                    $this->assertNotSame($otherkey, $resolved['api_key']);
+                }
+            }
         }
 
         // Three brands, three distinct keys.
@@ -199,13 +197,9 @@ final class mod_accredible_brand_wiring_test extends \advanced_testcase {
             brand_keys::for_brand(brand_keys::brand_for_activity($recordid, $course->id))['api_key']
         );
 
-        // Editing one saved against the global account: stays global, even
-        // though its category says CEAC.
-        $globalid = (new accredible())->save_record($this->post_for($course->id, ''));
-        $this->assertNull(brand_keys::brand_for_activity($globalid, $course->id));
-        $this->assertSame(
-            'globaltestapikey',
-            brand_keys::for_brand(brand_keys::brand_for_activity($globalid, $course->id))['api_key']
-        );
+        // An activity stored without a brand falls back to what its category
+        // says, which is the only answer available.
+        $nobrandid = (new accredible())->save_record($this->post_for($course->id, ''));
+        $this->assertSame('CEAC', brand_keys::brand_for_activity($nobrandid, $course->id));
     }
 }
