@@ -192,9 +192,33 @@ class mod_accredible_mod_form extends moodleform_mod {
         // Load available groups. These come from the selected brand's account,
         // so a group belonging to another brand is simply not offered. With no
         // brand yet there is nothing to list.
-        $templates = ['' => 'Select a Group'] + ($hasbrand ? $groupsclient->get_groups() : []);
-        $mform->addElement('select', 'groupid', get_string('accrediblegroup', 'accredible'), $templates, $inputstyle);
+        //
+        // Rendered as an autocomplete rather than a plain select: an account can
+        // hold hundreds of groups, and this filters them as you type. The search
+        // runs in the browser over the options already on the page, so it costs
+        // no API calls and can only ever match this brand's groups. Changing the
+        // brand reposts the form, which rebuilds the element from scratch and
+        // clears whatever was typed.
+        //
+        // Keep the placeholder short. core/form_autocomplete_input sizes the
+        // input to exactly the placeholder's character count and takes no
+        // account of the dropdown arrow drawn over its right edge, so a long
+        // placeholder ends up running underneath the arrow.
+        $templates = $hasbrand ? $groupsclient->get_groups() : [];
+        $mform->addElement(
+            'autocomplete',
+            'groupid',
+            get_string('accrediblegroup', 'accredible'),
+            $templates,
+            [
+                'multiple' => false,
+                'casesensitive' => false,
+                'noselectionstring' => get_string('groupnoselection', 'accredible'),
+                'placeholder' => get_string('groupsearchplaceholder', 'accredible'),
+            ]
+        );
         $mform->addRule('groupid', null, 'required', null, 'client');
+        $mform->addElement('static', 'groupsearchhelp', '', get_string('groupsearchhelp', 'accredible', count($templates)));
         if ($updatingcert && $accrediblecertificate->groupid) {
             $mform->setDefault('groupid', $accrediblecertificate->groupid);
         }
