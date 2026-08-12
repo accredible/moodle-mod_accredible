@@ -125,6 +125,79 @@ final class mod_accredible_brand_wiring_test extends \advanced_testcase {
     }
 
     /**
+     * An apirest double that answers get_groups() with a single page of the
+     * given groups, as one brand's account would.
+     *
+     * @param array<int, string> $groups id => name
+     * @return \PHPUnit\Framework\MockObject\MockObject
+     */
+    private function apirest_serving_groups(array $groups) {
+        $response = (object) [
+            'groups' => array_map(
+                static fn($id, $name) => (object) ['id' => $id, 'name' => $name],
+                array_keys($groups),
+                array_values($groups)
+            ),
+            'meta' => (object) ['next_page' => null],
+        ];
+
+        $api = $this->getMockBuilder(\mod_accredible\apirest\apirest::class)
+            ->onlyMethods(['get_groups', 'detect_error'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $api->method('get_groups')->willReturn($response);
+        $api->method('detect_error')->willReturn(null);
+
+        return $api;
+    }
+
+    /**
+     * The group picker only ever offers the selected brand's groups.
+     *
+     * The search box on that field filters in the browser over the options
+     * already rendered, so whatever the account does not return simply cannot
+     * be found -- which is what keeps one brand's groups out of another's list.
+     *
+     * @covers \mod_accredible\local\groups::get_groups
+     */
+    public function test_group_list_is_scoped_to_the_brand_account(): void {
+        $ceac = (new groups($this->apirest_serving_groups([
+            93516 => 'Prueba plataforma',
+            90001 => 'CEAC Diseño',
+        ])))->get_groups();
+
+        $salud = (new groups($this->apirest_serving_groups([
+            93518 => 'Prueba plataforma deusto salud',
+            90002 => 'Deusto Salud Nutrición',
+        ])))->get_groups();
+
+        $this->assertEqualsCanonicalizing([93516, 90001], array_keys($ceac));
+        $this->assertEqualsCanonicalizing([93518, 90002], array_keys($salud));
+
+        // Listed by name, which is the order the picker shows and searches.
+        $this->assertSame(['CEAC Diseño', 'Prueba plataforma'], array_values($ceac));
+        $this->assertSame(['Deusto Salud Nutrición', 'Prueba plataforma deusto salud'], array_values($salud));
+
+        // No group id and no group name is offered by both accounts.
+        $this->assertEmpty(array_intersect_key($ceac, $salud));
+        $this->assertEmpty(array_intersect($ceac, $salud));
+    }
+
+    /**
+     * With no brand resolved there is nothing to search: the field is built
+     * from an empty list rather than from some other account's groups.
+     *
+     * @covers \mod_accredible\local\brand_keys::brand_from_course
+     */
+    public function test_no_brand_means_no_groups_to_search(): void {
+        $category = $this->getDataGenerator()->create_category(['name' => 'Sin marca']);
+        $course = $this->getDataGenerator()->create_course(['category' => $category->id]);
+
+        $this->assertNull(brand_keys::brand_from_course($course));
+        $this->assertFalse(brand_keys::is_usable(brand_keys::brand_from_course($course)));
+    }
+
+    /**
      * The three brands never resolve to each other's account.
      *
      * @covers \mod_accredible\local\brand_keys::for_brand
