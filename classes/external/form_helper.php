@@ -22,6 +22,8 @@ global $CFG;
 
 require_once($CFG->libdir  . '/externallib.php');
 
+use mod_accredible\apirest\apirest;
+use mod_accredible\local\brand_keys;
 use mod_accredible\local\users;
 
 /**
@@ -91,6 +93,7 @@ class form_helper extends \external_api {
         );
         $context = \context_course::instance($courseid);
         self::validate_context($context);
+        require_capability('mod/accredible:addinstance', $context);
 
         $enrolledusers = get_enrolled_users($context, "mod/accredible:view", null, 'u.*', 'id');
         $users = [
@@ -98,7 +101,10 @@ class form_helper extends \external_api {
             'unissued_users' => [],
         ];
 
-        $userhelper = new users();
+        // The client never sends the brand: it is derived from the activity, or
+        // from the course category while the activity does not exist yet.
+        $brand = brand_keys::brand_for_activity($params['instanceid'], $params['courseid']);
+        $userhelper = new users(apirest::for_brand($brand));
         $users['users'] = $userhelper->get_users_with_credentials($enrolledusers, $groupid);
         $users['unissued_users'] = $userhelper->get_unissued_users($users['users'], $instanceid);
 
