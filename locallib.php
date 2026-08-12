@@ -165,7 +165,7 @@ function accredible_evaluate_completion_eligibility($user, $record, $quiz, $ctx)
  * Get the SSO link for a recipient
  * @param int $groupid
  * @param string $email
- * @param string|null $brand the activity's brand; null uses the global account
+ * @param string|null $brand the activity's brand; required, it selects the account
  */
 function accredible_get_recipient_sso_link($groupid, $email, $brand = null) {
     global $CFG, $DB;
@@ -236,7 +236,7 @@ function accredible_issue_default_certificate(
     $courseurl = new moodle_url('/course/view.php', ['id' => $accrediblecertificate->course]);
     $courselink = $courseurl->__toString();
 
-    $restapi = new apirest();
+    $restapi = apirest::for_brand($accrediblecertificate->brand ?? null);
     $credential = $restapi->create_credential_legacy(
         $name,
         $email,

@@ -45,15 +45,11 @@ class apirest {
      * Constructor method to define correct endpoints
      *
      * @param stdObject $client a mock client for testing
-     * @param string|null $apikey the brand API key; null falls back to the global setting
-     * @param bool|null $iseu the brand region; null falls back to the global setting
+     * @param string|null $apikey the brand API key
+     * @param bool|null $iseu the brand region; defaults to the US endpoint
      */
     public function __construct($client = null, $apikey = null, $iseu = null) {
-        global $CFG;
-
-        $useeu = $iseu ?? !empty($CFG->is_eu);
-
-        $this->apiendpoint = $useeu
+        $this->apiendpoint = !empty($iseu)
             ? 'https://eu.api.accredible.com/v1/'
             : 'https://api.accredible.com/v1/';
 

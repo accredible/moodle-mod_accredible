@@ -39,12 +39,14 @@ class attribute_keys {
      * @param stdObject $apirest a mock apirest for testing.
      */
     public function __construct($apirest = null) {
-        // An apirest with a mock client is passed when unit testing.
-        if ($apirest) {
-            $this->apirest = $apirest;
-        } else {
-            $this->apirest = new apirest();
+        // There is no default account: the caller must say which brand this
+        // client talks to.
+        if (!$apirest) {
+            throw new \coding_exception(
+                'mod_accredible: attribute_keys needs an apirest bound to a brand. Use apirest::for_brand($brand).'
+            );
         }
+        $this->apirest = $apirest;
     }
 
     /**

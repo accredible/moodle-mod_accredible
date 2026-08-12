@@ -25,29 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-// Global account. Kept as the fallback for activities with no brand set, and
-// for installs that never configure brands at all.
-// Later: language tags.
-$settings->add(
-    new admin_setting_configtext(
-        'accredible_api_key',
-        get_string('apikeylabel', 'accredible'),
-        get_string('apikeyhelp', 'accredible'),
-        ''
-    )
-);
-
-$settings->add(
-    new admin_setting_configcheckbox(
-        'is_eu',
-        get_string('eulabel', 'accredible'),
-        get_string('euhelp', 'accredible'),
-        ''
-    )
-);
-
-// Brands. Each slot is one Accredible account; activities pick a brand by name
-// and the plugin authenticates against that account instead of the global one.
+// Brands. Each slot is one Accredible account, and every activity issues
+// against one of them. There is no site-wide account: an activity without a
+// usable brand cannot be saved.
 $settings->add(
     new admin_setting_heading(
         'accredible_brands_heading',

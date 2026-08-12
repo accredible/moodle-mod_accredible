@@ -38,27 +38,26 @@ class brand_keys {
     /**
      * Resolve the account for a brand name.
      *
-     * Falls back to the global settings when the brand is empty, unknown, or
-     * configured without a key.
+     * There is no account to fall back to: every request belongs to a brand,
+     * and a request that cannot name one is a bug, not something to paper over
+     * by talking to some default account. So this throws rather than returning
+     * a usable-looking result.
      *
      * @param string|null $brand Brand name as stored on the activity.
      * @return array{api_key: string, is_eu: bool}
+     * @throws \moodle_exception when the brand is missing, unknown or keyless
      */
     public static function for_brand($brand) {
-        $fallback = self::global_account();
-
         if (empty($brand)) {
-            return $fallback;
+            throw new \moodle_exception('brandmissing', 'accredible');
         }
 
         foreach (self::all() as $configured) {
             if (strcasecmp($configured['name'], (string) $brand) !== 0) {
                 continue;
             }
-            // A named slot with no key is half-configured: degrade rather than
-            // send an empty Authorization header.
             if ($configured['api_key'] === '') {
-                return $fallback;
+                throw new \moodle_exception('brandwithoutkey', 'accredible', '', $configured['name']);
             }
             return [
                 'api_key' => $configured['api_key'],
@@ -66,7 +65,30 @@ class brand_keys {
             ];
         }
 
-        return $fallback;
+        throw new \moodle_exception('brandunknown', 'accredible', '', (string) $brand);
+    }
+
+    /**
+     * Whether a brand name resolves to a usable account.
+     *
+     * For callers that need to branch instead of failing, such as form
+     * validation deciding whether to show an error.
+     *
+     * @param string|null $brand
+     * @return bool
+     */
+    public static function is_usable($brand) {
+        if (empty($brand)) {
+            return false;
+        }
+
+        foreach (self::all() as $configured) {
+            if (strcasecmp($configured['name'], (string) $brand) === 0) {
+                return $configured['api_key'] !== '';
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -102,8 +124,9 @@ class brand_keys {
      *
      * Returns the configured brand name (in its configured casing) so the
      * result can be used directly as a form value, or null when the root has
-     * no idnumber or names a brand that is not configured. Null means "use the
-     * global account", which is the safe default in both cases.
+     * no idnumber or names a brand that is not configured. Null means no brand
+     * could be derived, which the activity form turns into a validation error:
+     * there is no account to fall back to.
      *
      * @param \stdClass|int|null $courseorid a course record or its id
      * @return string|null
@@ -127,23 +150,23 @@ class brand_keys {
     /**
      * The brand an activity issues against.
      *
-     * A saved activity carries its own brand, including the empty one meaning
-     * the global account. One that has not been saved yet has no brand of its
-     * own, so its course category answers instead. Callers that only know the
-     * course and instance id -- the web service, for one -- use this so the
-     * client never has to send the brand.
+     * A saved activity carries its own brand. One that has not been saved yet
+     * does not, and neither does a row left over from before the brand was
+     * mandatory, so the course category answers for both. This mirrors what
+     * the activity form preselects, which is what keeps the form and the web
+     * service reading the same account.
      *
      * @param int|null $instanceid accredible activity instance, 0 when creating
      * @param \stdClass|int|null $courseorid
-     * @return string|null null meaning the global account
+     * @return string|null null when nothing names a brand
      */
     public static function brand_for_activity($instanceid, $courseorid) {
         global $DB;
 
         if (!empty($instanceid)) {
             $record = $DB->get_record('accredible', ['id' => (int) $instanceid], 'id, brand');
-            if ($record) {
-                return empty($record->brand) ? null : $record->brand;
+            if ($record && !empty($record->brand)) {
+                return $record->brand;
             }
         }
 
@@ -229,18 +252,6 @@ class brand_keys {
      */
     public static function is_configured() {
         return !empty(self::all());
-    }
-
-    /**
-     * The legacy single-account settings.
-     *
-     * @return array{api_key: string, is_eu: bool}
-     */
-    public static function global_account() {
-        return [
-            'api_key' => trim(self::config('accredible_api_key')),
-            'is_eu'   => (bool) self::config('is_eu'),
-        ];
     }
 
     /**
