@@ -51,6 +51,9 @@ class accredible {
             'groupid' => $post->groupid,
             'attributemapping' => $this->build_attribute_mapping_list($post),
             'timecreated' => time(),
+            // Empty means the global account, which is what activities created
+            // before multi-brand support carry.
+            'brand' => empty($post->brand) ? null : $post->brand,
         ];
 
         if ($existingrecord) {

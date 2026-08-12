@@ -48,9 +48,11 @@ function accredible_add_instance($post, $mform = null, $localcredentials = null)
 
     $post->instance = isset($post->instance) ? $post->instance : null;
 
-    $localcredentials = $localcredentials ?? new credentials();
-    $evidenceitems = new evidenceitems();
-    $usersclient = new users();
+    // Everything that talks to Accredible must use the brand's account.
+    $brandapi = apirest::for_brand($post->brand ?? null);
+    $localcredentials = $localcredentials ?? new credentials($brandapi);
+    $evidenceitems = new evidenceitems($brandapi);
+    $usersclient = new users($brandapi);
     $accredible = new accredible();
 
     $recordid = $accredible->save_record($post);
@@ -147,9 +149,11 @@ function accredible_update_instance($post, $mform = null, $localcredentials = nu
     // To update your certificate details, go to accredible.com.
     global $DB;
 
-    $localcredentials = $localcredentials ?? new credentials();
-    $evidenceitems = new evidenceitems();
-    $usersclient = new users();
+    // Everything that talks to Accredible must use the brand's account.
+    $brandapi = apirest::for_brand($post->brand ?? null);
+    $localcredentials = $localcredentials ?? new credentials($brandapi);
+    $evidenceitems = new evidenceitems($brandapi);
+    $usersclient = new users($brandapi);
     $accredible = new accredible();
 
     // Load grade attributes for users if need to be added in the credential.

@@ -45,7 +45,10 @@ $PAGE->set_cm($cm);
 $PAGE->set_title(format_string($accrediblecertificate->name));
 $PAGE->set_heading(format_string($course->fullname));
 
-$localcredentials = new credentials();
+// Read the credentials from the account this activity issues against.
+$localcredentials = new credentials(
+    \mod_accredible\apirest\apirest::for_brand($accrediblecertificate->brand ?? null)
+);
 
 // User has admin privileges, show table of certificates.
 if (has_capability('mod/accredible:manage', $context)) {
@@ -115,7 +118,11 @@ if (has_capability('mod/accredible:manage', $context)) {
     }
 
     if ($accrediblecertificate->groupid) {
-        $userscertificatelink = accredible_get_recipient_sso_link($accrediblecertificate->groupid, $USER->email);
+        $userscertificatelink = accredible_get_recipient_sso_link(
+            $accrediblecertificate->groupid,
+            $USER->email,
+            $accrediblecertificate->brand ?? null
+        );
     } else { // Legacy achievment ID.
         foreach ($certificates as $certificate) {
             if ($certificate->recipient->email == $USER->email) {
