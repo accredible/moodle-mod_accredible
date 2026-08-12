@@ -125,6 +125,32 @@ class brand_keys {
     }
 
     /**
+     * The brand an activity issues against.
+     *
+     * A saved activity carries its own brand, including the empty one meaning
+     * the global account. One that has not been saved yet has no brand of its
+     * own, so its course category answers instead. Callers that only know the
+     * course and instance id -- the web service, for one -- use this so the
+     * client never has to send the brand.
+     *
+     * @param int|null $instanceid accredible activity instance, 0 when creating
+     * @param \stdClass|int|null $courseorid
+     * @return string|null null meaning the global account
+     */
+    public static function brand_for_activity($instanceid, $courseorid) {
+        global $DB;
+
+        if (!empty($instanceid)) {
+            $record = $DB->get_record('accredible', ['id' => (int) $instanceid], 'id, brand');
+            if ($record) {
+                return empty($record->brand) ? null : $record->brand;
+            }
+        }
+
+        return self::brand_from_course($courseorid);
+    }
+
+    /**
      * The idnumber of the root category a course hangs from, verbatim.
      *
      * Kept separate from brand_from_course() so callers can tell "no idnumber
