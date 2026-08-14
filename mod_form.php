@@ -30,6 +30,8 @@ require_once($CFG->dirroot . '/mod/accredible/lib.php');
 require_once($CFG->dirroot . '/mod/accredible/locallib.php');
 
 use mod_accredible\Html2Text\Html2Text;
+use mod_accredible\apirest\apirest;
+use mod_accredible\local\brand_keys;
 use mod_accredible\local\credentials;
 use mod_accredible\local\groups;
 use mod_accredible\local\users;
@@ -52,11 +54,8 @@ class mod_accredible_mod_form extends moodleform_mod {
     public function definition() {
         global $DB, $COURSE, $CFG, $PAGE, $OUTPUT;
 
-        $credentialsclient = new credentials();
-        $groupsclient = new groups();
-        $usersclient = new users();
-        $formhelper = new formhelper();
-
+        // The clients are built further down, once the course is known: which
+        // Accredible account they talk to depends on the activity's brand.
         $updatingcert = false;
         $alreadyexists = false;
 
@@ -73,16 +72,12 @@ class mod_accredible_mod_form extends moodleform_mod {
             $description = "Recipient has compeleted the achievement.";
         }
 
-        if ($CFG->is_eu) {
-            $dashboardurl = 'https://eu.dashboard.accredible.com/';
-        } else {
-            $dashboardurl = 'https://dashboard.accredible.com/';
+        // Make sure at least one brand is set up: without one there is no
+        // account to issue against at all.
+        if (!brand_keys::is_configured()) {
+            throw new moodle_exception('nobrandsconfigured', 'accredible');
         }
 
-        // Make sure the API key is set.
-        if (!isset($CFG->accredible_api_key)) {
-            throw new moodle_exception('Please set your API Key first in the plugin settings.');
-        }
         // Update form init.
         if (optional_param('update', '', PARAM_INT)) {
             $updatingcert = true;
@@ -98,11 +93,31 @@ class mod_accredible_mod_form extends moodleform_mod {
             $alreadyexists = $DB->record_exists('accredible', ['course' => $id]);
         }
 
+        // Resolve the brand before anything talks to the API: every client below
+        // is bound to the selected brand's account.
+        $selectedbrand = self::resolve_selected_brand($accrediblecertificate ?? null, $course);
+
+        // The course category may name no brand, or one that is not configured.
+        // The form still renders so a brand can be picked, but nothing is
+        // fetched from Accredible until there is one: showing another brand's
+        // groups would be worse than showing none.
+        $hasbrand = ($selectedbrand !== '');
+        $brandapi = $hasbrand ? apirest::for_brand($selectedbrand) : null;
+
+        $dashboardurl = ($hasbrand && brand_keys::for_brand($selectedbrand)['is_eu'])
+            ? 'https://eu.dashboard.accredible.com/'
+            : 'https://dashboard.accredible.com/';
+
+        $credentialsclient = $hasbrand ? new credentials($brandapi) : null;
+        $groupsclient = $hasbrand ? new groups($brandapi) : null;
+        $usersclient = $hasbrand ? new users($brandapi) : null;
+        $formhelper = new formhelper($brandapi);
+
         // Load user data.
         $context = context_course::instance($course->id);
         $users = get_enrolled_users($context, "mod/accredible:view", null, 'u.*');
 
-        if ($updatingcert) {
+        if ($updatingcert && $hasbrand) {
             // Grab existing certificates and cross-reference emails.
             if ($accrediblecertificate->achievementid) {
                 $userswithcredential = $usersclient->get_users_with_credentials($users, $accrediblecertificate->achievementid);
@@ -121,8 +136,9 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         $inputstyle = ['style' => 'width: 399px'];
 
-        // Load template contexts.
-        $attributekeyschoices = $formhelper->get_attributekeys_choices();
+        // Load template contexts. The attribute keys belong to the brand's
+        // account too, so they wait until there is a brand.
+        $attributekeyschoices = $hasbrand ? $formhelper->get_attributekeys_choices() : null;
 
         $accredibleoptions = $formhelper->map_select_options($attributekeyschoices);
         $coursefieldoptions = $formhelper->load_course_field_options();
@@ -153,10 +169,56 @@ class mod_accredible_mod_form extends moodleform_mod {
             $mform->addElement('static', 'additionalactivitiesone', '', get_string('additionalactivitiesone', 'accredible'));
         }
 
-        // Load available groups.
-        $templates = ['' => 'Select a Group'] + $groupsclient->get_groups();
-        $mform->addElement('select', 'groupid', get_string('accrediblegroup', 'accredible'), $templates, $inputstyle);
+        // Brand selector. It governs which Accredible account the group list
+        // below and the credential issuing talk to. The element is not rendered
+        // at all when no brand is configured, so installs that never set one up
+        // keep exactly the form they had before.
+        $brandoptions = ['' => get_string('brandchoose', 'accredible')] + brand_keys::menu();
+        $mform->addElement('select', 'brand', get_string('brandlabel', 'accredible'), $brandoptions, $inputstyle);
+        $mform->setType('brand', PARAM_TEXT);
+        $mform->setDefault('brand', $selectedbrand);
+        $mform->addRule('brand', null, 'required', null, 'client');
+        $mform->addElement('static', 'branddescription', '', get_string('branddescription', 'accredible'));
+
+        if (!$hasbrand) {
+            $mform->addElement('static', 'brandunresolved', '', get_string('brandunresolved', 'accredible'));
+        }
+
+        // No-submit button: reposts the form so the group list is rebuilt
+        // against the newly selected brand, without any JavaScript.
+        $mform->registerNoSubmitButton('reloadbrand');
+        $mform->addElement('submit', 'reloadbrand', get_string('brandreload', 'accredible'));
+
+        // Load available groups. These come from the selected brand's account,
+        // so a group belonging to another brand is simply not offered. With no
+        // brand yet there is nothing to list.
+        //
+        // Rendered as an autocomplete rather than a plain select: an account can
+        // hold hundreds of groups, and this filters them as you type. The search
+        // runs in the browser over the options already on the page, so it costs
+        // no API calls and can only ever match this brand's groups. Changing the
+        // brand reposts the form, which rebuilds the element from scratch and
+        // clears whatever was typed.
+        //
+        // Keep the placeholder short. core/form_autocomplete_input sizes the
+        // input to exactly the placeholder's character count and takes no
+        // account of the dropdown arrow drawn over its right edge, so a long
+        // placeholder ends up running underneath the arrow.
+        $templates = $hasbrand ? $groupsclient->get_groups() : [];
+        $mform->addElement(
+            'autocomplete',
+            'groupid',
+            get_string('accrediblegroup', 'accredible'),
+            $templates,
+            [
+                'multiple' => false,
+                'casesensitive' => false,
+                'noselectionstring' => get_string('groupnoselection', 'accredible'),
+                'placeholder' => get_string('groupsearchplaceholder', 'accredible'),
+            ]
+        );
         $mform->addRule('groupid', null, 'required', null, 'client');
+        $mform->addElement('static', 'groupsearchhelp', '', get_string('groupsearchhelp', 'accredible', count($templates)));
         if ($updatingcert && $accrediblecertificate->groupid) {
             $mform->setDefault('groupid', $accrediblecertificate->groupid);
         }
@@ -225,7 +287,7 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         if ($updatingcert && $accrediblecertificate->achievementid) {
             // Grab the list of templates available.
-            $templates = $groupsclient->get_templates();
+            $templates = $hasbrand ? $groupsclient->get_templates() : [];
             $mform->addElement('static', 'usestemplatesdescription', '', get_string('usestemplatesdescription', 'accredible'));
             $mform->addElement('select', 'achievementid', get_string('groupselect', 'accredible'), $templates);
             $mform->addRule('achievementid', null, 'required', null, 'client');
@@ -418,6 +480,78 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
+    }
+
+    /**
+     * Which brand the form works against.
+     *
+     * Priority: what the user just picked (a no-submit repost carries it in the
+     * request), then what the activity has stored, then the brand its course
+     * category implies. A brand that is no longer configured resolves to
+     * nothing rather than offering a value the select cannot show.
+     *
+     * @param stdClass|null $record the existing activity record when editing
+     * @param stdClass $course
+     * @return string the brand name, or an empty string when none could be derived
+     */
+    private static function resolve_selected_brand($record, $course) {
+        $configured = brand_keys::menu();
+
+        $submitted = optional_param('brand', null, PARAM_TEXT);
+        if ($submitted !== null) {
+            return isset($configured[$submitted]) ? $submitted : '';
+        }
+
+        if ($record && !empty($record->brand)) {
+            return isset($configured[$record->brand]) ? $record->brand : '';
+        }
+
+        return brand_keys::brand_from_course($course) ?? '';
+    }
+
+    /**
+     * The brand is mandatory, and the group has to belong to it.
+     *
+     * The group select is rebuilt whenever the brand changes, so a stale pair
+     * can only arrive from a hand-crafted post. Checked without calling the
+     * API: if the brand changed and the group did not, the group is stale.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
+    public function validation($data, $files) {
+        global $DB;
+
+        $errors = parent::validation($data, $files);
+
+        $newbrand = isset($data['brand']) ? trim((string) $data['brand']) : '';
+
+        // No account to fall back on: an activity without a usable brand has
+        // nowhere to issue, so it cannot be saved.
+        if (!brand_keys::is_usable($newbrand)) {
+            $errors['brand'] = get_string('brandrequired', 'accredible');
+            return $errors;
+        }
+
+        if (empty($this->_instance)) {
+            return $errors;
+        }
+
+        $existing = $DB->get_record('accredible', ['id' => $this->_instance], 'id, brand, groupid');
+        if (!$existing) {
+            return $errors;
+        }
+
+        $oldbrand = (string) ($existing->brand ?? '');
+
+        if ($newbrand !== $oldbrand
+            && !empty($data['groupid'])
+            && (string) $data['groupid'] === (string) $existing->groupid) {
+            $errors['groupid'] = get_string('brandgroupmismatch', 'accredible');
+        }
+
+        return $errors;
     }
 
     /**

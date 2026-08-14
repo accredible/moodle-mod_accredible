@@ -17,6 +17,7 @@
 namespace mod_accredible\apirest;
 
 use mod_accredible\client\client;
+use mod_accredible\local\brand_keys;
 
 /**
  * Class to make requests to Accredible API.
@@ -44,15 +45,13 @@ class apirest {
      * Constructor method to define correct endpoints
      *
      * @param stdObject $client a mock client for testing
+     * @param string|null $apikey the brand API key
+     * @param bool|null $iseu the brand region; defaults to the US endpoint
      */
-    public function __construct($client = null) {
-        global $CFG;
-
-        $this->apiendpoint = 'https://api.accredible.com/v1/';
-
-        if ($CFG->is_eu) {
-            $this->apiendpoint = 'https://eu.api.accredible.com/v1/';
-        }
+    public function __construct($client = null, $apikey = null, $iseu = null) {
+        $this->apiendpoint = !empty($iseu)
+            ? 'https://eu.api.accredible.com/v1/'
+            : 'https://api.accredible.com/v1/';
 
         $devapiendpoint = getenv('ACCREDIBLE_DEV_API_ENDPOINT');
         if ($devapiendpoint) {
@@ -63,8 +62,25 @@ class apirest {
         if ($client) {
             $this->client = $client;
         } else {
-            $this->client = new client();
+            $this->client = new client(null, $apikey);
         }
+    }
+
+    /**
+     * Build an apirest bound to a brand's Accredible account.
+     *
+     * Call sites that hold an activity record should use this instead of the
+     * constructor: it resolves key and region together, so they can never end
+     * up mismatched (an EU key against the US endpoint, for instance).
+     *
+     * @param string|null $brand the brand name stored on the activity
+     * @param stdObject $client a mock client for testing
+     * @return self
+     */
+    public static function for_brand($brand, $client = null) {
+        $account = brand_keys::for_brand($brand);
+
+        return new self($client, $account['api_key'], $account['is_eu']);
     }
 
     /**

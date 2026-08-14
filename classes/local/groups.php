@@ -47,12 +47,14 @@ class groups {
      * @param int $rand a random number to avoid duplicated names when creating groups.
      */
     public function __construct($apirest = null, $rand = null) {
-        // An apirest with a mock client is passed when unit testing.
-        if ($apirest) {
-            $this->apirest = $apirest;
-        } else {
-            $this->apirest = new apirest();
+        // There is no default account: the caller must say which brand this
+        // client talks to.
+        if (!$apirest) {
+            throw new \coding_exception(
+                'mod_accredible: groups needs an apirest bound to a brand. Use apirest::for_brand($brand).'
+            );
         }
+        $this->apirest = $apirest;
 
         // A fixed value is passed when unit testing.
         if ($rand) {

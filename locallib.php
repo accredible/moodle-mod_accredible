@@ -165,11 +165,12 @@ function accredible_evaluate_completion_eligibility($user, $record, $quiz, $ctx)
  * Get the SSO link for a recipient
  * @param int $groupid
  * @param string $email
+ * @param string|null $brand the activity's brand; required, it selects the account
  */
-function accredible_get_recipient_sso_link($groupid, $email) {
+function accredible_get_recipient_sso_link($groupid, $email, $brand = null) {
     global $CFG, $DB;
 
-    $apirest = new apirest();
+    $apirest = apirest::for_brand($brand);
 
     // Resolve the recipient so the logged api_request_failed event has a related user.
     $recipient = $DB->get_record('user', ['email' => $email], 'id', IGNORE_MULTIPLE);
@@ -235,7 +236,7 @@ function accredible_issue_default_certificate(
     $courseurl = new moodle_url('/course/view.php', ['id' => $accrediblecertificate->course]);
     $courselink = $courseurl->__toString();
 
-    $restapi = new apirest();
+    $restapi = apirest::for_brand($accrediblecertificate->brand ?? null);
     $credential = $restapi->create_credential_legacy(
         $name,
         $email,
@@ -311,10 +312,12 @@ function accredible_quiz_submission_handler($event, $localcredentials = null) {
     require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
     $ctx = context_module::instance($event->contextinstanceid);
-    $api = new apirest();
-    $localcredentials = $localcredentials ?? new credentials();
-    $usersclient = new users();
     $accredible = new accredible();
+
+    // A course can hold several activities, each with its own brand, so the API
+    // clients are built per record inside the loop. An injected client still
+    // wins, which is what the tests rely on.
+    $injectedcredentials = $localcredentials;
 
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
 
@@ -322,6 +325,10 @@ function accredible_quiz_submission_handler($event, $localcredentials = null) {
     $user = $DB->get_record('user', ['id' => $event->relateduserid]);
     if ($accrediblecertificaterecords = $DB->get_records('accredible', ['course' => $event->courseid])) {
         foreach ($accrediblecertificaterecords as $record) {
+            $api = apirest::for_brand($record->brand ?? null);
+            $localcredentials = $injectedcredentials ?? new credentials($api);
+            $usersclient = new users($api);
+
             try {
                 if (!$record->finalquiz && !$record->completionactivities) {
                     \mod_accredible\event\credential_issue_skipped::create([
@@ -506,15 +513,21 @@ function accredible_course_completed_handler($event, $localcredentials = null) {
     global $DB, $CFG;
 
     $ctx = context_course::instance($event->courseid);
-    $localcredentials = $localcredentials ?? new credentials();
-    $usersclient = new users();
     $accredible = new accredible();
+
+    // One client per record: activities in the same course can target different
+    // brands. An injected client still wins, which is what the tests rely on.
+    $injectedcredentials = $localcredentials;
 
     $user = $DB->get_record('user', ['id' => $event->relateduserid]);
 
     // Check we have a course record.
     if ($accrediblecertificaterecords = $DB->get_records('accredible', ['course' => $event->courseid])) {
         foreach ($accrediblecertificaterecords as $record) {
+            $api = apirest::for_brand($record->brand ?? null);
+            $localcredentials = $injectedcredentials ?? new credentials($api);
+            $usersclient = new users($api);
+
             try {
                 // Check for the existence of an activity instance and an auto-issue rule.
                 if ($record && ($record->completionactivities && $record->completionactivities != 0)) {

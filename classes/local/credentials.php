@@ -39,12 +39,14 @@ class credentials {
      * @param stdObject $apirest a mock apirest for testing.
      */
     public function __construct($apirest = null) {
-        // A mock apirest is passed when unit testing.
-        if ($apirest) {
-            $this->apirest = $apirest;
-        } else {
-            $this->apirest = new apirest();
+        // There is no default account: the caller must say which brand this
+        // client talks to.
+        if (!$apirest) {
+            throw new \coding_exception(
+                'mod_accredible: credentials needs an apirest bound to a brand. Use apirest::for_brand($brand).'
+            );
         }
+        $this->apirest = $apirest;
     }
 
     /**

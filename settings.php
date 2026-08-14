@@ -25,21 +25,42 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-// Later: language tags.
+// Brands. Each slot is one Accredible account, and every activity issues
+// against one of them. There is no site-wide account: an activity without a
+// usable brand cannot be saved.
 $settings->add(
-    new admin_setting_configtext(
-        'accredible_api_key',
-        get_string('apikeylabel', 'accredible'),
-        get_string('apikeyhelp', 'accredible'),
-        ''
+    new admin_setting_heading(
+        'accredible_brands_heading',
+        get_string('brandsheading', 'accredible'),
+        get_string('brandsheadinghelp', 'accredible')
     )
 );
 
-$settings->add(
-    new admin_setting_configcheckbox(
-        'is_eu',
-        get_string('eulabel', 'accredible'),
-        get_string('euhelp', 'accredible'),
-        ''
-    )
-);
+for ($brandslot = 1; $brandslot <= \mod_accredible\local\brand_keys::SLOTS; $brandslot++) {
+    $settings->add(
+        new admin_setting_configtext(
+            "accredible_brand{$brandslot}_name",
+            get_string('brandnamelabel', 'accredible', $brandslot),
+            get_string('brandnamehelp', 'accredible'),
+            ''
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configpasswordunmask(
+            "accredible_brand{$brandslot}_api_key",
+            get_string('brandapikeylabel', 'accredible', $brandslot),
+            get_string('brandapikeyhelp', 'accredible'),
+            ''
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configcheckbox(
+            "accredible_brand{$brandslot}_is_eu",
+            get_string('brandeulabel', 'accredible', $brandslot),
+            get_string('brandeuhelp', 'accredible'),
+            0
+        )
+    );
+}

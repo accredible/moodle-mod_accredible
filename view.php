@@ -45,13 +45,29 @@ $PAGE->set_cm($cm);
 $PAGE->set_title(format_string($accrediblecertificate->name));
 $PAGE->set_heading(format_string($course->fullname));
 
-$localcredentials = new credentials();
+// Read the credentials from the account this activity issues against. The brand
+// is mandatory on the form, so an activity without a usable one can only come
+// from data predating that rule or edited by hand. Degrade to "no credentials"
+// rather than fataling the page: the teacher gets a notice and the student sees
+// the certificate as still pending.
+$localcredentials = null;
+try {
+    $localcredentials = new credentials(
+        \mod_accredible\apirest\apirest::for_brand($accrediblecertificate->brand ?? null)
+    );
+} catch (\Throwable $e) {
+    debugging('mod_accredible: unusable brand on activity ' . $accrediblecertificate->id
+        . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
+}
 
 // User has admin privileges, show table of certificates.
 if (has_capability('mod/accredible:manage', $context)) {
     // Get array of certificates. The API failure is already logged (api_request_failed),
     // so degrade to an empty list with a notice instead of fataling the page.
     try {
+        if (!$localcredentials) {
+            throw new \moodle_exception('brandmissing', 'accredible');
+        }
         if ($accrediblecertificate->achievementid) { // Legacy achievment ID.
             $certificates = $localcredentials->get_credentials($accrediblecertificate->achievementid);
         } else { // Group id.
@@ -105,6 +121,9 @@ if (has_capability('mod/accredible:manage', $context)) {
     // The API failure is already logged (api_request_failed); degrade to "in progress"
     // instead of fataling the page for the student.
     try {
+        if (!$localcredentials) {
+            throw new \moodle_exception('brandmissing', 'accredible');
+        }
         if ($accrediblecertificate->achievementid) { // Legacy achievment ID.
             $certificates = $localcredentials->get_credentials($accrediblecertificate->achievementid, $USER->email);
         } else { // Group id.
@@ -114,9 +133,18 @@ if (has_capability('mod/accredible:manage', $context)) {
         $certificates = [];
     }
 
-    if ($accrediblecertificate->groupid) {
-        $userscertificatelink = accredible_get_recipient_sso_link($accrediblecertificate->groupid, $USER->email);
-    } else { // Legacy achievment ID.
+    if ($accrediblecertificate->groupid && $localcredentials) {
+        // Resolving the brand can throw for the same reason as above.
+        try {
+            $userscertificatelink = accredible_get_recipient_sso_link(
+                $accrediblecertificate->groupid,
+                $USER->email,
+                $accrediblecertificate->brand ?? null
+            );
+        } catch (\Throwable $e) {
+            $userscertificatelink = null;
+        }
+    } else if (!$accrediblecertificate->groupid) { // Legacy achievment ID.
         foreach ($certificates as $certificate) {
             if ($certificate->recipient->email == $USER->email) {
                 if (isset($certificate->url)) {

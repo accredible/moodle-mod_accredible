@@ -62,11 +62,18 @@ class client {
     public $lasturl;
 
     /**
+     * The brand API key this client authenticates with.
+     * @var string $token
+     */
+    private $token;
+
+    /**
      * Constructor method
      *
      * @param stdObject $curl a mock curl for testing
+     * @param string $apikey the brand API key; required, there is no default account
      */
-    public function __construct($curl = null) {
+    public function __construct($curl = null, $apikey = null) {
         global $CFG;
         require_once($CFG->libdir . '/filelib.php');
 
@@ -77,12 +84,15 @@ class client {
             $this->curl = new \curl();
         }
 
-        $token = $CFG->accredible_api_key;
+        $this->token = trim((string) $apikey);
+
+        // The header is frozen here for the life of the client, so one client
+        // instance always speaks to exactly one Accredible account.
         // No CURLOPT_FAILONERROR: keep 4xx/5xx bodies so apirest can read them.
         $this->curloptions = [
             'CURLOPT_RETURNTRANSFER' => true,
             'CURLOPT_HTTPHEADER'     => [
-                'Authorization: Token ' . $token,
+                'Authorization: Token ' . $this->token,
                 'Content-Type: application/json; charset=utf-8',
                 'Accredible-Integration: Moodle',
             ],
@@ -128,6 +138,15 @@ class client {
      * @return \stdClass|null
      */
     private function send_req($url, $method, $reqdata = null) {
+        // Every request belongs to a brand. An empty key used to mean "use the
+        // global account"; there is no such account any more, so it means a
+        // caller reached the API without going through apirest::for_brand().
+        if ($this->token === '') {
+            throw new \coding_exception(
+                'mod_accredible: an API key is required. Build the client through apirest::for_brand($brand).'
+            );
+        }
+
         $curl = $this->curl;
 
         // Reset per-request state; the client instance is reused across calls.

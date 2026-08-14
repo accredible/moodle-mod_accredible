@@ -51,6 +51,10 @@ class accredible {
             'groupid' => $post->groupid,
             'attributemapping' => $this->build_attribute_mapping_list($post),
             'timecreated' => time(),
+            // The account this activity issues against. The form makes it
+            // mandatory; it is only nullable in the schema so the column could
+            // be added to existing rows.
+            'brand' => empty($post->brand) ? null : $post->brand,
         ];
 
         if ($existingrecord) {

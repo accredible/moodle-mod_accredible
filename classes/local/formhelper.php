@@ -29,6 +29,21 @@ use mod_accredible\local\attribute_keys;
  */
 class formhelper {
     /**
+     * HTTP request apirest, bound to the brand's account when one is given.
+     * @var apirest|null
+     */
+    private $apirest;
+
+    /**
+     * Constructor method
+     *
+     * @param stdObject $apirest an apirest bound to a brand, or a mock for testing.
+     */
+    public function __construct($apirest = null) {
+        $this->apirest = $apirest;
+    }
+
+    /**
      * Load grade item options for the custom attribute mapping dropdown.
      *
      * This function retrieves grade items associated with the course and formats them for use in a select element.
@@ -259,7 +274,7 @@ class formhelper {
      * @return attribute_keys An instance of the attribute_keys client.
      */
     public function get_attribute_keys_client() {
-        return  new attribute_keys();
+        return new attribute_keys($this->apirest);
     }
 
     /**

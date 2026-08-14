@@ -230,6 +230,7 @@ final class mod_accredible_formhelper_test extends \advanced_testcase {
         // Mock attribute_keys class and 1 method.
         $attributekeysmock = $this->getMockBuilder(attribute_keys::class)
             ->onlyMethods(['get_attribute_keys'])
+            ->disableOriginalConstructor()
             ->getMock();
 
         // When get_attribute_keys(mocked) method returns values for 'text' and 'date'.
@@ -253,6 +254,7 @@ final class mod_accredible_formhelper_test extends \advanced_testcase {
         // Mock attribute_keys class and 1 method.
         $attributekeysmock = $this->getMockBuilder(attribute_keys::class)
             ->onlyMethods(['get_attribute_keys'])
+            ->disableOriginalConstructor()
             ->getMock();
 
         // When get_attribute_keys(mocked) method returns empty for 'text' and 'date'.

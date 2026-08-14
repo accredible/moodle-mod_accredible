@@ -54,8 +54,12 @@ final class mod_accredible_handler_resilience_test extends \advanced_testcase {
         $this->setAdminUser();
         $this->user = $this->getDataGenerator()->create_user();
         $this->course = $this->getDataGenerator()->create_course();
-        set_config('accredible_api_key', 'sometestapikey');
-        set_config('is_eu', 0);
+
+        // Every activity issues against a brand: there is no default account.
+        set_config('accredible_brand1_name', 'CEAC');
+        set_config('accredible_brand1_api_key', 'ceacapikey');
+        set_config('accredible_brand1_is_eu', 1);
+
         putenv('ACCREDIBLE_DEV_API_ENDPOINT');
     }
 
@@ -82,6 +86,7 @@ final class mod_accredible_handler_resilience_test extends \advanced_testcase {
             'passinggrade' => 70,
             'timecreated' => time(),
             'groupid' => 1,
+            'brand' => 'CEAC',
             'completionactivities' => $completionactivities,
         ]);
         return $DB->get_record('accredible', ['id' => $id]);

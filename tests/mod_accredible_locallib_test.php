@@ -56,8 +56,6 @@ final class mod_accredible_locallib_test extends \advanced_testcase {
         $this->course = $this->getDataGenerator()->create_course();
 
         // Add plugin settings.
-        set_config('accredible_api_key', 'sometestapikey');
-        set_config('is_eu', 0);
 
         // Unset the devlopment environment variable.
         putenv('ACCREDIBLE_DEV_API_ENDPOINT');

@@ -43,8 +43,6 @@ final class mod_accredible_apirest_test extends \advanced_testcase {
         $this->setAdminUser();
 
         // Add plugin settings.
-        set_config('accredible_api_key', 'sometestapikey');
-        set_config('is_eu', 0);
 
         // Unset the devlopment environment variable.
         putenv('ACCREDIBLE_DEV_API_ENDPOINT');
@@ -69,18 +67,19 @@ final class mod_accredible_apirest_test extends \advanced_testcase {
      * @coversNothing
      */
     public function test_api_endpoint(): void {
-        // When is_eu is NOT enabled.
-        $api = new apirest();
+        $mockclient = new \stdClass();
+
+        // When the brand is not on the EU region.
+        $api = new apirest($mockclient, 'somebrandapikey', false);
         $this->assertEquals($api->apiendpoint, 'https://api.accredible.com/v1/');
 
-        // When is_eu is enabled.
-        set_config('is_eu', 1);
-        $api = new apirest();
+        // When the brand is on the EU region.
+        $api = new apirest($mockclient, 'somebrandapikey', true);
         $this->assertEquals($api->apiendpoint, 'https://eu.api.accredible.com/v1/');
 
         // When the environemnt variable is set.
         putenv('ACCREDIBLE_DEV_API_ENDPOINT=http://host.docker.internal:3000/v1/');
-        $api = new apirest();
+        $api = new apirest($mockclient, 'somebrandapikey', true);
         $this->assertEquals($api->apiendpoint, 'http://host.docker.internal:3000/v1/');
     }
 
@@ -744,7 +743,7 @@ final class mod_accredible_apirest_test extends \advanced_testcase {
         $enddate = strtotime('2022-04-15');
 
         // Expect to throw an exception.
-        $api = new apirest();
+        $api = new apirest(new \stdClass(), 'somebrandapikey', false);
         $foundexception = false;
         try {
             $api->create_evidence_item_duration($startdate, $enddate, 1);

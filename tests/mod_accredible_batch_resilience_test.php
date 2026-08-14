@@ -38,8 +38,12 @@ final class mod_accredible_batch_resilience_test extends \advanced_testcase {
         require_once($CFG->dirroot . '/mod/accredible/lib.php');
         $this->resetAfterTest();
         $this->setAdminUser();
-        set_config('accredible_api_key', 'sometestapikey');
-        set_config('is_eu', 0);
+
+        // Every activity issues against a brand: there is no default account.
+        set_config('accredible_brand1_name', 'CEAC');
+        set_config('accredible_brand1_api_key', 'ceacapikey');
+        set_config('accredible_brand1_is_eu', 1);
+
         putenv('ACCREDIBLE_DEV_API_ENDPOINT');
     }
 
@@ -61,6 +65,7 @@ final class mod_accredible_batch_resilience_test extends \advanced_testcase {
             'finalquiz' => 0,
             'passinggrade' => 70,
             'groupid' => 1,
+            'brand' => 'CEAC',
             'completionactivities' => null,
             'instance' => null,
             'coursemodule' => 0,

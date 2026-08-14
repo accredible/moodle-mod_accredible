@@ -16,7 +16,6 @@
 
 namespace mod_accredible\local;
 
-use mod_accredible\apirest\apirest;
 use mod_accredible\local\attributemapping;
 
 /**
@@ -29,12 +28,6 @@ use mod_accredible\local\attributemapping;
  */
 class attributemapping_list {
     /**
-     * The apirest object used to call API requests.
-     * @var apirest
-     */
-    private $apirest;
-
-    /**
      * Array of attribute mapping objects.
      * @var $attributemapping[] attributemappings
      */
@@ -45,20 +38,12 @@ class attributemapping_list {
      * Constructor method
      *
      * @param attributemapping[] $attributemappings an array of mappings.
-     * @param stdObject $apirest a mock apirest for testing.
      */
-    public function __construct($attributemappings, $apirest = null) {
+    public function __construct($attributemappings) {
         // Handle validation.
         $this->validate_attributemapping($attributemappings);
 
         $this->attributemappings = $attributemappings;
-
-        // A mock apirest is passed when unit testing.
-        if ($apirest) {
-            $this->apirest = $apirest;
-        } else {
-            $this->apirest = new apirest();
-        }
     }
 
     /**
