@@ -44,52 +44,17 @@ function accredible_check_if_cert_earned($record, $user) {
 
     $earned = false;
 
-    // Check for the existence of an activity instance and an auto-issue rule.
-    if ($record && ($record->finalquiz || $record->completionactivities)) {
-        if ($record->finalquiz) {
-            $quiz = $DB->get_record('quiz', ['id' => $record->finalquiz], '*', MUST_EXIST);
-            // Create that credential if it doesn't exist.
-            $usersgrade = min(( quiz_get_best_grade($quiz, $user['id']) / $quiz->grade ) * 100, 100);
-            $gradeishighenough = ($usersgrade >= $record->passinggrade);
+    // Check for the existence of an activity instance and a final-quiz rule.
+    // Issuance on course completion is decided by accredible_course_completed_handler().
+    if ($record && $record->finalquiz) {
+        $quiz = $DB->get_record('quiz', ['id' => $record->finalquiz], '*', MUST_EXIST);
+        $usersgrade = min(( quiz_get_best_grade($quiz, $user['id']) / $quiz->grade ) * 100, 100);
+        $gradeishighenough = ($usersgrade >= $record->passinggrade);
 
-            // Check for pass.
-            if ($gradeishighenough) {
-                // Student earned certificate through final quiz.
-                $earned = true;
-            }
-        }
-
-        $completionactivities = unserialize_completion_array($record->completionactivities);
-
-        if (!empty($quiz)) {
-            // If this quiz is in the completion activities.
-            if (isset($completionactivities[$quiz->id])) {
-                $completionactivities[$quiz->id] = true;
-                $quizattempts = $DB->get_records('quiz_attempts', ['userid' => $user['id'], 'state' => 'finished']);
-                foreach ($quizattempts as $quizattempt) {
-                    // If this quiz was already attempted, then we shouldn't be issuing a certificate.
-                    if ($quizattempt->quiz == $quiz->id && $quizattempt->attempt > 1) {
-                        return null;
-                    }
-                    // Otherwise, set this quiz as completed.
-                    if (isset($completionactivities[$quizattempt->quiz])) {
-                        $completionactivities[$quizattempt->quiz] = true;
-                    }
-                }
-
-                // But was this the last required activity that was completed?
-                $coursecomplete = true;
-                foreach ($completionactivities as $iscomplete) {
-                    if (!$iscomplete) {
-                        $coursecomplete = false;
-                    }
-                }
-                // If it was the final activity.
-                if ($coursecomplete) {
-                    // Student earned certificate by completing completion activities.
-                    $earned = true;
-                }
-            }
+        // Check for pass.
+        if ($gradeishighenough) {
+            // Student earned certificate through final quiz.
+            $earned = true;
         }
     }
     return $earned;
@@ -509,24 +474,6 @@ function accredible_get_transcript($courseid, $userid, $finalquizid) {
     } else {
         return false;
     }
-}
-
-/**
- * Serialize completion array
- *
- * @param Array $completionarray
- */
-function serialize_completion_array($completionarray) {
-    return base64_encode(serialize((array)$completionarray));
-}
-
-/**
- * Unserialize completion array
- *
- * @param stdObject $completionobject
- */
-function unserialize_completion_array($completionobject) {
-    return is_null($completionobject) ? [] : (array)unserialize(base64_decode($completionobject));
 }
 
 /**
