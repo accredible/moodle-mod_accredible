@@ -276,7 +276,7 @@ final class mod_accredible_handler_resilience_test extends \advanced_testcase {
         $quiz = $this->create_quiz();
         $attempt = $this->insert_attempt($quiz->id, 1);
         $DB->insert_record('quiz_grades', ['quiz' => $quiz->id, 'userid' => $this->user->id, 'grade' => 5]);
-        // '1' is what the settings-form checkbox stores.
+        // The settings-form checkbox stores '1'.
         $this->create_accredible_record($quiz->id, '1');
 
         $mockcreds = $this->mock_credentials();
