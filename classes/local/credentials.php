@@ -125,11 +125,7 @@ class credentials {
             throw new api_exception(
                 'credentialcreateerror',
                 'https://help.accredible.com/hc/en-us',
-                (object) [
-                    'userid' => $user->id,
-                    'groupid' => $groupid,
-                    'cause' => api_exception::cause_text($e),
-                ],
+                (object) ['cause' => api_exception::cause_text($e)],
                 // No $debuginfo: the cause is already in $a, and core would append it to the
                 // message a second time on any box running DEBUG_DEVELOPER.
                 null,
@@ -184,13 +180,7 @@ class credentials {
             throw new api_exception(
                 'credentialcreateerror',
                 'https://help.accredible.com/hc/en-us',
-                (object) [
-                    'userid' => $user->id,
-                    // The legacy path has no group; Accredible takes the achievement name in the
-                    // same slot, as get_credentials() sending it as group_id shows.
-                    'groupid' => $achievementname,
-                    'cause' => api_exception::cause_text($e),
-                ],
+                (object) ['cause' => api_exception::cause_text($e)],
                 // No $debuginfo: the cause is already in $a, and core would append it to the
                 // message a second time on any box running DEBUG_DEVELOPER.
                 null,
@@ -246,10 +236,7 @@ class credentials {
             throw new api_exception(
                 'getcredentialserror',
                 'https://help.accredible.com/hc/en-us',
-                (object) [
-                    'groupid' => $groupid,
-                    'cause' => api_exception::cause_text($e),
-                ],
+                (object) ['cause' => api_exception::cause_text($e)],
                 // No $debuginfo: the cause is already in $a, and core would append it to the
                 // message a second time on any box running DEBUG_DEVELOPER.
                 null,
@@ -286,10 +273,7 @@ class credentials {
             throw new api_exception(
                 'groupsyncerror',
                 'https://help.accredible.com/hc/en-us',
-                (object) [
-                    'groupid' => $groupid,
-                    'cause' => api_exception::cause_text($e),
-                ],
+                (object) ['cause' => api_exception::cause_text($e)],
                 // No $debuginfo: the cause is already in $a, and core would append it to the
                 // message a second time on any box running DEBUG_DEVELOPER.
                 null,

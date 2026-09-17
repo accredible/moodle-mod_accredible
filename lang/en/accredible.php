@@ -74,10 +74,11 @@ $string['reason_malformed_completion_record'] = 'The stored completion activitie
 $string['manualissuefailures'] = 'Credential issuance failed for {$a->count} user(s): {$a->users}. See Site administration → Reports → Logs (component mod_accredible) for details.';
 $string['credentialloaderror'] = 'Could not load credentials from Accredible right now. Please try again later; details are in the logs (component mod_accredible).';
 
-// Accredible API errors. {$a->cause} carries the originating error into the Moodle log.
-$string['groupsyncerror'] = 'An error occurred while checking for an existing credential in group {$a->groupid}. The error was: {$a->cause}';
-$string['getcredentialserror'] = 'An error occurred while fetching credentials for group {$a->groupid}. The error was: {$a->cause}';
-$string['credentialcreateerror'] = 'An error occurred while issuing a credential to Accredible for user id = {$a->userid} in group {$a->groupid}. The error was: {$a->cause}';
+// Accredible API errors. {$a->cause} carries the originating error into the Moodle log; the
+// event description supplies the learner and the group, so these say only what went wrong.
+$string['groupsyncerror'] = 'An error occurred while checking for an existing credential. The error was: {$a->cause}';
+$string['getcredentialserror'] = 'An error occurred while fetching credentials. The error was: {$a->cause}';
+$string['credentialcreateerror'] = 'An error occurred while creating a credential on Accredible. The error was: {$a->cause}';
 $string['evidenceadderror'] = 'An error occurred while adding evidence to Accredible credential id = {$a->credentialid}. The error was: {$a->cause}';
 
 // Shown on the activity settings form rather than logged.

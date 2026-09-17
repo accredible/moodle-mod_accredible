@@ -169,8 +169,10 @@ final class mod_accredible_api_exception_test extends \advanced_testcase {
         } catch (api_exception $e) {
             $message = $this->production_message($e);
             $this->assertStringContainsString('Invalid Group', $message);
-            $this->assertStringContainsString('999999999', $message);
             $this->assertStringNotContainsString('accredible/groupsyncerror', $message);
+            // The group belongs to the event description, not to this message - asserted in
+            // tests/event/mod_accredible_event_test.php.
+            $this->assertStringNotContainsString('999999999', $message);
         }
     }
 
