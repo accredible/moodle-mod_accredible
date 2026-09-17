@@ -130,7 +130,9 @@ class credentials {
                     'groupid' => $groupid,
                     'cause' => api_exception::cause_text($e),
                 ],
-                (string) $e->getMessage(),
+                // No $debuginfo: the cause is already in $a, and core would append it to the
+                // message a second time on any box running DEBUG_DEVELOPER.
+                null,
                 $e
             );
         }
@@ -189,7 +191,9 @@ class credentials {
                     'groupid' => $achievementname,
                     'cause' => api_exception::cause_text($e),
                 ],
-                (string) $e->getMessage(),
+                // No $debuginfo: the cause is already in $a, and core would append it to the
+                // message a second time on any box running DEBUG_DEVELOPER.
+                null,
                 $e
             );
         }
@@ -246,7 +250,9 @@ class credentials {
                     'groupid' => $groupid,
                     'cause' => api_exception::cause_text($e),
                 ],
-                (string) $e->getMessage(),
+                // No $debuginfo: the cause is already in $a, and core would append it to the
+                // message a second time on any box running DEBUG_DEVELOPER.
+                null,
                 $e
             );
         }
@@ -284,7 +290,9 @@ class credentials {
                     'groupid' => $groupid,
                     'cause' => api_exception::cause_text($e),
                 ],
-                (string) $e->getMessage(),
+                // No $debuginfo: the cause is already in $a, and core would append it to the
+                // message a second time on any box running DEBUG_DEVELOPER.
+                null,
                 $e
             );
         }

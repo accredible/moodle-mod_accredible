@@ -204,7 +204,7 @@ class apirest {
                     'credentialid' => $credentialid,
                     'cause' => $errmsg,
                 ],
-                $errmsg
+                null
             );
         }
         return $result;
