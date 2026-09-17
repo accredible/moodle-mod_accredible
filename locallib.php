@@ -340,7 +340,8 @@ function accredible_quiz_submission_handler($event, $localcredentials = null) {
                     'other' => [
                         'reason' => 'exception',
                         'message' => $e->getMessage(),
-                        'class' => get_class($e),
+                        'class' => \mod_accredible\local\api_exception::origin_class($e),
+                        'debuginfo' => \mod_accredible\local\api_exception::debug_detail($e),
                         'groupid' => $record->groupid ?? null,
                     ],
                 ])->trigger();
@@ -415,7 +416,8 @@ function accredible_course_completed_handler($event, $localcredentials = null) {
                     'other' => [
                         'reason' => 'exception',
                         'message' => $e->getMessage(),
-                        'class' => get_class($e),
+                        'class' => \mod_accredible\local\api_exception::origin_class($e),
+                        'debuginfo' => \mod_accredible\local\api_exception::debug_detail($e),
                         'groupid' => $record->groupid ?? null,
                     ],
                 ])->trigger();

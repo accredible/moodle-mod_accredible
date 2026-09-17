@@ -121,13 +121,17 @@ class credentials {
             ])->trigger();
 
             return $credential->credential;
-        } catch (\Exception $e) {
-            throw new \moodle_exception(
+        } catch (\Throwable $e) {
+            throw new api_exception(
                 'credentialcreateerror',
-                'accredible',
                 'https://help.accredible.com/hc/en-us',
-                $user->email,
-                $groupid
+                (object) [
+                    'userid' => $user->id,
+                    'groupid' => $groupid,
+                    'cause' => api_exception::cause_text($e),
+                ],
+                (string) $e->getMessage(),
+                $e
             );
         }
     }
@@ -174,13 +178,19 @@ class credentials {
             // The legacy (achievement-name) path emits certificate_created from its
             // callers, not credential_issued (which is the modern group-based event).
             return $credential->credential;
-        } catch (\Exception $e) {
-            throw new \moodle_exception(
+        } catch (\Throwable $e) {
+            throw new api_exception(
                 'credentialcreateerror',
-                'accredible',
                 'https://help.accredible.com/hc/en-us',
-                $user->email,
-                $achievementname
+                (object) [
+                    'userid' => $user->id,
+                    // The legacy path has no group; Accredible takes the achievement name in the
+                    // same slot, as get_credentials() sending it as group_id shows.
+                    'groupid' => $achievementname,
+                    'cause' => api_exception::cause_text($e),
+                ],
+                (string) $e->getMessage(),
+                $e
             );
         }
     }
@@ -225,22 +235,19 @@ class credentials {
                 }
             }
             return $credentials;
-        } catch (\Exception $e) {
-            // Throw API exception.
-            // Include the achievement id that triggered the error.
-            // Direct the user to accredible's support.
-            // Dump the achievement id to debug_info.
-            $exceptionparam = new \stdClass();
-            $exceptionparam->groupid = $groupid;
-            $exceptionparam->email = $email;
-            if (isset($credentialspage)) {
-                $exceptionparam->last_response = $credentialspage;
-            }
-            throw new \moodle_exception(
+        } catch (\Throwable $e) {
+            // The learner's email and the raw last response used to be passed here. Both now stay
+            // out: this message is written to logstore_standard_log, relateduserid already
+            // identifies the learner, and a decoded response is unbounded in size.
+            throw new api_exception(
                 'getcredentialserror',
-                'accredible',
                 'https://help.accredible.com/hc/en-us',
-                $exceptionparam
+                (object) [
+                    'groupid' => $groupid,
+                    'cause' => api_exception::cause_text($e),
+                ],
+                (string) $e->getMessage(),
+                $e
             );
         }
     }
@@ -267,12 +274,19 @@ class credentials {
             } else {
                 return false;
             }
-        } catch (\Exception $e) {
-            // Throw API exception
-            // include the achievement id that triggered the error
-            // direct the user to accredible's support
-            // dump the achievement id to debug_info.
-            throw new \moodle_exception('groupsyncerror', 'accredible', 'https://help.accredible.com/hc/en-us', $groupid, $groupid);
+        } catch (\Throwable $e) {
+            // \Throwable, not \Exception: dereferencing an unexpected response shape below raises
+            // an \Error on PHP 8, which would otherwise escape this catch entirely.
+            throw new api_exception(
+                'groupsyncerror',
+                'https://help.accredible.com/hc/en-us',
+                (object) [
+                    'groupid' => $groupid,
+                    'cause' => api_exception::cause_text($e),
+                ],
+                (string) $e->getMessage(),
+                $e
+            );
         }
     }
 

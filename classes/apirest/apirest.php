@@ -17,6 +17,7 @@
 namespace mod_accredible\apirest;
 
 use mod_accredible\client\client;
+use mod_accredible\local\api_exception;
 
 /**
  * Class to make requests to Accredible API.
@@ -196,11 +197,13 @@ class apirest {
 
         $errmsg = $this->detect_error($result);
         if ($throwerror && $errmsg !== null) {
-            throw new \moodle_exception(
+            throw new api_exception(
                 'evidenceadderror',
-                'accredible',
                 'https://help.accredible.com/hc/en-us',
-                $credentialid,
+                (object) [
+                    'credentialid' => $credentialid,
+                    'cause' => $errmsg,
+                ],
                 $errmsg
             );
         }
