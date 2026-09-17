@@ -73,6 +73,18 @@ $string['reason_repeat_attempt'] = 'The deciding quiz was attempted more than on
 $string['reason_malformed_completion_record'] = 'The stored completion activities record is corrupt';
 $string['manualissuefailures'] = 'Credential issuance failed for {$a->count} user(s): {$a->users}. See Site administration → Reports → Logs (component mod_accredible) for details.';
 $string['credentialloaderror'] = 'Could not load credentials from Accredible right now. Please try again later; details are in the logs (component mod_accredible).';
+
+// Accredible API errors. {$a->cause} carries the originating error into the Moodle log.
+$string['groupsyncerror'] = 'An error occurred while checking for an existing credential in group {$a->groupid}. The error was: {$a->cause}';
+$string['getcredentialserror'] = 'An error occurred while fetching credentials for group {$a->groupid}. The error was: {$a->cause}';
+$string['credentialcreateerror'] = 'An error occurred while issuing a credential to Accredible for user id = {$a->userid} in group {$a->groupid}. The error was: {$a->cause}';
+$string['evidenceadderror'] = 'An error occurred while adding evidence to Accredible credential id = {$a->credentialid}. The error was: {$a->cause}';
+
+// Shown on the activity settings form rather than logged.
+$string['getgroupserror'] = 'An error occurred while fetching your Accredible groups. Check the API key in the plugin settings, or contact Accredible\'s support.';
+$string['gettemplateserror'] = 'An error occurred while fetching certificate templates. Check the API key in the plugin settings, or contact Accredible\'s support.';
+$string['getattributekeysserror'] = 'An error occurred while fetching your Accredible custom attribute keys. Check the API key in the plugin settings, or contact Accredible\'s support.';
+
 $string['gradeissueheader'] = 'Auto-issue criteria: by final quiz grade';
 $string['id'] = 'ID';
 $string['indexheader'] = 'All certificates/badges for {$a}';
