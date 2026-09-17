@@ -59,7 +59,12 @@ class credential_issue_failed extends \core\event\base {
         $groupclause = $group ? " in Accredible group '{$group}'" : '';
         $class = $this->other['class'] ?? null;
         $classclause = $class ? " [{$class}]" : '';
+        $trigger = $this->other['trigger'] ?? null;
+        $triggertext = $trigger && get_string_manager()->string_exists('trigger_' . $trigger, 'mod_accredible')
+            ? get_string('trigger_' . $trigger, 'mod_accredible')
+            : $trigger;
+        $triggerclause = $triggertext ? ", triggered by {$triggertext}" : '';
         return "Accredible credential issuance failed (reason: {$reasontext}) for user with id " .
-            "'{$this->relateduserid}'{$groupclause}. {$message}{$classclause}";
+            "'{$this->relateduserid}'{$groupclause}{$triggerclause}. {$message}{$classclause}";
     }
 }

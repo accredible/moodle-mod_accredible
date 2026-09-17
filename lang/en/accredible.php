@@ -71,6 +71,9 @@ $string['reason_missing_groupid'] = 'No Accredible group id is configured';
 $string['reason_nothing_to_check'] = 'The activity has no final quiz or completion activities configured';
 $string['reason_repeat_attempt'] = 'The deciding quiz was attempted more than once';
 $string['reason_malformed_completion_record'] = 'The stored completion activities record is corrupt';
+$string['trigger_quiz_submission'] = 'a quiz submission';
+$string['trigger_course_completed'] = 'course completion';
+$string['trigger_manual_issue'] = 'a manual issue from the activity settings';
 $string['manualissuefailures'] = 'Credential issuance failed for {$a->count} user(s): {$a->users}. See Site administration → Reports → Logs (component mod_accredible) for details.';
 $string['credentialloaderror'] = 'Could not load credentials from Accredible right now. Please try again later; details are in the logs (component mod_accredible).';
 

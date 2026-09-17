@@ -226,7 +226,11 @@ function accredible_quiz_submission_handler($event, $localcredentials = null) {
                     \mod_accredible\event\credential_issue_skipped::create([
                         'context' => $ctx,
                         'relateduserid' => $user->id,
-                        'other' => ['reason' => 'nothing_to_check', 'groupid' => $record->groupid ?? null],
+                        'other' => [
+                            'reason' => 'nothing_to_check',
+                            'trigger' => 'quiz_submission',
+                            'groupid' => $record->groupid ?? null,
+                        ],
                     ])->trigger();
                     continue;
                 }
@@ -271,7 +275,11 @@ function accredible_quiz_submission_handler($event, $localcredentials = null) {
                                 \mod_accredible\event\credential_issue_skipped::create([
                                     'context' => $ctx,
                                     'relateduserid' => $user->id,
-                                    'other' => ['reason' => 'grade_below_threshold', 'groupid' => $record->groupid],
+                                    'other' => [
+                                        'reason' => 'grade_below_threshold',
+                                        'trigger' => 'quiz_submission',
+                                        'groupid' => $record->groupid,
+                                    ],
                                 ])->trigger();
                             }
                         }
@@ -327,7 +335,10 @@ function accredible_quiz_submission_handler($event, $localcredentials = null) {
                                 \mod_accredible\event\credential_issue_skipped::create([
                                     'context' => $ctx,
                                     'relateduserid' => $user->id,
-                                    'other' => ['reason' => 'grade_below_threshold'],
+                                    'other' => [
+                                        'reason' => 'grade_below_threshold',
+                                        'trigger' => 'quiz_submission',
+                                    ],
                                 ])->trigger();
                             }
                         }
@@ -339,6 +350,7 @@ function accredible_quiz_submission_handler($event, $localcredentials = null) {
                     'relateduserid' => $user->id,
                     'other' => [
                         'reason' => 'exception',
+                        'trigger' => 'quiz_submission',
                         'message' => $e->getMessage(),
                         'class' => \mod_accredible\local\api_exception::origin_class($e),
                         'debuginfo' => \mod_accredible\local\api_exception::debug_detail($e),
@@ -415,6 +427,7 @@ function accredible_course_completed_handler($event, $localcredentials = null) {
                     'relateduserid' => $user->id,
                     'other' => [
                         'reason' => 'exception',
+                        'trigger' => 'course_completed',
                         'message' => $e->getMessage(),
                         'class' => \mod_accredible\local\api_exception::origin_class($e),
                         'debuginfo' => \mod_accredible\local\api_exception::debug_detail($e),

@@ -111,6 +111,7 @@ function accredible_add_instance($post, $mform = null, $localcredentials = null)
                         'relateduserid' => $user->id,
                         'other' => [
                             'reason' => 'exception',
+                            'trigger' => 'manual_issue',
                             'message' => $e->getMessage(),
                             'class' => \mod_accredible\local\api_exception::origin_class($e),
                             'debuginfo' => \mod_accredible\local\api_exception::debug_detail($e),
@@ -260,6 +261,7 @@ function accredible_update_instance($post, $mform = null, $localcredentials = nu
                         'relateduserid' => $user->id,
                         'other' => [
                             'reason' => 'exception',
+                            'trigger' => 'manual_issue',
                             'message' => $e->getMessage(),
                             'class' => \mod_accredible\local\api_exception::origin_class($e),
                             'debuginfo' => \mod_accredible\local\api_exception::debug_detail($e),
@@ -351,6 +353,7 @@ function accredible_update_instance($post, $mform = null, $localcredentials = nu
                         'relateduserid' => $user->id,
                         'other' => [
                             'reason' => 'exception',
+                            'trigger' => 'manual_issue',
                             'message' => $e->getMessage(),
                             'class' => \mod_accredible\local\api_exception::origin_class($e),
                             'debuginfo' => \mod_accredible\local\api_exception::debug_detail($e),

@@ -69,7 +69,7 @@ final class mod_accredible_event_test extends \advanced_testcase {
         $event = credential_issue_skipped::create([
             'context' => \context_system::instance(),
             'relateduserid' => 42,
-            'other' => ['reason' => 'completion_not_met', 'groupid' => 55],
+            'other' => ['reason' => 'completion_not_met', 'groupid' => 55, 'trigger' => 'quiz_submission'],
         ]);
         $event->trigger();
         $events = $sink->get_events();
@@ -87,6 +87,10 @@ final class mod_accredible_event_test extends \advanced_testcase {
         );
         // The Logs report shows only the description, so the group has to be rendered into it.
         $this->assertStringContainsString("Accredible group '55'", $event->get_description());
+        $this->assertStringContainsString(
+            get_string('trigger_quiz_submission', 'mod_accredible'),
+            $event->get_description()
+        );
     }
 
     /**
@@ -100,6 +104,7 @@ final class mod_accredible_event_test extends \advanced_testcase {
             'relateduserid' => 42,
             'other' => [
                 'reason' => 'exception', 'message' => 'boom', 'class' => 'TypeError', 'groupid' => 55,
+                'trigger' => 'course_completed',
             ],
         ]);
         $event->trigger();
@@ -121,6 +126,12 @@ final class mod_accredible_event_test extends \advanced_testcase {
         // Group and originating class are only readable if the description spells them out.
         $this->assertStringContainsString("Accredible group '55'", $event->get_description());
         $this->assertStringContainsString('[TypeError]', $event->get_description());
+        // The quiz and course-completion handlers both fire for one submission that completes a
+        // course; without this the two failure rows are indistinguishable.
+        $this->assertStringContainsString(
+            get_string('trigger_course_completed', 'mod_accredible'),
+            $event->get_description()
+        );
     }
 
     /**

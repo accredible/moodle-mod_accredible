@@ -55,7 +55,12 @@ class credential_issue_skipped extends \core\event\base {
             : $reason;
         $group = $this->other['groupid'] ?? null;
         $groupclause = $group ? " in Accredible group '{$group}'" : '';
+        $trigger = $this->other['trigger'] ?? null;
+        $triggertext = $trigger && get_string_manager()->string_exists('trigger_' . $trigger, 'mod_accredible')
+            ? get_string('trigger_' . $trigger, 'mod_accredible')
+            : $trigger;
+        $triggerclause = $triggertext ? ", triggered by {$triggertext}" : '';
         return "Accredible credential issuance was skipped (reason: {$reasontext}) for user with id " .
-            "'{$this->relateduserid}'{$groupclause}.";
+            "'{$this->relateduserid}'{$groupclause}{$triggerclause}.";
     }
 }
