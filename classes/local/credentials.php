@@ -268,8 +268,8 @@ class credentials {
                 return false;
             }
         } catch (\Throwable $e) {
-            // \Throwable, not \Exception: dereferencing an unexpected response shape below raises
-            // an \Error on PHP 8, which would otherwise escape this catch entirely.
+            // Caught as Throwable rather than Exception: a PHP 8 Error raised in the try above
+            // would otherwise escape this catch entirely.
             throw new api_exception(
                 'groupsyncerror',
                 'https://help.accredible.com/hc/en-us',

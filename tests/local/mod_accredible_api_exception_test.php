@@ -99,7 +99,7 @@ final class mod_accredible_api_exception_test extends \advanced_testcase {
      * @return credentials
      */
     private function credentials_with(callable $getcredentials, $errmsg = null) {
-        $apirest = new class($getcredentials, $errmsg) {
+        $apirest = new class ($getcredentials, $errmsg) {
             /** @var callable */
             private $getcredentials;
             /** @var string|null */
@@ -246,8 +246,11 @@ final class mod_accredible_api_exception_test extends \advanced_testcase {
                 $credentials->$method('999999999', $email);
                 $this->fail("Expected an api_exception from {$method}().");
             } catch (api_exception $e) {
-                $this->assertStringNotContainsString('@', $this->production_message($e),
-                    "{$method}() put an email address into a message the handlers log.");
+                $this->assertStringNotContainsString(
+                    '@',
+                    $this->production_message($e),
+                    "{$method}() put an email address into a message the handlers log."
+                );
             }
         }
     }

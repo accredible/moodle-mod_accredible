@@ -428,7 +428,7 @@ class apirest {
         if (!is_string($url) || strpos($url, '?') === false) {
             return $url;
         }
-        list($path, $querystring) = explode('?', $url, 2);
+        [$path, $querystring] = explode('?', $url, 2);
         parse_str($querystring, $params);
         if (empty($params['email'])) {
             return $url;
