@@ -251,6 +251,53 @@ final class mod_accredible_api_exception_test extends \advanced_testcase {
     }
 
     /**
+     * A failed lookup must not write the learner's email address into the log.
+     *
+     * @covers \mod_accredible\apirest\apirest::detect_error
+     */
+    public function test_logged_endpoint_carries_no_learner_email(): void {
+        $mockclient = $this->getMockBuilder(client::class)->onlyMethods(['get'])->getMock();
+        $mockclient->lasturl = 'https://api.accredible.com/v1/all_credentials?group_id=9549&email='
+            . rawurlencode('learner@example.com') . '&page_size=50&page=1';
+        $mockclient->respcode = 422;
+        $api = new apirest($mockclient);
+
+        $sink = $this->redirectEvents();
+        $api->detect_error((object) ['errors' => 'Invalid Group'], 14);
+        $events = $sink->get_events();
+        $sink->close();
+
+        $this->assertCount(1, $events);
+        $endpoint = $events[0]->other['endpoint'];
+        $this->assertStringNotContainsString('@', $endpoint);
+        $this->assertStringNotContainsString('learner', $endpoint);
+        // The parts that actually help diagnose must survive.
+        $this->assertStringContainsString('all_credentials', $endpoint);
+        $this->assertStringContainsString('group_id=9549', $endpoint);
+        $this->assertStringContainsString('page=1', $endpoint);
+    }
+
+    /**
+     * A URL carrying no email must be logged exactly as it was requested.
+     *
+     * @covers \mod_accredible\apirest\apirest::detect_error
+     */
+    public function test_logged_endpoint_without_an_email_is_untouched(): void {
+        $url = 'https://api.accredible.com/v1/credentials';
+        $mockclient = $this->getMockBuilder(client::class)->onlyMethods(['get'])->getMock();
+        $mockclient->lasturl = $url;
+        $mockclient->respcode = 422;
+        $api = new apirest($mockclient);
+
+        $sink = $this->redirectEvents();
+        $api->detect_error((object) ['errors' => 'Invalid Group'], 14);
+        $events = $sink->get_events();
+        $sink->close();
+
+        $this->assertSame($url, $events[0]->other['endpoint']);
+    }
+
+    /**
      * An API-layer failure must leave an api_request_failed row beside the issuance failure.
      *
      * @covers \mod_accredible\apirest\apirest::detect_error
