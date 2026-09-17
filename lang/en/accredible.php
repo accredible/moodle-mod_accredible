@@ -77,14 +77,11 @@ $string['trigger_manual_issue'] = 'a manual issue from the activity settings';
 $string['manualissuefailures'] = 'Credential issuance failed for {$a->count} user(s): {$a->users}. See Site administration → Reports → Logs (component mod_accredible) for details.';
 $string['credentialloaderror'] = 'Could not load credentials from Accredible right now. Please try again later; details are in the logs (component mod_accredible).';
 
-// Accredible API errors. {$a->cause} carries the originating error into the Moodle log; the
-// event description supplies the learner and the group, so these say only what went wrong.
 $string['groupsyncerror'] = 'An error occurred while checking for an existing credential. The error was: {$a->cause}';
 $string['getcredentialserror'] = 'An error occurred while fetching credentials. The error was: {$a->cause}';
 $string['credentialcreateerror'] = 'An error occurred while creating a credential on Accredible. The error was: {$a->cause}';
 $string['evidenceadderror'] = 'An error occurred while adding evidence to Accredible credential id = {$a->credentialid}. The error was: {$a->cause}';
 
-// Shown on the activity settings form rather than logged.
 $string['getgroupserror'] = 'An error occurred while fetching your Accredible groups. Check the API key in the plugin settings, or contact Accredible\'s support.';
 $string['gettemplateserror'] = 'An error occurred while fetching certificate templates. Check the API key in the plugin settings, or contact Accredible\'s support.';
 $string['getattributekeysserror'] = 'An error occurred while fetching your Accredible custom attribute keys. Check the API key in the plugin settings, or contact Accredible\'s support.';
