@@ -215,13 +215,44 @@ final class mod_accredible_locallib_test extends \advanced_testcase {
     }
 
     /**
+     * Legacy pre-2017 completionactivities maps are treated as a plain flag.
+     *
+     * Characterisation test. Before the completion-map rule was removed, a stored
+     * base64-serialized map containing the final quiz's id could earn a credential
+     * on its own, independently of the grade. Only the final-quiz grade decides now.
+     * Pinned here so that divergence stays deliberate rather than incidental.
+     *
+     * @covers ::accredible_check_if_cert_earned
+     */
+    public function test_check_if_cert_earned_ignores_legacy_completion_map(): void {
+        $user = [
+            'id'    => $this->user->id,
+            'email' => $this->user->email,
+            'name'  => $this->user->firstname . ' ' . $this->user->lastname,
+        ];
+
+        // Quiz is out of 10 and passinggrade is 70, so 4 scores 40% and fails.
+        $quiz = $this->create_quiz_module($this->course->id);
+        $this->create_quiz_grades($quiz->id, $this->user->id, 4);
+
+        // The shape the pre-2017 settings form wrote: the final quiz, marked incomplete.
+        $legacymap = base64_encode(serialize([$quiz->id => false]));
+        $accredible = $this->create_accredible_instance($this->course->id, $quiz->id, $legacymap);
+
+        // The old completion sweep marked this map satisfied and returned true despite
+        // the failing grade. The grade rule alone decides now.
+        $this->assertFalse(accredible_check_if_cert_earned($accredible, $user));
+    }
+
+    /**
      * Create accredible activity.
      *
      * @param int $courseid
      * @param int $finalquizid
+     * @param mixed $completionactivities stored completionactivities column value
      * @return \stdClass accredible instance
      */
-    private function create_accredible_instance($courseid, $finalquizid = 0): \stdClass {
+    private function create_accredible_instance($courseid, $finalquizid = 0, $completionactivities = null): \stdClass {
         global $DB;
         $dbrecord = [
             "name"                 => 'Accredible Test',
@@ -230,7 +261,7 @@ final class mod_accredible_locallib_test extends \advanced_testcase {
             "passinggrade"         => 70,
             "timecreated"          => time(),
             "groupid"              => 1,
-            "completionactivities" => null,
+            "completionactivities" => $completionactivities,
         ];
 
         $id = $DB->insert_record('accredible', $dbrecord);

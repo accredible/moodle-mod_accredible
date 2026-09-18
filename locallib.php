@@ -44,121 +44,20 @@ function accredible_check_if_cert_earned($record, $user) {
 
     $earned = false;
 
-    // Check for the existence of an activity instance and an auto-issue rule.
-    if ($record && ($record->finalquiz || $record->completionactivities)) {
-        if ($record->finalquiz) {
-            $quiz = $DB->get_record('quiz', ['id' => $record->finalquiz], '*', MUST_EXIST);
-            // Create that credential if it doesn't exist.
-            $usersgrade = min(( quiz_get_best_grade($quiz, $user['id']) / $quiz->grade ) * 100, 100);
-            $gradeishighenough = ($usersgrade >= $record->passinggrade);
+    // Check for the existence of an activity instance and a final-quiz rule.
+    // Issuance on course completion is decided by accredible_course_completed_handler().
+    if ($record && $record->finalquiz) {
+        $quiz = $DB->get_record('quiz', ['id' => $record->finalquiz], '*', MUST_EXIST);
+        $usersgrade = min(( quiz_get_best_grade($quiz, $user['id']) / $quiz->grade ) * 100, 100);
+        $gradeishighenough = ($usersgrade >= $record->passinggrade);
 
-            // Check for pass.
-            if ($gradeishighenough) {
-                // Student earned certificate through final quiz.
-                $earned = true;
-            }
-        }
-
-        $completionactivities = unserialize_completion_array($record->completionactivities);
-
-        if (!empty($quiz)) {
-            // If this quiz is in the completion activities.
-            if (isset($completionactivities[$quiz->id])) {
-                $completionactivities[$quiz->id] = true;
-                $quizattempts = $DB->get_records('quiz_attempts', ['userid' => $user['id'], 'state' => 'finished']);
-                foreach ($quizattempts as $quizattempt) {
-                    // If this quiz was already attempted, then we shouldn't be issuing a certificate.
-                    if ($quizattempt->quiz == $quiz->id && $quizattempt->attempt > 1) {
-                        return null;
-                    }
-                    // Otherwise, set this quiz as completed.
-                    if (isset($completionactivities[$quizattempt->quiz])) {
-                        $completionactivities[$quizattempt->quiz] = true;
-                    }
-                }
-
-                // But was this the last required activity that was completed?
-                $coursecomplete = true;
-                foreach ($completionactivities as $iscomplete) {
-                    if (!$iscomplete) {
-                        $coursecomplete = false;
-                    }
-                }
-                // If it was the final activity.
-                if ($coursecomplete) {
-                    // Student earned certificate by completing completion activities.
-                    $earned = true;
-                }
-            }
+        // Check for pass.
+        if ($gradeishighenough) {
+            // Student earned certificate through final quiz.
+            $earned = true;
         }
     }
     return $earned;
-}
-
-/**
- * Evaluate completion-activities eligibility for a quiz submission.
- * Fires credential_issue_skipped at each negative decision point and returns a
- * result array the caller can act on without re-implementing the eligibility rules.
- *
- * @param stdClass $user
- * @param stdClass $record accredible activity record
- * @param stdClass $quiz submitted quiz
- * @param \context $ctx context for events
- * @return array ['relevant' => false] | ['eligible' => false, 'reason' => string] | ['eligible' => true]
- */
-function accredible_evaluate_completion_eligibility($user, $record, $quiz, $ctx) {
-    global $DB;
-
-    if (empty($record->completionactivities)) {
-        return ['relevant' => false];
-    }
-
-    // Detect a corrupt record: non-empty value that fails to unserialize.
-    $unserialized = @unserialize(base64_decode($record->completionactivities));
-    if ($unserialized === false) {
-        \mod_accredible\event\credential_issue_skipped::create([
-            'context' => $ctx,
-            'relateduserid' => $user->id,
-            'other' => ['reason' => 'malformed_completion_record', 'groupid' => $record->groupid ?? null],
-        ])->trigger();
-        return ['eligible' => false, 'reason' => 'malformed_completion_record'];
-    }
-
-    $completionactivities = (array)$unserialized;
-
-    // This quiz is not tracked by this record — not relevant to its issuance rule.
-    if (!isset($completionactivities[$quiz->id])) {
-        return ['relevant' => false];
-    }
-
-    $completionactivities[$quiz->id] = true;
-    $quizattempts = $DB->get_records('quiz_attempts', ['userid' => $user->id, 'state' => 'finished']);
-    foreach ($quizattempts as $quizattempt) {
-        if ($quizattempt->quiz == $quiz->id && $quizattempt->attempt > 1) {
-            \mod_accredible\event\credential_issue_skipped::create([
-                'context' => $ctx,
-                'relateduserid' => $user->id,
-                'other' => ['reason' => 'repeat_attempt', 'groupid' => $record->groupid ?? null],
-            ])->trigger();
-            return ['eligible' => false, 'reason' => 'repeat_attempt'];
-        }
-        if (isset($completionactivities[$quizattempt->quiz])) {
-            $completionactivities[$quizattempt->quiz] = true;
-        }
-    }
-
-    foreach ($completionactivities as $iscomplete) {
-        if (!$iscomplete) {
-            \mod_accredible\event\credential_issue_skipped::create([
-                'context' => $ctx,
-                'relateduserid' => $user->id,
-                'other' => ['reason' => 'completion_not_met', 'groupid' => $record->groupid ?? null],
-            ])->trigger();
-            return ['eligible' => false, 'reason' => 'completion_not_met'];
-        }
-    }
-
-    return ['eligible' => true];
 }
 
 /**
@@ -362,27 +261,13 @@ function accredible_quiz_submission_handler($event, $localcredentials = null) {
                             }
                         }
                     } else {
-                        $gradetoolow = false;
-
-                        // Final-quiz grade rule. Defer the skip so the completion rule can be the
-                        // single terminal decision when this quiz belongs to both rules.
+                        // Final-quiz grade rule. Issuance on course completion is owned by
+                        // accredible_course_completed_handler(), not by this handler.
                         if ($quiz->id == $record->finalquiz) {
                             $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
                             if ($usersgrade >= $record->passinggrade) {
                                 $localcredentials->create_credential($user, $record->groupid, null, $customattributes, $ctx);
-                                $existingcertificate = true;
                             } else {
-                                $gradetoolow = true;
-                            }
-                        }
-
-                        // Completion-activities rule (skipped once the grade rule has issued).
-                        if (!$existingcertificate) {
-                            $eligibility = accredible_evaluate_completion_eligibility($user, $record, $quiz, $ctx);
-                            if (isset($eligibility['eligible']) && $eligibility['eligible']) {
-                                $localcredentials->create_credential($user, $record->groupid, null, $customattributes, $ctx);
-                            } else if ($gradetoolow && isset($eligibility['relevant'])) {
-                                // Grade too low and the completion rule didn't apply to this quiz.
                                 \mod_accredible\event\credential_issue_skipped::create([
                                     'context' => $ctx,
                                     'relateduserid' => $user->id,
@@ -416,10 +301,8 @@ function accredible_quiz_submission_handler($event, $localcredentials = null) {
                             }
                         }
                     } else {
-                        $gradetoolow = false;
-
-                        // Final-quiz grade rule. Defer the skip so the completion rule can be the
-                        // single terminal decision when this quiz belongs to both rules.
+                        // Final-quiz grade rule. Issuance on course completion is owned by
+                        // accredible_course_completed_handler(), not by this handler.
                         if ($quiz->id == $record->finalquiz) {
                             $usersgrade = min(( quiz_get_best_grade($quiz, $user->id) / $quiz->grade ) * 100, 100);
                             if ($usersgrade >= $record->passinggrade) {
@@ -440,35 +323,7 @@ function accredible_quiz_submission_handler($event, $localcredentials = null) {
                                   'relateduserid' => $event->relateduserid,
                                 ]);
                                 $certificateevent->trigger();
-                                $existingcertificate = true;
                             } else {
-                                $gradetoolow = true;
-                            }
-                        }
-
-                        // Completion-activities rule (skipped once the grade rule has issued).
-                        if (!$existingcertificate) {
-                            $eligibility = accredible_evaluate_completion_eligibility($user, $record, $quiz, $ctx);
-                            if (isset($eligibility['eligible']) && $eligibility['eligible']) {
-                                // And issue a certificate.
-                                $apiresponse = accredible_issue_default_certificate(
-                                    $user->id,
-                                    $record->id,
-                                    fullname($user),
-                                    $user->email,
-                                    null,
-                                    null,
-                                    null,
-                                    $customattributes
-                                );
-                                $certificateevent = \mod_accredible\event\certificate_created::create([
-                                  'objectid' => $apiresponse->credential->id,
-                                  'context' => $ctx,
-                                  'relateduserid' => $event->relateduserid,
-                                ]);
-                                $certificateevent->trigger();
-                            } else if ($gradetoolow && isset($eligibility['relevant'])) {
-                                // Grade too low and the completion rule didn't apply to this quiz.
                                 \mod_accredible\event\credential_issue_skipped::create([
                                     'context' => $ctx,
                                     'relateduserid' => $user->id,
@@ -619,24 +474,6 @@ function accredible_get_transcript($courseid, $userid, $finalquizid) {
     } else {
         return false;
     }
-}
-
-/**
- * Serialize completion array
- *
- * @param Array $completionarray
- */
-function serialize_completion_array($completionarray) {
-    return base64_encode(serialize((array)$completionarray));
-}
-
-/**
- * Unserialize completion array
- *
- * @param stdObject $completionobject
- */
-function unserialize_completion_array($completionobject) {
-    return is_null($completionobject) ? [] : (array)unserialize(base64_decode($completionobject));
 }
 
 /**
