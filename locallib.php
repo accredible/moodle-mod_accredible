@@ -200,6 +200,25 @@ function accredible_log_creation($certificateid, $userid, $courseid, $cmid) {
 }
 
 /**
+ * Decode a pre-2017 activity-completion map, if that is what this record still stores.
+ *
+ * The settings form became a simple "issue on course completion" checkbox in March 2017, but no
+ * upgrade step ever converted the existing rows, so a record nobody has re-saved since then still
+ * holds a base64-encoded serialized [quizid => bool] map. Nothing reads that map any more, so such
+ * an activity silently stops issuing; detecting it lets the handler say so in the log.
+ *
+ * @param string|null $value the stored completionactivities value.
+ * @return array|false the decoded map, or false when this is a current value.
+ */
+function accredible_decode_legacy_completion_map($value) {
+    if ($value === null || $value === '' || $value === '0' || $value === '1') {
+        return false;
+    }
+    $decoded = @unserialize(base64_decode((string) $value, true));
+    return is_array($decoded) ? $decoded : false;
+}
+
+/**
  * Quiz submission handler (checks for a completed course)
  *
  * @param core/event $event quiz mod attempt_submitted event
@@ -222,6 +241,23 @@ function accredible_quiz_submission_handler($event, $localcredentials = null) {
     if ($accrediblecertificaterecords = $DB->get_records('accredible', ['course' => $event->courseid])) {
         foreach ($accrediblecertificaterecords as $record) {
             try {
+                // A record still holding the pre-2017 map has no rule any code path can act on.
+                // Only complain for the quizzes that map actually tracked, so a course does not
+                // log this on every submission.
+                $legacymap = accredible_decode_legacy_completion_map($record->completionactivities);
+                if ($legacymap !== false && isset($legacymap[$quiz->id])) {
+                    \mod_accredible\event\credential_issue_skipped::create([
+                        'context' => $ctx,
+                        'relateduserid' => $user->id,
+                        'other' => [
+                            'reason' => 'legacy_completion_map',
+                            'trigger' => 'quiz_submission',
+                            'groupid' => $record->groupid ?? null,
+                        ],
+                    ])->trigger();
+                    continue;
+                }
+
                 if (!$record->finalquiz && !$record->completionactivities) {
                     \mod_accredible\event\credential_issue_skipped::create([
                         'context' => $ctx,

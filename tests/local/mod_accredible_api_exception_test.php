@@ -303,6 +303,30 @@ final class mod_accredible_api_exception_test extends \advanced_testcase {
     }
 
     /**
+     * A pre-2017 completion map must be recognised, and current values must not be.
+     *
+     * @covers ::accredible_decode_legacy_completion_map
+     */
+    public function test_legacy_completion_map_detection(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/accredible/locallib.php');
+
+        $map = base64_encode(serialize([7 => true, 9 => false]));
+        $this->assertSame([7 => true, 9 => false], accredible_decode_legacy_completion_map($map));
+
+        // Everything the settings form has written since March 2017.
+        foreach ([null, '', '0', '1'] as $current) {
+            $this->assertFalse(
+                accredible_decode_legacy_completion_map($current),
+                'A current value was mistaken for a legacy map: ' . var_export($current, true)
+            );
+        }
+        // Anything else is left alone rather than guessed at.
+        $this->assertFalse(accredible_decode_legacy_completion_map('not base64 at all'));
+        $this->assertFalse(accredible_decode_legacy_completion_map(base64_encode(serialize('a string'))));
+    }
+
+    /**
      * An API-layer failure must leave an api_request_failed row beside the issuance failure.
      *
      * @covers \mod_accredible\apirest\apirest::detect_error
