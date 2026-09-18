@@ -70,9 +70,23 @@ $string['reason_missing_email'] = 'The user has no email address';
 $string['reason_missing_groupid'] = 'No Accredible group id is configured';
 $string['reason_nothing_to_check'] = 'The activity has no final quiz or completion activities configured';
 $string['reason_repeat_attempt'] = 'The deciding quiz was attempted more than once';
+$string['reason_legacy_completion_map'] = 'The activity uses an activity-completion rule that is no longer supported - set a final quiz, or enable course completion for this course';
 $string['reason_malformed_completion_record'] = 'The stored completion activities record is corrupt';
+$string['trigger_quiz_submission'] = 'a quiz submission';
+$string['trigger_course_completed'] = 'course completion';
+$string['trigger_manual_issue'] = 'a manual issue from the activity settings';
 $string['manualissuefailures'] = 'Credential issuance failed for {$a->count} user(s): {$a->users}. See Site administration → Reports → Logs (component mod_accredible) for details.';
 $string['credentialloaderror'] = 'Could not load credentials from Accredible right now. Please try again later; details are in the logs (component mod_accredible).';
+
+$string['groupsyncerror'] = 'An error occurred while checking for an existing credential. The error was: {$a->cause}';
+$string['getcredentialserror'] = 'An error occurred while fetching credentials. The error was: {$a->cause}';
+$string['credentialcreateerror'] = 'An error occurred while creating a credential on Accredible. The error was: {$a->cause}';
+$string['evidenceadderror'] = 'An error occurred while adding evidence to Accredible credential id = {$a->credentialid}. The error was: {$a->cause}';
+
+$string['getgroupserror'] = 'An error occurred while fetching your Accredible groups. Check the API key in the plugin settings, or contact Accredible\'s support.';
+$string['gettemplateserror'] = 'An error occurred while fetching certificate templates. Check the API key in the plugin settings, or contact Accredible\'s support.';
+$string['getattributekeysserror'] = 'An error occurred while fetching your Accredible custom attribute keys. Check the API key in the plugin settings, or contact Accredible\'s support.';
+
 $string['gradeissueheader'] = 'Auto-issue criteria: by final quiz grade';
 $string['id'] = 'ID';
 $string['indexheader'] = 'All certificates/badges for {$a}';

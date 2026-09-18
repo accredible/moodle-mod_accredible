@@ -239,11 +239,64 @@ final class mod_accredible_handler_resilience_test extends \advanced_testcase {
     }
 
     /**
+     * A final-quiz submission below the passing grade logs grade_below_threshold.
+     * @covers ::accredible_quiz_submission_handler
+     */
+    public function test_quiz_handler_logs_grade_below_threshold(): void {
+        global $DB;
+        $quiz = $this->create_quiz();
+        $attempt = $this->insert_attempt($quiz->id, 1);
+        // Quiz is out of 10 and passinggrade is 70, so 5 scores 50% and fails.
+        $DB->insert_record('quiz_grades', ['quiz' => $quiz->id, 'userid' => $this->user->id, 'grade' => 5]);
+        $this->create_accredible_record($quiz->id);
+
+        $mockcreds = $this->mock_credentials();
+        $mockcreds->method('check_for_existing_credential')->willReturn(false);
+        $mockcreds->expects($this->never())->method('create_credential');
+
+        $sink = $this->redirectEvents();
+        accredible_quiz_submission_handler($this->quiz_submitted_event($quiz, $attempt), $mockcreds);
+
+        $skipped = $this->filter_events($sink->get_events(), credential_issue_skipped::class);
+        $this->assertCount(1, $skipped);
+        $this->assertEquals('grade_below_threshold', $skipped[0]->other['reason']);
+    }
+
+    /**
+     * The real skip reason survives when the completion checkbox is also enabled.
+     *
+     * Regression guard: the removed completion-eligibility rule used to intercept this
+     * case and log malformed_completion_record instead, masking the actual reason for
+     * every completion-enabled record.
+     *
+     * @covers ::accredible_quiz_submission_handler
+     */
+    public function test_quiz_handler_logs_grade_below_threshold_with_completion_enabled(): void {
+        global $DB;
+        $quiz = $this->create_quiz();
+        $attempt = $this->insert_attempt($quiz->id, 1);
+        $DB->insert_record('quiz_grades', ['quiz' => $quiz->id, 'userid' => $this->user->id, 'grade' => 5]);
+        // The settings-form checkbox stores '1'.
+        $this->create_accredible_record($quiz->id, '1');
+
+        $mockcreds = $this->mock_credentials();
+        $mockcreds->method('check_for_existing_credential')->willReturn(false);
+        $mockcreds->expects($this->never())->method('create_credential');
+
+        $sink = $this->redirectEvents();
+        accredible_quiz_submission_handler($this->quiz_submitted_event($quiz, $attempt), $mockcreds);
+
+        $skipped = $this->filter_events($sink->get_events(), credential_issue_skipped::class);
+        $this->assertCount(1, $skipped);
+        $this->assertEquals('grade_below_threshold', $skipped[0]->other['reason']);
+    }
+
+    /**
      * course_completed does not re-issue when a credential already exists
      * @covers ::accredible_course_completed_handler
      */
     public function test_course_completed_guard_prevents_double_issue(): void {
-        $this->create_accredible_record(0, serialize_completion_array([999 => 1]));
+        $this->create_accredible_record(0, '1');
 
         $mockcreds = $this->mock_credentials();
         $mockcreds->method('check_for_existing_credential')->willReturn((object)['id' => 123]);

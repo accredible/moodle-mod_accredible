@@ -53,7 +53,18 @@ class credential_issue_failed extends \core\event\base {
             ? get_string('reason_' . $reason, 'mod_accredible')
             : $reason;
         $message = $this->other['message'] ?? '';
+        // The Logs report renders only this description, never the raw "other" blob, so the group
+        // and the originating class have to be spelled out here or they cannot be read at all.
+        $group = $this->other['groupid'] ?? null;
+        $groupclause = $group ? " in Accredible group '{$group}'" : '';
+        $class = $this->other['class'] ?? null;
+        $classclause = $class ? " [{$class}]" : '';
+        $trigger = $this->other['trigger'] ?? null;
+        $triggertext = $trigger && get_string_manager()->string_exists('trigger_' . $trigger, 'mod_accredible')
+            ? get_string('trigger_' . $trigger, 'mod_accredible')
+            : $trigger;
+        $triggerclause = $triggertext ? ", triggered by {$triggertext}" : '';
         return "Accredible credential issuance failed (reason: {$reasontext}) for user with id " .
-            "'{$this->relateduserid}'. {$message}";
+            "'{$this->relateduserid}'{$groupclause}{$triggerclause}. {$message}{$classclause}";
     }
 }
