@@ -111,9 +111,11 @@ jobs:
           # Preferred source: the "## <tag>" section of CHANGELOG.md, written by
           # hand during the version bump and reviewed in the release PR.
           if [[ -f CHANGELOG.md ]]; then
+            # Stop at the next release heading or at the trailing "---"
+            # footer, so the last section does not swallow the file footer.
             awk -v tag="## ${TAGNAME}" '
               $0 == tag { found = 1; next }
-              found && /^## / { exit }
+              found && /^(## |---[[:space:]]*$)/ { exit }
               found { print }
             ' CHANGELOG.md | sed -e '/./,$!d' -e ':a' -e '/^\n*$/{$d;N;ba' -e '}' > "${NOTES_FILE}"
           fi
