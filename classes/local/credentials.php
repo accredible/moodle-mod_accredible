@@ -121,13 +121,15 @@ class credentials {
             ])->trigger();
 
             return $credential->credential;
-        } catch (\Exception $e) {
-            throw new \moodle_exception(
+        } catch (\Throwable $e) {
+            throw new api_exception(
                 'credentialcreateerror',
-                'accredible',
                 'https://help.accredible.com/hc/en-us',
-                $user->email,
-                $groupid
+                (object) ['cause' => api_exception::cause_text($e)],
+                // No $debuginfo: the cause is already in $a, and core would append it to the
+                // message a second time on any box running DEBUG_DEVELOPER.
+                null,
+                $e
             );
         }
     }
@@ -174,13 +176,15 @@ class credentials {
             // The legacy (achievement-name) path emits certificate_created from its
             // callers, not credential_issued (which is the modern group-based event).
             return $credential->credential;
-        } catch (\Exception $e) {
-            throw new \moodle_exception(
+        } catch (\Throwable $e) {
+            throw new api_exception(
                 'credentialcreateerror',
-                'accredible',
                 'https://help.accredible.com/hc/en-us',
-                $user->email,
-                $achievementname
+                (object) ['cause' => api_exception::cause_text($e)],
+                // No $debuginfo: the cause is already in $a, and core would append it to the
+                // message a second time on any box running DEBUG_DEVELOPER.
+                null,
+                $e
             );
         }
     }
@@ -225,22 +229,18 @@ class credentials {
                 }
             }
             return $credentials;
-        } catch (\Exception $e) {
-            // Throw API exception.
-            // Include the achievement id that triggered the error.
-            // Direct the user to accredible's support.
-            // Dump the achievement id to debug_info.
-            $exceptionparam = new \stdClass();
-            $exceptionparam->groupid = $groupid;
-            $exceptionparam->email = $email;
-            if (isset($credentialspage)) {
-                $exceptionparam->last_response = $credentialspage;
-            }
-            throw new \moodle_exception(
+        } catch (\Throwable $e) {
+            // The learner's email and the raw last response used to be passed here. Both now stay
+            // out: this message is written to logstore_standard_log, relateduserid already
+            // identifies the learner, and a decoded response is unbounded in size.
+            throw new api_exception(
                 'getcredentialserror',
-                'accredible',
                 'https://help.accredible.com/hc/en-us',
-                $exceptionparam
+                (object) ['cause' => api_exception::cause_text($e)],
+                // No $debuginfo: the cause is already in $a, and core would append it to the
+                // message a second time on any box running DEBUG_DEVELOPER.
+                null,
+                $e
             );
         }
     }
@@ -267,12 +267,18 @@ class credentials {
             } else {
                 return false;
             }
-        } catch (\Exception $e) {
-            // Throw API exception
-            // include the achievement id that triggered the error
-            // direct the user to accredible's support
-            // dump the achievement id to debug_info.
-            throw new \moodle_exception('groupsyncerror', 'accredible', 'https://help.accredible.com/hc/en-us', $groupid, $groupid);
+        } catch (\Throwable $e) {
+            // Caught as Throwable rather than Exception: a PHP 8 Error raised in the try above
+            // would otherwise escape this catch entirely.
+            throw new api_exception(
+                'groupsyncerror',
+                'https://help.accredible.com/hc/en-us',
+                (object) ['cause' => api_exception::cause_text($e)],
+                // No $debuginfo: the cause is already in $a, and core would append it to the
+                // message a second time on any box running DEBUG_DEVELOPER.
+                null,
+                $e
+            );
         }
     }
 

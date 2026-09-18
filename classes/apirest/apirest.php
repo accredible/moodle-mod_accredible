@@ -17,6 +17,7 @@
 namespace mod_accredible\apirest;
 
 use mod_accredible\client\client;
+use mod_accredible\local\api_exception;
 
 /**
  * Class to make requests to Accredible API.
@@ -196,12 +197,14 @@ class apirest {
 
         $errmsg = $this->detect_error($result);
         if ($throwerror && $errmsg !== null) {
-            throw new \moodle_exception(
+            throw new api_exception(
                 'evidenceadderror',
-                'accredible',
                 'https://help.accredible.com/hc/en-us',
-                $credentialid,
-                $errmsg
+                (object) [
+                    'credentialid' => $credentialid,
+                    'cause' => $errmsg,
+                ],
+                null
             );
         }
         return $result;
@@ -400,13 +403,40 @@ class apirest {
             'context' => \context_system::instance(),
             'relateduserid' => $userid ?: null,
             'other' => [
-                'endpoint' => $this->client->lasturl,
+                'endpoint' => self::redact_endpoint($this->client->lasturl),
                 'http_status' => $this->client->respcode,
                 'error' => $errmsg,
                 'latencyms' => $this->client->latencyms,
             ],
         ])->trigger();
         return $errmsg;
+    }
+
+    /**
+     * Strip the learner's email address out of a request URL before it is logged.
+     *
+     * get_credentials() is the only call that puts an address in a URL, and it sits on the issuance
+     * hot path, so every failed lookup wrote one into logstore_standard_log, which gets exported as
+     * CSV. Only email is replaced; group_id and the paging stay. This does lose the address as
+     * actually sent, which relateduserid cannot recover - if that matters, record it deliberately
+     * and declare it in classes/privacy/provider.php rather than reinstating it here.
+     *
+     * @param string|null $url the URL of the last request.
+     * @return string|null
+     */
+    private static function redact_endpoint($url) {
+        if (!is_string($url) || strpos($url, '?') === false) {
+            return $url;
+        }
+        [$path, $querystring] = explode('?', $url, 2);
+        parse_str($querystring, $params);
+        if (empty($params['email'])) {
+            return $url;
+        }
+        $params['email'] = 'REDACTED';
+        // The separator is pinned: Moodle sets arg_separator.output to "&amp;", which would
+        // otherwise be HTML-encoded into the logged URL.
+        return $path . '?' . http_build_query($params, '', '&');
     }
 
     /**
