@@ -1,8 +1,12 @@
 #
-# Whenever a new tag starting with "v" is pushed, add the tagged version
-# to the Moodle Plugins directory at https://moodle.org/plugins
+# Whenever a new tag starting with "v" is pushed, submit the tagged version to
+# Moodle Marketplace at https://marketplace.moodle.com/plugins/mod_accredible
 #
-name: Releasing in the Plugins directory
+# The Moodle Plugins directory (moodle.org/plugins) became read-only on
+# 20 July 2026 and its local_plugins_add_version webservice no longer accepts
+# submissions. See https://moodledev.io/general/community/plugincontribution/moodlemarketplaceapi
+#
+name: Releasing in Moodle Marketplace
 run-name: Release ${{ inputs.tag || github.ref_name }}
 
 on:
@@ -17,7 +21,7 @@ on:
         required: true
         type: string
     secrets:
-      MOODLE_ORG_TOKEN:
+      MOODLE_MARKETPLACE_TOKEN:
         required: true
 
   workflow_dispatch:
@@ -31,18 +35,17 @@ defaults:
     shell: bash
 
 jobs:
-  release-at-moodle-org:
+  release-to-marketplace:
     runs-on: ubuntu-latest
     env:
       PLUGIN: mod_accredible
-      CURL: curl -s
-      ENDPOINT: https://moodle.org/webservice/rest/server.php
-      TOKEN: ${{ secrets.MOODLE_ORG_TOKEN }}
-      FUNCTION: local_plugins_add_version
+      PLUGIN_DIR: accredible
+      ENDPOINT: https://marketplace.moodle.com/api
+      TOKEN: ${{ secrets.MOODLE_MARKETPLACE_TOKEN }}
 
     steps:
-      - name: Call the service function
-        id: add-version
+      - name: Resolve the tag name
+        id: resolve-tag
         run: |
           # workflow_dispatch input
           if [[ ! -z "${{ github.event.inputs.tag }}" ]]; then
@@ -55,26 +58,148 @@ jobs:
             TAGNAME="${GITHUB_REF##*/}"
           fi
           if [[ -z "${TAGNAME}" ]]; then
-            echo "No tag name has been provided!"
+            echo "::error::No tag name has been provided!"
             exit 1
           fi
-          ZIPURL="https://api.github.com/repos/${{ github.repository }}/zipball/${TAGNAME}"
-          RESPONSE=$(${CURL} ${ENDPOINT} --data-urlencode "wstoken=${TOKEN}" \
-                                         --data-urlencode "wsfunction=${FUNCTION}" \
-                                         --data-urlencode "moodlewsrestformat=json" \
-                                         --data-urlencode "frankenstyle=${PLUGIN}" \
-                                         --data-urlencode "zipurl=${ZIPURL}" \
-                                         --data-urlencode "vcssystem=git" \
-                                         --data-urlencode "vcsrepositoryurl=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
-                                         --data-urlencode "vcstag=${TAGNAME}" \
-                                         --data-urlencode "changelogurl=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commits/${TAGNAME}" \
-                                         --data-urlencode "altdownloadurl=${ZIPURL}")
-          echo "response=${RESPONSE}" >> $GITHUB_OUTPUT
+          echo "tag=${TAGNAME}" >> $GITHUB_OUTPUT
 
-      - name: Evaluate the response
-        id: evaluate-response
-        env:
-          RESPONSE: ${{ steps.add-version.outputs.response }}
+      - name: Checkout the tagged code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.resolve-tag.outputs.tag }}
+          # Full history so the previous tag can be resolved for the fallback
+          # release notes.
+          fetch-depth: 0
+
+      - name: Build the plugin zip
+        id: package
         run: |
-          jq <<< ${RESPONSE}
-          jq --exit-status ".id" <<< ${RESPONSE} > /dev/null
+          STAGE="${RUNNER_TEMP}/package"
+          ZIP_FILE="${RUNNER_TEMP}/${PLUGIN_DIR}.zip"
+          mkdir -p "${STAGE}/${PLUGIN_DIR}"
+
+          # Same exclude list as scripts/build-plugin-zip.sh: ship the plugin,
+          # not the repo's development tooling. A leading slash anchors the
+          # pattern to the repo root, so a nested directory that happens to be
+          # called scripts/ (or similar) is still packaged.
+          rsync -a \
+            --exclude='/.git' \
+            --exclude='/.github' \
+            --exclude='/.claude' \
+            --exclude='/.vscode' \
+            --exclude='/.playwright-mcp' \
+            --exclude='/.gitignore' \
+            --exclude='/scripts' \
+            --exclude='/Dockerfile' \
+            --exclude='/docker-compose*.yml' \
+            --exclude='/phpunit.xml' \
+            --exclude='/tests/phpunit.xml' \
+            --exclude='.DS_Store' \
+            --exclude='node_modules' \
+            --exclude='*.zip' \
+            "${GITHUB_WORKSPACE}/" "${STAGE}/${PLUGIN_DIR}/"
+
+          ( cd "${STAGE}" && zip -r -X -q "${ZIP_FILE}" "${PLUGIN_DIR}" )
+
+          echo "zip_file=${ZIP_FILE}" >> $GITHUB_OUTPUT
+          echo "Packaged $(du -h "${ZIP_FILE}" | cut -f1) into ${PLUGIN_DIR}/"
+
+      - name: Collect the release notes
+        id: release-notes
+        env:
+          TAGNAME: ${{ steps.resolve-tag.outputs.tag }}
+        run: |
+          NOTES_FILE="${RUNNER_TEMP}/release-notes.txt"
+
+          # Preferred source: the "## <tag>" section of CHANGELOG.md, written by
+          # hand during the version bump and reviewed in the release PR.
+          if [[ -f CHANGELOG.md ]]; then
+            # Stop at the next release heading or at the trailing "---"
+            # footer, so the last section does not swallow the file footer.
+            awk -v tag="## ${TAGNAME}" '
+              $0 == tag { found = 1; next }
+              found && /^(## |---[[:space:]]*$)/ { exit }
+              found { print }
+            ' CHANGELOG.md | sed -e '/./,$!d' -e ':a' -e '/^\n*$/{$d;N;ba' -e '}' > "${NOTES_FILE}"
+          fi
+
+          # Fallback: the commit subjects since the previous tag, minus the
+          # version bump and any merge commits. "--no-merges" misses squash
+          # merges, whose subject is still "Merge pull request ...", so those
+          # are filtered by subject too.
+          if [[ ! -s "${NOTES_FILE}" ]]; then
+            echo "No CHANGELOG.md section for ${TAGNAME}; falling back to the commit log."
+            PREV_TAG=$(git describe --tags --abbrev=0 "${TAGNAME}^" 2>/dev/null || true)
+            if [[ -n "${PREV_TAG}" ]]; then
+              RANGE="${PREV_TAG}..${TAGNAME}"
+            else
+              RANGE="${TAGNAME}"
+            fi
+            git log --no-merges --pretty='- %s' "${RANGE}" \
+              | grep -viE '^- (bump version|merge )' > "${NOTES_FILE}" || true
+          fi
+
+          echo "notes_file=${NOTES_FILE}" >> $GITHUB_OUTPUT
+          echo "Release notes for ${TAGNAME}:"
+          cat "${NOTES_FILE}"
+
+      - name: Submit the version to Moodle Marketplace
+        id: submit
+        env:
+          TAGNAME: ${{ steps.resolve-tag.outputs.tag }}
+          ZIP_FILE: ${{ steps.package.outputs.zip_file }}
+          NOTES_FILE: ${{ steps.release-notes.outputs.notes_file }}
+        run: |
+          if [[ -z "${TOKEN}" ]]; then
+            echo "::error::MOODLE_MARKETPLACE_TOKEN is not set. Generate one at https://marketplace.moodle.com/account/security"
+            exit 1
+          fi
+
+          ARGS=(
+            --silent
+            --show-error
+            --request POST
+            --header "Authorization: Bearer ${TOKEN}"
+            --form "file=@${ZIP_FILE}"
+            --form "vcsTag=${TAGNAME}"
+            --form "vcsBranch=master"
+            --form "vcsRepositoryUrl=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
+          )
+
+          # releaseNotes is optional; "=<file" keeps multi-line text intact and
+          # stops curl from reading a leading "@" or "<" as a file reference.
+          if [[ -s "${NOTES_FILE}" ]]; then
+            ARGS+=(--form "releaseNotes=<${NOTES_FILE}")
+          fi
+
+          HTTP_STATUS=$(curl "${ARGS[@]}" \
+            --output response.json \
+            --write-out '%{http_code}' \
+            "${ENDPOINT}/plugins/${PLUGIN}/versions")
+
+          echo "HTTP ${HTTP_STATUS}"
+          jq . response.json 2>/dev/null || cat response.json
+
+          if [[ "${HTTP_STATUS}" -ne 201 ]]; then
+            echo "::error::Marketplace API returned ${HTTP_STATUS} for ${TAGNAME}"
+            if jq -e '.violations' response.json >/dev/null 2>&1; then
+              echo "Validation violations:"
+              jq '.violations' response.json
+            fi
+            exit 1
+          fi
+
+          VERSION_ID=$(jq -r '.id' response.json)
+          VERSION_STATUS=$(jq -r '.status' response.json)
+
+          echo "## 🚀 Submitted to Moodle Marketplace" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Tag** | \`${TAGNAME}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Version ID** | \`${VERSION_ID}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Status** | \`${VERSION_STATUS}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Automated prechecks run before the version goes live." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [View on Moodle Marketplace](https://marketplace.moodle.com/plugins/${PLUGIN})" >> $GITHUB_STEP_SUMMARY

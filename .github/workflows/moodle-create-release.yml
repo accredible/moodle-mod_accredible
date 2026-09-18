@@ -10,7 +10,7 @@
 #   2. Create and push annotated git tag
 #   3. Merge master back into develop with --no-ff
 #   4. Push develop
-#   5. Trigger moodle-release.yml via workflow_call
+#   5. Trigger moodle-release.yml via workflow_call (submits to Moodle Marketplace)
 #
 name: Create Release Tag
 
@@ -151,15 +151,15 @@ jobs:
           echo "| **Release Branch** | \`${RELEASE_BRANCH}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| **Merged to develop** | ${{ github.event.inputs.skip_develop_merge != 'true' && '✅ Yes' || '⏭️ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "The **Releasing in the Plugins directory** workflow will run next." >> $GITHUB_STEP_SUMMARY
+          echo "The **Releasing in Moodle Marketplace** workflow will run next." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🔗 [View release on Moodle.org](https://moodle.org/plugins/mod_accredible)" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [View release on Moodle Marketplace](https://marketplace.moodle.com/plugins/mod_accredible)" >> $GITHUB_STEP_SUMMARY
 
-  # Trigger the release workflow to publish to Moodle.org
+  # Trigger the release workflow to publish to Moodle Marketplace
   trigger-release:
     needs: create-release
     uses: ./.github/workflows/moodle-release.yml
     with:
       tag: ${{ needs.create-release.outputs.version }}
     secrets:
-      MOODLE_ORG_TOKEN: ${{ secrets.MOODLE_ORG_TOKEN }}
+      MOODLE_MARKETPLACE_TOKEN: ${{ secrets.MOODLE_MARKETPLACE_TOKEN }}
