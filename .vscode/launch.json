@@ -1,0 +1,31 @@
+{
+  // Xdebug step debugging for mod_accredible against the moodle-docker stack.
+  // Requires the "PHP Debug" extension (xdebug.php-debug) and Xdebug enabled in
+  // the container: scripts/xdebug.sh enable
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Plugin + Moodle core. Adjust the second mapping if your moodle-docker
+      // checkout does not sit at ../moodle-dev/moodle-docker relative to this repo.
+      "name": "Listen for Xdebug (plugin + core)",
+      "type": "php",
+      "request": "launch",
+      "port": 9003,
+      "pathMappings": {
+        "/var/www/html/mod/accredible": "${workspaceFolder}",
+        "/var/www/html": "${workspaceFolder}/../moodle-dev/moodle-docker/moodle"
+      }
+    },
+    {
+      // Plugin only - use this if you have not cloned Moodle core locally.
+      // Breakpoints only bind inside this repo.
+      "name": "Listen for Xdebug (plugin only)",
+      "type": "php",
+      "request": "launch",
+      "port": 9003,
+      "pathMappings": {
+        "/var/www/html/mod/accredible": "${workspaceFolder}"
+      }
+    }
+  ]
+}

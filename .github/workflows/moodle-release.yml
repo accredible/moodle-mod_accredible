@@ -79,21 +79,24 @@ jobs:
           mkdir -p "${STAGE}/${PLUGIN_DIR}"
 
           # Same exclude list as scripts/build-plugin-zip.sh: ship the plugin,
-          # not the repo's development tooling.
+          # not the repo's development tooling. A leading slash anchors the
+          # pattern to the repo root, so a nested directory that happens to be
+          # called scripts/ (or similar) is still packaged.
           rsync -a \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='.claude' \
-            --exclude='.vscode' \
-            --exclude='.playwright-mcp' \
-            --exclude='scripts' \
+            --exclude='/.git' \
+            --exclude='/.github' \
+            --exclude='/.claude' \
+            --exclude='/.vscode' \
+            --exclude='/.playwright-mcp' \
+            --exclude='/.gitignore' \
+            --exclude='/scripts' \
+            --exclude='/Dockerfile' \
+            --exclude='/docker-compose*.yml' \
+            --exclude='/phpunit.xml' \
+            --exclude='/tests/phpunit.xml' \
             --exclude='.DS_Store' \
-            --exclude='phpunit.xml' \
-            --exclude='tests/phpunit.xml' \
             --exclude='node_modules' \
             --exclude='*.zip' \
-            --exclude='Dockerfile' \
-            --exclude='docker-compose*.yml' \
             "${GITHUB_WORKSPACE}/" "${STAGE}/${PLUGIN_DIR}/"
 
           ( cd "${STAGE}" && zip -r -X -q "${ZIP_FILE}" "${PLUGIN_DIR}" )

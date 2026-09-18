@@ -179,6 +179,135 @@ MOODLE_DATABASE_PASSWORD: (No password)
 
 You can find available environment variables on [README.md](https://github.com/bitnami/bitnami-docker-moodle) of the original docker-compose repository from bitnami.
 
+### Step debugging with Xdebug
+
+You can step through the plugin's PHP line by line (breakpoints, call stack, variable
+inspection) with [Xdebug](https://xdebug.org/). The instructions below are for the
+[moodle-docker](https://github.com/moodlehq/moodle-docker) dev environment, where this
+repo is bind-mounted into the webserver container at `/var/www/html/mod/accredible`.
+
+#### 1. Enable Xdebug in the container
+
+The `moodlehq/moodle-php-apache` image does not ship Xdebug, so it has to be compiled
+into the running container:
+
+```
+scripts/xdebug.sh enable
+```
+
+The script installs Xdebug with PECL, writes the debug settings, restarts the webserver
+and prints the resulting configuration. Other subcommands:
+
+```
+scripts/xdebug.sh status     # is Xdebug loaded, and with which settings?
+scripts/xdebug.sh disable    # turn it off without uninstalling
+```
+
+The container is auto-detected; override it with `WEBSERVER_CONTAINER=<name>` if you run
+more than one Moodle stack. `XDEBUG_PORT` (default `9003`) and `XDEBUG_IDEKEY` (default
+`PHPSTORM`) can be overridden the same way.
+
+> **Note:** the install lives in the container's writable layer. It survives
+> `docker restart`, but is lost when the container is recreated (`docker compose down`,
+> an image pull, etc). Just run `scripts/xdebug.sh enable` again.
+
+The settings written are:
+
+```
+xdebug.mode = debug
+xdebug.client_host = host.docker.internal
+xdebug.client_port = 9003
+xdebug.start_with_request = trigger
+xdebug.idekey = PHPSTORM
+```
+
+`start_with_request = trigger` means only requests that explicitly ask for it are
+debugged, so ordinary page loads are not slowed down or left hanging when the IDE is not
+listening.
+
+#### 2. Configure your IDE
+
+**PhpStorm**
+
+1. *Settings → PHP → Debug*: set **Debug port** to `9003`.
+2. *Settings → PHP → Servers*: add a server named `moodle-docker`, host `localhost`,
+   port `8000`, debugger *Xdebug*, tick **Use path mappings** and map:
+
+   | Local path                        | Server path                      |
+   | --------------------------------- | -------------------------------- |
+   | your `moodle-docker/moodle` clone  | `/var/www/html`                  |
+   | this repo                         | `/var/www/html/mod/accredible`   |
+
+   The second mapping is easy to miss — without it, breakpoints in `lib.php`,
+   `locallib.php` or `classes/**` will never be hit.
+3. Click the phone icon (**Start Listening for PHP Debug Connections**).
+
+**VS Code**
+
+1. Install the [PHP Debug](https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug)
+   extension (`xdebug.php-debug`).
+2. This repo ships a ready-made `.vscode/launch.json` with two configurations:
+
+   - **Listen for Xdebug (plugin + core)** — breakpoints bind in this repo *and* in
+     Moodle core. It assumes your moodle-docker checkout sits at
+     `../moodle-dev/moodle-docker` relative to this repo; adjust the `/var/www/html`
+     mapping if yours is elsewhere.
+   - **Listen for Xdebug (plugin only)** — use this if you have not cloned Moodle core
+     locally. Breakpoints outside this repo will not bind.
+
+3. Open the **Run and Debug** panel (`⇧⌘D`), pick a configuration and press `F5`. The
+   status bar turns orange while VS Code is listening on port 9003.
+
+The `/var/www/html/mod/accredible` → `${workspaceFolder}` mapping is the important one —
+without it, breakpoints in `lib.php`, `locallib.php` or `classes/**` will never be hit.
+
+#### 3. Trigger a debug session
+
+Set a breakpoint, make sure the IDE is listening, then:
+
+- **Browser** — append `?XDEBUG_TRIGGER=1` to the URL, or install the
+  [Xdebug helper](https://github.com/BrianGilbert/xdebug-helper-for-chrome) browser
+  extension and toggle it on. The extension is the easier option for AJAX endpoints,
+  since its cookie is sent with every request automatically.
+- **CLI scripts / cron**:
+
+  ```
+  docker exec -e XDEBUG_TRIGGER=1 -e PHP_IDE_CONFIG=serverName=moodle-docker \
+    moodle-docker-webserver-1 php admin/cli/cron.php
+  ```
+
+- **PHPUnit** — same environment variables in front of the `phpunit` command:
+
+  ```
+  docker exec -e XDEBUG_TRIGGER=1 -e PHP_IDE_CONFIG=serverName=moodle-docker \
+    moodle-docker-webserver-1 php admin/tool/phpunit/cli/util.php --run mod/accredible/tests
+  ```
+
+#### Troubleshooting
+
+- **Breakpoints are grey / never hit** — the path mapping for
+  `/var/www/html/mod/accredible` is missing or wrong.
+- **No connection at all** — check the container can reach the host. On Docker Desktop
+  for Mac and Windows `host.docker.internal` resolves automatically; on plain Linux use
+  the host IP or add `extra_hosts: ["host.docker.internal:host-gateway"]` to the
+  webserver service. Also make sure port `9003` is not blocked by a firewall.
+- **Requests hang with no debugger attached** — something set
+  `xdebug.start_with_request = yes`. Reset it with `scripts/xdebug.sh disable` and
+  re-enable.
+
+#### Without a debugger
+
+For quick tracing you often do not need to step at all. Set the following in the
+Moodle `config.php`:
+
+```php
+$CFG->debug = (E_ALL | E_STRICT);
+$CFG->debugdisplay = 1;
+```
+
+and write to the log with `error_log(print_r($value, true));`, which shows up in
+`docker logs -f moodle-docker-webserver-1`.
+
 ### Test
 
 This plugin uses [PHPUnit](https://docs.moodle.org/dev/PHPUnit) for the unit tests.
@@ -255,40 +384,58 @@ This plugin is trying to be consistent and follow the recommendations according 
 
 ### Code checker setup
 
-You can check if the code meets the Moodle coding style with PHP_CodeSniffer and Code checker. 
+Coding style is checked with [PHP_CodeSniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer) (PHPCS) using the
+[`moodle` standard from `moodlehq/moodle-cs`](https://github.com/moodlehq/moodle-cs). This is the same standard the CI
+workflow applies via `moodle-plugin-ci phpcs`.
 
-#### 1. PHP_CodeSniffer
-
-Install [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) (PHPCS).
-
-For Mac:
+Install both with a single Composer global requirement — `moodle-cs` depends on PHPCS, so it is pulled in for you:
 
 ```
-brew install php-code-sniffer
+composer global config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+composer global require moodlehq/moodle-cs
+```
+
+Make sure Composer's global `bin` directory is on your `PATH`:
+
+```
+export PATH="$(composer global config home)/vendor/bin:$PATH"
+```
+
+No manual `installed_paths` configuration is needed — `moodle-cs` ships the
+`dealerdirect/phpcodesniffer-composer-installer` plugin, which registers the standard with PHPCS on install.
+
+Verify the setup:
+
+```
 phpcs --version
-```
-
-#### 2. Code checker
-
-Download the Moodle coding standard with [Code checker](https://github.com/moodlehq/moodle-local_codechecker) and add it to PHPCS.
-
-```
-git clone https://github.com/moodlehq/moodle-local_codechecker.git .codechecker
-phpcs --config-set installed_paths $(pwd)/.codechecker
-```
-
-Check the installed coding standards with the following command:
-
-```
 phpcs -i
 ```
 
-Confirm that `moodle` is displayed in the installed coding standards.
+Confirm that `moodle` is listed in the installed coding standards.
 
 ### Run Code checker
 
-Replace `[FILE_PATH]` by the target directory or file path, and run the following command to check the coding style.
+Check the whole plugin:
+
+```
+phpcs --standard=moodle --extensions=php '--ignore=*/node_modules/*,*/vendor/*' .
+```
+
+The quotes around `--ignore` are required in zsh, which otherwise tries to expand the globs itself and fails with
+`no matches found`.
+
+Check a specific directory or file:
 
 ```
 phpcs --standard=moodle [FILE_PATH]
 ```
+
+Other useful options:
+
+```
+phpcs --standard=moodle --warning-severity=0 [FILE_PATH]   # errors only
+phpcbf --standard=moodle [FILE_PATH]                       # auto-fix what can be fixed
+```
+
+CI runs `moodle-plugin-ci phpcs --max-warnings 0`, so warnings fail the build just like errors. The plugin should
+report zero of both before you open a PR.
