@@ -42,6 +42,7 @@ $functions = [
         'classpath' => '',
         'description' => 'Use by form autocomplete for selecting a sharable question.',
         'type' => 'read',
+        'capabilities' => 'mod/accredible:addinstance, moodle/course:manageactivities',
         'ajax' => true,
     ],
 ];
