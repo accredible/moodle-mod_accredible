@@ -308,6 +308,7 @@ final class mod_accredible_locallib_test extends \advanced_testcase {
             'not base64' => ['not base64!'],
             'base64 of plain text' => [base64_encode('hello')],
             'base64 of a serialized string' => [base64_encode(serialize('a:1'))],
+            'base64 of a malformed array' => [base64_encode('a:invalid')],
         ];
     }
 
