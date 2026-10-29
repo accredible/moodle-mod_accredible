@@ -226,6 +226,36 @@ function accredible_decode_legacy_completion_map($value) {
 }
 
 /**
+ * Reduce a completionactivities value to one the plugin can have written itself.
+ *
+ * Current records hold '0', '1' or null, and records nobody has re-saved since 2017 may still
+ * hold a legacy [quizid => bool] map. Anything else did not come from this plugin, so it is
+ * dropped.
+ *
+ * @param mixed $value the completionactivities value to store.
+ * @return string|null the value unchanged when it is one of those, otherwise null.
+ */
+function accredible_normalise_completionactivities($value) {
+    if ($value === null) {
+        return null;
+    }
+    $value = (string) $value;
+    if ($value === '0' || $value === '1') {
+        return $value;
+    }
+    $legacymap = accredible_decode_legacy_completion_map($value);
+    if ($legacymap === false) {
+        return null;
+    }
+    foreach ($legacymap as $completed) {
+        if (!is_scalar($completed)) {
+            return null;
+        }
+    }
+    return $value;
+}
+
+/**
  * Quiz submission handler (checks for a completed course)
  *
  * @param core/event $event quiz mod attempt_submitted event

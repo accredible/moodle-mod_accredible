@@ -312,6 +312,39 @@ final class mod_accredible_locallib_test extends \advanced_testcase {
     }
 
     /**
+     * Only values the plugin could have written itself are kept.
+     *
+     * @dataProvider normalise_completionactivities_provider
+     * @covers ::accredible_normalise_completionactivities
+     * @param mixed $value incoming completionactivities value
+     * @param string|null $expected value to store
+     */
+    public function test_normalise_completionactivities($value, $expected): void {
+        $this->assertSame($expected, accredible_normalise_completionactivities($value));
+    }
+
+    /**
+     * Incoming completionactivities values and what should be stored for each.
+     *
+     * @return array
+     */
+    public static function normalise_completionactivities_provider(): array {
+        $legacymap = base64_encode(serialize([12 => false, 34 => true]));
+        return [
+            'null' => [null, null],
+            'unchecked' => ['0', '0'],
+            'checked' => ['1', '1'],
+            'checked as int' => [1, '1'],
+            'legacy map' => [$legacymap, $legacymap],
+            'empty' => ['', null],
+            'other text' => ['payload', null],
+            'serialized object' => [base64_encode(serialize(new \stdClass())), null],
+            'legacy map holding an object' => [base64_encode(serialize([12 => new \stdClass()])), null],
+            'legacy map holding an array' => [base64_encode(serialize([12 => [true]])), null],
+        ];
+    }
+
+    /**
      * Create accredible activity.
      *
      * @param int $courseid
