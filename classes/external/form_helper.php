@@ -83,24 +83,44 @@ class form_helper extends \external_api {
      * @param int $instanceid ID of the accredible activity instance.
      *
      * @return array of users.
+     * @throws \required_capability_exception when the user cannot add or edit the activity.
+     * @throws \dml_missing_record_exception when the activity does not belong to the course.
      */
     public static function reload_users($courseid, $groupid, $instanceid = null) {
+        global $DB;
+
         $params = self::validate_parameters(
             self::reload_users_parameters(),
             ['courseid' => $courseid, 'groupid' => $groupid, 'instanceid' => $instanceid]
         );
-        $context = \context_course::instance($courseid);
-        self::validate_context($context);
+        $coursecontext = \context_course::instance($params['courseid']);
 
-        $enrolledusers = get_enrolled_users($context, "mod/accredible:view", null, 'u.*', 'id');
+        // Only the activity edit form needs this list, so require what that form requires.
+        if ($params['instanceid']) {
+            $accredible = $DB->get_record(
+                'accredible',
+                ['id' => $params['instanceid'], 'course' => $params['courseid']],
+                'id',
+                MUST_EXIST
+            );
+            $cm = get_coursemodule_from_instance('accredible', $accredible->id, $params['courseid'], false, MUST_EXIST);
+            $context = \context_module::instance($cm->id);
+            self::validate_context($context);
+            require_capability('moodle/course:manageactivities', $context);
+        } else {
+            self::validate_context($coursecontext);
+            require_capability('mod/accredible:addinstance', $coursecontext);
+        }
+
+        $enrolledusers = get_enrolled_users($coursecontext, "mod/accredible:view", null, 'u.*', 'id');
         $users = [
             'users' => [],
             'unissued_users' => [],
         ];
 
         $userhelper = new users();
-        $users['users'] = $userhelper->get_users_with_credentials($enrolledusers, $groupid);
-        $users['unissued_users'] = $userhelper->get_unissued_users($users['users'], $instanceid);
+        $users['users'] = $userhelper->get_users_with_credentials($enrolledusers, $params['groupid']);
+        $users['unissued_users'] = $userhelper->get_unissued_users($users['users'], $params['instanceid']);
 
         return $users;
     }
