@@ -207,6 +207,9 @@ function accredible_log_creation($certificateid, $userid, $courseid, $cmid) {
  * holds a base64-encoded serialized [quizid => bool] map. Nothing reads that map any more, so such
  * an activity silently stops issuing; detecting it lets the handler say so in the log.
  *
+ * The stored value can be set through course restore, so it is untrusted: only a serialized
+ * array is decoded, and never with classes allowed, so no object can be instantiated from it.
+ *
  * @param string|null $value the stored completionactivities value.
  * @return array|false the decoded map, or false when this is a current value.
  */
@@ -214,7 +217,11 @@ function accredible_decode_legacy_completion_map($value) {
     if ($value === null || $value === '' || $value === '0' || $value === '1') {
         return false;
     }
-    $decoded = @unserialize(base64_decode((string) $value, true));
+    $serialized = base64_decode((string) $value, true);
+    if ($serialized === false || strpos($serialized, 'a:') !== 0) {
+        return false;
+    }
+    $decoded = @unserialize($serialized, ['allowed_classes' => false]);
     return is_array($decoded) ? $decoded : false;
 }
 
