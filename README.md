@@ -18,7 +18,7 @@ Here's a video showing a tutorial on how to install and start using the plugin: 
 
 ## Compatability
 
-This plugin has been tested and is working on Moodle 2.7+ and Moodle 3.1+.
+Requires Moodle 3.11 or later. It is tested on Moodle 3.11 through 5.0, with PHP 7.4 to 8.3.
 
 ---
 
