@@ -20,6 +20,11 @@ use mod_accredible\local\user;
 use mod_accredible\client\client;
 use mod_accredible\apirest\apirest;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/accredible/tests/mock_helper.php');
+
 /**
  * Unit tests for mod/accredible/classes/local/users.php
  *
@@ -30,6 +35,8 @@ use mod_accredible\apirest\apirest;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class mod_accredible_users_test extends \advanced_testcase {
+    use \mod_accredible\mock_helper;
+
     /**
      * Mock API response data.
      * @var class $mockapi
@@ -117,8 +124,7 @@ final class mod_accredible_users_test extends \advanced_testcase {
                               'credential_id'  => 10250012, ];
         $expectedresponse = ['0' => $userrespone, '1' => $user2respone];
 
-        $mockclient1 = $this->getMockBuilder(client::class)
-            ->onlyMethods(['get'])
+        $mockclient1 = $this->get_partial_mock_builder(client::class, ['get'])
             ->getMock();
 
         // Mock API response data.
@@ -149,8 +155,7 @@ final class mod_accredible_users_test extends \advanced_testcase {
         $this->assertEquals($result, $expectedresponse);
 
         // When apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder(client::class)
-            ->onlyMethods(['get'])
+        $mockclient2 = $this->get_partial_mock_builder(client::class, ['get'])
             ->getMock();
 
         // Mock API response data. The error is detected by HTTP status, so set respcode.

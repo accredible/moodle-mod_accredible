@@ -21,6 +21,11 @@ use mod_accredible\client\client;
 use mod_accredible\Html2Text\Html2Text;
 use mod_accredible\local\groups;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/accredible/tests/mock_helper.php');
+
 /**
  * Unit tests for mod/accredible/classes/local/groups.php
  *
@@ -31,6 +36,8 @@ use mod_accredible\local\groups;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class mod_accredible_groups_test extends \advanced_testcase {
+    use \mod_accredible\mock_helper;
+
     /**
      * Mock API response data.
      * @var class $mockapi
@@ -71,8 +78,7 @@ final class mod_accredible_groups_test extends \advanced_testcase {
      */
     public function test_get_groups(): void {
         // When the apirest returns groups.
-        $mockclient1 = $this->getMockBuilder(client::class)
-            ->onlyMethods(['get'])
+        $mockclient1 = $this->get_partial_mock_builder(client::class, ['get'])
             ->getMock();
 
         // Mock API response data.
@@ -109,8 +115,7 @@ final class mod_accredible_groups_test extends \advanced_testcase {
         ]);
 
         // When the apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder(client::class)
-            ->onlyMethods(['get'])
+        $mockclient2 = $this->get_partial_mock_builder(client::class, ['get'])
             ->getMock();
 
         // Mock API response data.
@@ -136,8 +141,7 @@ final class mod_accredible_groups_test extends \advanced_testcase {
         $this->assertTrue($foundexception);
 
         // When the apirest returns no groups.
-        $mockclient3 = $this->getMockBuilder(client::class)
-            ->onlyMethods(['get'])
+        $mockclient3 = $this->get_partial_mock_builder(client::class, ['get'])
             ->getMock();
 
         // Mock API response data.
@@ -163,8 +167,7 @@ final class mod_accredible_groups_test extends \advanced_testcase {
      */
     public function test_get_templates(): void {
         // When the apirest returns groups.
-        $mockclient1 = $this->getMockBuilder(client::class)
-            ->onlyMethods(['post'])
+        $mockclient1 = $this->get_partial_mock_builder(client::class, ['post'])
             ->getMock();
 
         // Mock API response data.
@@ -205,8 +208,7 @@ final class mod_accredible_groups_test extends \advanced_testcase {
         ]);
 
         // When the apirest returns an error response.
-        $mockclient2 = $this->getMockBuilder(client::class)
-            ->onlyMethods(['post'])
+        $mockclient2 = $this->get_partial_mock_builder(client::class, ['post'])
             ->getMock();
 
         // Mock API response data.
@@ -234,8 +236,7 @@ final class mod_accredible_groups_test extends \advanced_testcase {
         $this->assertTrue($foundexception);
 
         // When the apirest returns no groups.
-        $mockclient3 = $this->getMockBuilder(client::class)
-            ->onlyMethods(['post'])
+        $mockclient3 = $this->get_partial_mock_builder(client::class, ['post'])
             ->getMock();
 
         // Mock API response data.

@@ -21,6 +21,11 @@ use mod_accredible\event\credential_issued;
 use mod_accredible\event\credential_issue_failed;
 use mod_accredible\event\credential_issue_skipped;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/accredible/tests/mock_helper.php');
+
 /**
  * Resilience tests for the issuance event handlers in locallib.php.
  *
@@ -31,6 +36,8 @@ use mod_accredible\event\credential_issue_skipped;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class mod_accredible_handler_resilience_test extends \advanced_testcase {
+    use \mod_accredible\mock_helper;
+
     /**
      * Test user.
      * @var \stdClass $user
@@ -156,8 +163,7 @@ final class mod_accredible_handler_resilience_test extends \advanced_testcase {
      * @return \PHPUnit\Framework\MockObject\MockObject
      */
     private function mock_credentials() {
-        return $this->getMockBuilder(credentials::class)
-            ->onlyMethods(['check_for_existing_credential', 'create_credential'])
+        return $this->get_partial_mock_builder(credentials::class, ['check_for_existing_credential', 'create_credential'])
             ->disableOriginalConstructor()
             ->getMock();
     }

@@ -19,6 +19,11 @@ namespace mod_accredible\local;
 use mod_accredible\apirest\apirest;
 use mod_accredible\client\client;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/accredible/tests/mock_helper.php');
+
 /**
  * Unit tests for error-cause preservation on the credential issuance path.
  *
@@ -29,6 +34,8 @@ use mod_accredible\client\client;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class mod_accredible_api_exception_test extends \advanced_testcase {
+    use \mod_accredible\mock_helper;
+
     /**
      * Every error key the plugin throws.
      * @var array
@@ -261,7 +268,7 @@ final class mod_accredible_api_exception_test extends \advanced_testcase {
      * @covers \mod_accredible\apirest\apirest::detect_error
      */
     public function test_logged_endpoint_carries_no_learner_email(): void {
-        $mockclient = $this->getMockBuilder(client::class)->onlyMethods(['get'])->getMock();
+        $mockclient = $this->get_partial_mock_builder(client::class, ['get'])->getMock();
         $mockclient->lasturl = 'https://api.accredible.com/v1/all_credentials?group_id=9549&email='
             . rawurlencode('learner@example.com') . '&page_size=50&page=1';
         $mockclient->respcode = 422;
@@ -289,7 +296,7 @@ final class mod_accredible_api_exception_test extends \advanced_testcase {
      */
     public function test_logged_endpoint_without_an_email_is_untouched(): void {
         $url = 'https://api.accredible.com/v1/credentials';
-        $mockclient = $this->getMockBuilder(client::class)->onlyMethods(['get'])->getMock();
+        $mockclient = $this->get_partial_mock_builder(client::class, ['get'])->getMock();
         $mockclient->lasturl = $url;
         $mockclient->respcode = 422;
         $api = new apirest($mockclient);
@@ -332,8 +339,7 @@ final class mod_accredible_api_exception_test extends \advanced_testcase {
      * @covers \mod_accredible\apirest\apirest::detect_error
      */
     public function test_api_failure_also_fires_api_request_failed(): void {
-        $mockclient = $this->getMockBuilder(client::class)
-            ->onlyMethods(['get'])
+        $mockclient = $this->get_partial_mock_builder(client::class, ['get'])
             ->getMock();
         $mockclient->error = 'The requested URL returned error: 401 Unauthorized';
         $mockclient->respcode = 401;

@@ -16,6 +16,11 @@
 
 namespace mod_accredible\local;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/accredible/tests/mock_helper.php');
+
 /**
  * Unit tests for mod/accredible/classes/local/formhelper.php
  *
@@ -26,6 +31,8 @@ namespace mod_accredible\local;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class mod_accredible_formhelper_test extends \advanced_testcase {
+    use \mod_accredible\mock_helper;
+
     /**
      * Course.
      * @var \stdClass $course
@@ -228,8 +235,7 @@ final class mod_accredible_formhelper_test extends \advanced_testcase {
      */
     public function test_get_attributekeys_choices(): void {
         // Mock attribute_keys class and 1 method.
-        $attributekeysmock = $this->getMockBuilder(attribute_keys::class)
-            ->onlyMethods(['get_attribute_keys'])
+        $attributekeysmock = $this->get_partial_mock_builder(attribute_keys::class, ['get_attribute_keys'])
             ->getMock();
 
         // When get_attribute_keys(mocked) method returns values for 'text' and 'date'.
@@ -251,8 +257,7 @@ final class mod_accredible_formhelper_test extends \advanced_testcase {
         $this->assertEquals($expected, $result);
 
         // Mock attribute_keys class and 1 method.
-        $attributekeysmock = $this->getMockBuilder(attribute_keys::class)
-            ->onlyMethods(['get_attribute_keys'])
+        $attributekeysmock = $this->get_partial_mock_builder(attribute_keys::class, ['get_attribute_keys'])
             ->getMock();
 
         // When get_attribute_keys(mocked) method returns empty for 'text' and 'date'.

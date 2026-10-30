@@ -7,6 +7,10 @@ Add a `## vX.Y.Z` section as part of the version bump on the release branch,
 before the tag is created. Marketplace versions cannot be edited after they
 are submitted, so whatever is written here is permanent for that release.
 
+## Unreleased
+
+- Raise the minimum supported Moodle version to 3.9.
+
 ## v2.5.1
 
 - Update Moodle logging.
