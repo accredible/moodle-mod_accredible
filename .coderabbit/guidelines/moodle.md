@@ -39,9 +39,10 @@ The plugin supports Moodle 3.11 to 5.0 on PHP 7.4 to 8.3 (see the CI matrix in
   check, and `require_login()` does not belong in an external function. The function's entry in
   `db/services.php` lists the capabilities it checks, and its `type` is `write` if it changes
   data.
-- Capabilities are `mod/accredible:*`, defined in `db/access.php`. Check them in the module
-  context, not the system context. A new capability needs a lang string
-  (`accredible:<name>`) and a version bump.
+- Capabilities are `mod/accredible:*`, defined in `db/access.php`. Check each one in the context
+  it is declared for: `addinstance` and the course-wide `index.php` use the course context;
+  anything acting on an existing instance uses the module context. Never the system context. A
+  new capability needs a lang string (`accredible:<name>`) and a version bump.
 - Input comes through `required_param()` / `optional_param()` or the external function's
   parameters, with the narrowest `PARAM_*` type. Flag `PARAM_RAW` on input and any direct use of
   `$_GET`, `$_POST` or `$_REQUEST`.
@@ -57,8 +58,10 @@ The plugin supports Moodle 3.11 to 5.0 on PHP 7.4 to 8.3 (see the CI matrix in
 - The API key (`$CFG->accredible_api_key`) must never be logged, put in an exception message,
   sent to the browser or included in an event.
 - API failures must not break the Moodle action that triggered them (course completion, grading,
-  the activity page). Catch `mod_accredible\local\api_exception`, record it with the existing
-  events (`api_request_failed`, `credential_issue_failed`), and carry on.
+  the activity page). Catch `mod_accredible\local\api_exception`, and also check responses with
+  `$apirest->detect_error()`: some calls, such as `recipient_sso_link()`, return null or an error
+  body instead of throwing (see `accredible_get_recipient_sso_link()` in `locallib.php`). Record
+  failures with the existing events (`api_request_failed`, `credential_issue_failed`) and carry on.
 - Sending new personal data to Accredible, or storing new user data locally, needs a matching
   update to `classes/privacy/provider.php`.
 
