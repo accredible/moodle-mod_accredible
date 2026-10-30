@@ -2,6 +2,8 @@
 language: 'en-US'
 
 knowledge_base:
+  web_search:
+    enabled: true
   code_guidelines:
     enabled: true
     filePatterns:

@@ -2,6 +2,22 @@
 
 Rules for reviewing this plugin. Flag code that breaks them; don't restate them when it doesn't.
 
+## Sources
+
+These guidelines cover what is specific to this plugin. For anything they don't cover, follow
+the Moodle developer docs:
+
+- Coding style: https://moodledev.io/general/development/policies/codingstyle
+- Security: https://moodledev.io/general/development/policies/security
+- External functions: https://moodledev.io/docs/apis/subsystems/external/security
+- Database API: https://moodledev.io/docs/apis/core/dml
+- Privacy API: https://moodledev.io/docs/apis/subsystems/privacy
+- Activity modules: https://moodledev.io/docs/apis/plugintypes/mod
+- PHPUnit: https://moodledev.io/general/development/tools/phpunit
+
+moodledev.io describes the latest Moodle by default. When it recommends an API or syntax that
+doesn't work on Moodle 3.11 or PHP 7.4, the Compatibility section below wins: don't suggest it.
+
 ## Compatibility
 
 The plugin supports Moodle 3.11 to 5.0 on PHP 7.4 to 8.3 (see the CI matrix in
