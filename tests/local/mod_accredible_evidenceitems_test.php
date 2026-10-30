@@ -19,6 +19,11 @@ namespace mod_accredible\local;
 use mod_accredible\apirest\apirest;
 use mod_accredible\client\client;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/accredible/tests/mock_helper.php');
+
 /**
  * Unit tests for mod/accredible/classes/local/evidenceitems.php
  *
@@ -29,6 +34,8 @@ use mod_accredible\client\client;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class mod_accredible_evidenceitems_test extends \advanced_testcase {
+    use \mod_accredible\mock_helper;
+
     /**
      * Mock API response data.
      * @var class $mockapi
@@ -82,8 +89,7 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
      */
     public function test_post_evidence(): void {
         // When the throw_error is FALSE and the response is successful.
-        $mockclient1 = $this->getMockBuilder(client::class)
-            ->onlyMethods(['post'])
+        $mockclient1 = $this->get_partial_mock_builder(client::class, ['post'])
             ->getMock();
 
         // Mock API response data.
@@ -114,8 +120,7 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
         $this->assertEquals($result, null);
 
         // When the throw_error is FALSE and the response is NOT successful.
-        $mockclient2 = $this->getMockBuilder(client::class)
-            ->onlyMethods(['post'])
+        $mockclient2 = $this->get_partial_mock_builder(client::class, ['post'])
             ->getMock();
         $mockclient2->error = 'The requested URL returned error: 401 Unauthorized';
 
@@ -137,8 +142,7 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
         $this->assertEquals($result, null);
 
         // When the throw_error is TRUE and the response is NOT successful.
-        $mockclient3 = $this->getMockBuilder(client::class)
-            ->onlyMethods(['post'])
+        $mockclient3 = $this->get_partial_mock_builder(client::class, ['post'])
             ->getMock();
         $mockclient3->error = 'The requested URL returned error: 401 Unauthorized';
 
@@ -206,8 +210,7 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
         $this->create_question_attempt($quiz->id, $this->user->id, $questionusageid, $question->id);
         $this->create_quiz_attempt($quiz->id, $this->user->id, $questionusageid);
 
-        $mockclient1 = $this->getMockBuilder(client::class)
-            ->onlyMethods(['post'])
+        $mockclient1 = $this->get_partial_mock_builder(client::class, ['post'])
             ->getMock();
 
         // Mock API response data.
@@ -274,8 +277,7 @@ final class mod_accredible_evidenceitems_test extends \advanced_testcase {
         $enrolid = $this->create_enrolment(1);
         $this->create_user_enrolment($enrolid, $user->id, strtotime('2022-04-15'));
 
-        $mockclient1 = $this->getMockBuilder(client::class)
-            ->onlyMethods(['post'])
+        $mockclient1 = $this->get_partial_mock_builder(client::class, ['post'])
             ->getMock();
 
         // Mock API response data.

@@ -19,6 +19,11 @@ namespace mod_accredible;
 use mod_accredible\local\credentials;
 use mod_accredible\event\credential_issue_failed;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/accredible/tests/mock_helper.php');
+
 /**
  * Resilience tests for the manual issuance batches in lib.php.
  *
@@ -29,6 +34,8 @@ use mod_accredible\event\credential_issue_failed;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class mod_accredible_batch_resilience_test extends \advanced_testcase {
+    use \mod_accredible\mock_helper;
+
     /**
      * Setup before every test.
      */
@@ -69,8 +76,7 @@ final class mod_accredible_batch_resilience_test extends \advanced_testcase {
 
         // The mock throws for the second user and is a no-op (skip) for the others,
         // so the success path does not reach the evidence-item API calls.
-        $mockcreds = $this->getMockBuilder(credentials::class)
-            ->onlyMethods(['create_credential'])
+        $mockcreds = $this->get_partial_mock_builder(credentials::class, ['create_credential'])
             ->disableOriginalConstructor()
             ->getMock();
         $mockcreds->expects($this->exactly(3))

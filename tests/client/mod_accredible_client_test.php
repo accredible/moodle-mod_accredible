@@ -18,6 +18,11 @@ namespace mod_accredible\client;
 
 use mod_accredible\client\client;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/accredible/tests/mock_helper.php');
+
 /**
  * Unit tests for mod/accredible/classes/client/client.php
  *
@@ -28,6 +33,8 @@ use mod_accredible\client\client;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class mod_accredible_client_test extends \advanced_testcase {
+    use \mod_accredible\mock_helper;
+
     /**
      * Setup before every test.
      */
@@ -56,8 +63,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
         ];
 
         // Mock curl.
-        $mockcurl = $this->getMockBuilder('curl')
-            ->onlyMethods(['get'])
+        $mockcurl = $this->get_partial_mock_builder('curl', ['get'])
             ->getMock();
 
         $mockcurl->expects($this->once())
@@ -89,8 +95,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
         ];
 
         // Mock curl.
-        $mockcurl = $this->getMockBuilder('curl')
-            ->onlyMethods(['post'])
+        $mockcurl = $this->get_partial_mock_builder('curl', ['post'])
             ->getMock();
 
         $reqdata = '{"evidence_item":{"string_object":"100"}}';
@@ -123,8 +128,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
         ];
 
         // Mock curl.
-        $mockcurl = $this->getMockBuilder('curl')
-            ->onlyMethods(['put'])
+        $mockcurl = $this->get_partial_mock_builder('curl', ['put'])
             ->getMock();
 
         $reqdata = '{"evidence_item":{"string_object":"100"}}';
@@ -158,8 +162,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
         $error = 'The requested URL returned error: 401 Unauthorized';
 
         // Mock curl.
-        $mockcurl = $this->getMockBuilder('curl')
-            ->onlyMethods(['get'])
+        $mockcurl = $this->get_partial_mock_builder('curl', ['get'])
             ->getMock();
         $mockcurl->error = $error;
 
@@ -186,7 +189,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
     public function test_error_is_reset_between_requests(): void {
         $url = 'https://api.accredible.com/v1/all_credentials';
 
-        $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
+        $mockcurl = $this->get_partial_mock_builder('curl', ['get'])->getMock();
         $mockcurl->method('get')->willReturn('{"ok":true}');
         $client = new client($mockcurl);
 
@@ -209,7 +212,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
     public function test_respcode_is_captured(): void {
         $url = 'https://api.accredible.com/v1/all_credentials';
 
-        $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
+        $mockcurl = $this->get_partial_mock_builder('curl', ['get'])->getMock();
         $mockcurl->info = ['http_code' => 404];
         $mockcurl->method('get')->willReturn('{"success":false,"data":"Group does not exist"}');
         $client = new client($mockcurl);
@@ -227,7 +230,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
     public function test_curl_error_returns_null_with_error(): void {
         $url = 'https://api.accredible.com/v1/all_credentials';
 
-        $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
+        $mockcurl = $this->get_partial_mock_builder('curl', ['get'])->getMock();
         $mockcurl->error = 'Could not resolve host';
         $mockcurl->method('get')->willReturn(false);
         $client = new client($mockcurl);
@@ -245,7 +248,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
     public function test_empty_body_returns_null_without_error(): void {
         $url = 'https://api.accredible.com/v1/all_credentials';
 
-        $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
+        $mockcurl = $this->get_partial_mock_builder('curl', ['get'])->getMock();
         $mockcurl->method('get')->willReturn('');
         $client = new client($mockcurl);
 
@@ -261,7 +264,7 @@ final class mod_accredible_client_test extends \advanced_testcase {
     public function test_malformed_json_returns_null_with_error(): void {
         $url = 'https://api.accredible.com/v1/all_credentials';
 
-        $mockcurl = $this->getMockBuilder('curl')->onlyMethods(['get'])->getMock();
+        $mockcurl = $this->get_partial_mock_builder('curl', ['get'])->getMock();
         $mockcurl->method('get')->willReturn('<html>Bad Gateway</html>');
         $client = new client($mockcurl);
 
