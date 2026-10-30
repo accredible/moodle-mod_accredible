@@ -245,6 +245,107 @@ final class mod_accredible_locallib_test extends \advanced_testcase {
     }
 
     /**
+     * A genuine pre-2017 map still decodes, so the handler can keep logging it.
+     *
+     * @covers ::accredible_decode_legacy_completion_map
+     */
+    public function test_decode_legacy_completion_map_decodes_legacy_array(): void {
+        $legacymap = base64_encode(serialize([12 => false, 34 => true]));
+
+        $this->assertSame([12 => false, 34 => true], accredible_decode_legacy_completion_map($legacymap));
+    }
+
+    /**
+     * A stored serialized object is never decoded.
+     *
+     * @covers ::accredible_decode_legacy_completion_map
+     */
+    public function test_decode_legacy_completion_map_rejects_object(): void {
+        $stored = base64_encode(serialize(new \stdClass()));
+
+        $this->assertFalse(accredible_decode_legacy_completion_map($stored));
+    }
+
+    /**
+     * An object hidden inside an array is left as an incomplete class and never woken up.
+     *
+     * @covers ::accredible_decode_legacy_completion_map
+     */
+    public function test_decode_legacy_completion_map_does_not_instantiate_nested_object(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/accredible/tests/fixtures/legacy_map_probe.php');
+        $stored = base64_encode(serialize([12 => new \mod_accredible\tests\fixtures\legacy_map_probe()]));
+        \mod_accredible\tests\fixtures\legacy_map_probe::$wokenup = false;
+
+        $decoded = accredible_decode_legacy_completion_map($stored);
+
+        $this->assertFalse(\mod_accredible\tests\fixtures\legacy_map_probe::$wokenup);
+        $this->assertInstanceOf(\__PHP_Incomplete_Class::class, $decoded[12]);
+    }
+
+    /**
+     * Current and malformed values are not treated as a legacy map.
+     *
+     * @dataProvider decode_legacy_completion_map_current_values_provider
+     * @covers ::accredible_decode_legacy_completion_map
+     * @param string|null $value stored completionactivities value
+     */
+    public function test_decode_legacy_completion_map_current_values($value): void {
+        $this->assertFalse(accredible_decode_legacy_completion_map($value));
+    }
+
+    /**
+     * Values that must not decode to a legacy map.
+     *
+     * @return array
+     */
+    public static function decode_legacy_completion_map_current_values_provider(): array {
+        return [
+            'null' => [null],
+            'empty' => [''],
+            'unchecked' => ['0'],
+            'checked' => ['1'],
+            'not base64' => ['not base64!'],
+            'base64 of plain text' => [base64_encode('hello')],
+            'base64 of a serialized string' => [base64_encode(serialize('a:1'))],
+            'base64 of a malformed array' => [base64_encode('a:invalid')],
+        ];
+    }
+
+    /**
+     * Only values the plugin could have written itself are kept.
+     *
+     * @dataProvider normalise_completionactivities_provider
+     * @covers ::accredible_normalise_completionactivities
+     * @param mixed $value incoming completionactivities value
+     * @param string|null $expected value to store
+     */
+    public function test_normalise_completionactivities($value, $expected): void {
+        $this->assertSame($expected, accredible_normalise_completionactivities($value));
+    }
+
+    /**
+     * Incoming completionactivities values and what should be stored for each.
+     *
+     * @return array
+     */
+    public static function normalise_completionactivities_provider(): array {
+        $legacymap = base64_encode(serialize([12 => false, 34 => true]));
+        return [
+            'null' => [null, null],
+            'unchecked' => ['0', '0'],
+            'checked' => ['1', '1'],
+            'checked as int' => [1, '1'],
+            'legacy map' => [$legacymap, $legacymap],
+            'empty' => ['', null],
+            'other text' => ['payload', null],
+            'serialized object' => [base64_encode(serialize(new \stdClass())), null],
+            'legacy map holding an object' => [base64_encode(serialize([12 => new \stdClass()])), null],
+            'legacy map holding an array' => [base64_encode(serialize([12 => [true]])), null],
+        ];
+    }
+
+    /**
      * Create accredible activity.
      *
      * @param int $courseid

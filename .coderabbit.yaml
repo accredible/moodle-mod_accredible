@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: 'en-US'
+
+knowledge_base:
+  web_search:
+    enabled: true
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - '.coderabbit/guidelines/*.md'
+  jira:
+    usage: 'enabled'
+    project_keys:
+      - 'DGR'
+
+reviews:
+  profile: 'chill'
+  poem: false
+  high_level_summary: true
+  in_progress_fortune: false
+  review_progress: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  related_issues: false
+  related_prs: false
+  suggested_labels: false
+  suggested_reviewers: true
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - 'master'
+      - 'develop'
+
+  path_filters:
+    - '!amd/build/**'
+
+  path_instructions:
+    - path: '**/*.php'
+      instructions: |
+        Apply .coderabbit/guidelines/moodle.md. Missing capability checks and PHP 8.0+ syntax
+        (the plugin still supports PHP 7.4 and Moodle 3.11) are the most important to catch.
+    - path: 'db/**'
+      instructions: |
+        Apply the "Database schema and versions" section of .coderabbit/guidelines/moodle.md.
+    - path: 'tests/**'
+      instructions: |
+        Apply the "Tests" section of .coderabbit/guidelines/moodle.md.
+
+  tools:
+    phpcs:
+      enabled: true
+    phpstan:
+      enabled: true
+    gitleaks:
+      enabled: true
+    actionlint:
+      enabled: true
+
+chat:
+  auto_reply: true

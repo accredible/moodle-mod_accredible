@@ -41,7 +41,7 @@ class accredible {
         $includegradeattribute = $post->includegradeattribute ?? 0;
         $gradeattributechecked = $includegradeattribute !== 0;
         $dbrecord = (object) [
-            'completionactivities' => $post->completionactivities ?? null,
+            'completionactivities' => !empty($post->completionactivities) ? 1 : 0,
             'name' => $post->name,
             'finalquiz' => $post->finalquiz,
             'passinggrade' => $post->passinggrade,
