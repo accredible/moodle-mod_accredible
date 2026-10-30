@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2026091800; // The current module version (Date: YYYYMMDDXX).
-$plugin->requires  = 2021051700; // Requires Moodle 3.11.
+$plugin->requires  = 2020061500; // Requires Moodle 3.9.
 $plugin->cron      = 0; // Period for cron to check this module (secs).
 $plugin->component = 'mod_accredible';
 

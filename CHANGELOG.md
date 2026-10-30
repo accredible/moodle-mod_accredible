@@ -9,7 +9,7 @@ are submitted, so whatever is written here is permanent for that release.
 
 ## Unreleased
 
-- Raise the minimum supported Moodle version to 3.11.
+- Raise the minimum supported Moodle version to 3.9.
 
 ## v2.5.1
 
