@@ -182,6 +182,54 @@ final class mod_accredible_accredible_test extends \advanced_testcase {
         $this->assertEquals(1, $result);
     }
 
+    /**
+     * The completion checkbox is stored as 1 or 0, whatever was posted.
+     *
+     * @dataProvider save_record_completionactivities_provider
+     * @covers ::save_record
+     * @param mixed $posted posted completionactivities value, or null when the field is absent
+     * @param int $expected value written to the record
+     */
+    public function test_save_record_stores_completionactivities_as_flag($posted, $expected): void {
+        global $DB;
+
+        $post = $this->generatepostobject();
+        if ($posted === null) {
+            unset($post->completionactivities);
+        } else {
+            $post->completionactivities = $posted;
+        }
+
+        $DB = $this->createMock(\moodle_database::class);
+        $DB->expects($this->once())
+            ->method('insert_record')
+            ->with(
+                'accredible',
+                $this->callback(function ($subject) use ($expected) {
+                    return $subject->completionactivities === $expected;
+                })
+            )
+            ->willReturn(1);
+
+        $this->accredible->save_record($post);
+    }
+
+    /**
+     * Posted completionactivities values and what should be stored for each.
+     *
+     * @return array
+     */
+    public static function save_record_completionactivities_provider(): array {
+        return [
+            'ticked' => ['1', 1],
+            'ticked as int' => [1, 1],
+            'unticked on update' => [0, 0],
+            'absent' => [null, 0],
+            'other text' => ['payload', 1],
+            'serialized object' => [base64_encode(serialize(new \stdClass())), 1],
+        ];
+    }
+
 
     /**
      * Test load_credential_custom_attributes method.

@@ -353,6 +353,7 @@ class mod_accredible_mod_form extends moodleform_mod {
 
         $mform->addElement('header', 'completionissue', get_string('completionissueheader', 'accredible'));
         $mform->addElement('checkbox', 'completionactivities', get_string('completionissuecheckbox', 'accredible'));
+        $mform->setType('completionactivities', PARAM_BOOL);
         if ($updatingcert && isset($accrediblecertificate->completionactivities)) {
             $mform->setDefault('completionactivities', 1);
         }
