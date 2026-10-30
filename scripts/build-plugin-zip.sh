@@ -62,6 +62,7 @@ rsync -a \
     --exclude='/.git' \
     --exclude='/.github' \
     --exclude='/.claude' \
+    --exclude='/.coderabbit*' \
     --exclude='/.vscode' \
     --exclude='/.playwright-mcp' \
     --exclude='/.gitignore' \
