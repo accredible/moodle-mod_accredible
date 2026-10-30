@@ -2,6 +2,10 @@
 language: 'en-US'
 
 knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - '.coderabbit/guidelines/*.md'
   jira:
     usage: 'enabled'
     project_keys:
@@ -38,21 +42,14 @@ reviews:
   path_instructions:
     - path: '**/*.php'
       instructions: |
-        Moodle plugin code. Follow Moodle coding style.
-        Page scripts must call require_login() then require_capability() before acting.
-        External functions must call validate_parameters(), validate_context() and then
-        require_capability(); validate_context() is not a capability check, and require_login()
-        does not belong in external functions. Flag any missing check.
-        Use the $DB API with placeholders, never string-built SQL. Escape output with
-        s()/format_string()/format_text(). User-facing strings go through get_string() with keys
-        in lang/en/accredible.php.
+        Apply .coderabbit/guidelines/moodle.md. Missing capability checks and PHP 8.0+ syntax
+        (the plugin still supports PHP 7.4 and Moodle 3.11) are the most important to catch.
     - path: 'db/**'
       instructions: |
-        upgrade.php steps must bump version.php; capabilities in access.php need matching
-        lang strings; services.php entries must list their capabilities.
+        Apply the "Database schema and versions" section of .coderabbit/guidelines/moodle.md.
     - path: 'tests/**'
       instructions: |
-        PHPUnit (advanced_testcase). Call resetAfterTest(). Test behaviour, not implementation.
+        Apply the "Tests" section of .coderabbit/guidelines/moodle.md.
 
   tools:
     phpcs:
