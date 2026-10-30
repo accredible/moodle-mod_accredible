@@ -109,6 +109,8 @@ class form_helper extends \external_api {
             require_capability('moodle/course:manageactivities', $context);
         } else {
             self::validate_context($coursecontext);
+            // Same pair as can_add_moduleinfo() and course_allowed_module() in course/modedit.php.
+            require_capability('moodle/course:manageactivities', $coursecontext);
             require_capability('mod/accredible:addinstance', $coursecontext);
         }
 

@@ -127,6 +127,23 @@ final class mod_accredible_form_helper_test extends \advanced_testcase {
     }
 
     /**
+     * Adding needs manageactivities as well as addinstance, as the add form does.
+     *
+     * @covers ::reload_users
+     */
+    public function test_addinstance_without_manageactivities_cannot_reload_users(): void {
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('mod/accredible:addinstance', CAP_ALLOW, $roleid, \context_system::instance());
+        $user = $this->getDataGenerator()->create_and_enrol($this->course, 'student');
+        role_assign($roleid, $user->id, \context_course::instance($this->course->id));
+        $this->setUser($user);
+
+        $this->expectException(\required_capability_exception::class);
+        $this->expectExceptionMessage('Manage activities');
+        $this->reload_users($this->course->id, 0);
+    }
+
+    /**
      * A non-editing teacher cannot open the edit form, so cannot load its list either.
      *
      * @covers ::reload_users
