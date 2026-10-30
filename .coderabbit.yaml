@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: 'en-US'
+
+knowledge_base:
+  jira:
+    usage: 'enabled'
+    project_keys:
+      - 'DGR'
+
+reviews:
+  profile: 'chill'
+  poem: false
+  high_level_summary: true
+  in_progress_fortune: false
+  review_progress: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  related_issues: false
+  related_prs: false
+  suggested_labels: false
+  suggested_reviewers: true
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - 'master'
+      - 'develop'
+
+  path_filters:
+    - '!amd/build/**'
+
+  path_instructions:
+    - path: '**/*.php'
+      instructions: |
+        Moodle plugin code. Follow Moodle coding style. External functions and pages must call
+        require_login / require_capability (or validate_context) before acting; flag missing
+        capability checks. Use the $DB API with placeholders, never string-built SQL. Escape
+        output with s()/format_string()/format_text(). User-facing strings go through
+        get_string() with keys in lang/en/accredible.php.
+    - path: 'db/**'
+      instructions: |
+        upgrade.php steps must bump version.php; capabilities in access.php need matching
+        lang strings; services.php entries must list their capabilities.
+    - path: 'tests/**'
+      instructions: |
+        PHPUnit (advanced_testcase). Call resetAfterTest(). Test behaviour, not implementation.
+
+  tools:
+    phpcs:
+      enabled: true
+    phpstan:
+      enabled: true
+    gitleaks:
+      enabled: true
+    actionlint:
+      enabled: true
+
+chat:
+  auto_reply: true
