@@ -44,7 +44,8 @@ class restore_accredible_activity_structure_step extends restore_activity_struct
      * @param object $data old accredible activity
      */
     protected function process_accredible($data) {
-        global $DB;
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/accredible/locallib.php');
 
         $data = (object)$data;
         $oldid = $data->id;
@@ -52,6 +53,12 @@ class restore_accredible_activity_structure_step extends restore_activity_struct
 
         $data->gradeattributegradeitemid = $this->get_mappingid('grade_item', $data->gradeattributegradeitemid);
         $data->finalquiz = $this->get_mappingid('quiz', $data->finalquiz);
+
+        // Backup files can be edited, so only keep values this plugin could have written.
+        $data->completionactivities = accredible_normalise_completionactivities($data->completionactivities ?? null);
+        $data->passinggrade = (int) ($data->passinggrade ?? 0);
+        $data->includegradeattribute = (int) ($data->includegradeattribute ?? 0);
+        $data->groupid = isset($data->groupid) ? (int) $data->groupid : null;
 
         // Insert the accredible record.
         $newitemid = $DB->insert_record('accredible', $data);
