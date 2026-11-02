@@ -144,6 +144,49 @@ final class mod_accredible_form_helper_test extends \advanced_testcase {
     }
 
     /**
+     * A custom role with manageactivities but not addinstance can still edit an activity.
+     *
+     * @covers ::reload_users
+     */
+    public function test_manageactivities_without_addinstance_can_reload_users_for_existing_activity(): void {
+        $this->setUser($this->create_manageactivities_user());
+
+        $result = $this->reload_users($this->course->id, $this->instanceid);
+
+        $this->assertCount(4, $result['users']);
+    }
+
+    /**
+     * A custom role with manageactivities but not addinstance cannot add an activity.
+     *
+     * @covers ::reload_users
+     */
+    public function test_manageactivities_without_addinstance_cannot_reload_users_for_new_activity(): void {
+        $this->setUser($this->create_manageactivities_user());
+
+        $this->expectException(\required_capability_exception::class);
+        $this->expectExceptionMessage('Add a certificate/badge instance');
+        $this->reload_users($this->course->id, 0);
+    }
+
+    /**
+     * Editing is checked against the activity, so a prohibit on the activity applies.
+     *
+     * @covers ::reload_users
+     */
+    public function test_manageactivities_prohibited_on_activity_cannot_reload_users(): void {
+        $cm = get_coursemodule_from_instance('accredible', $this->instanceid, $this->course->id, false, MUST_EXIST);
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('moodle/course:manageactivities', CAP_PROHIBIT, $roleid, \context_module::instance($cm->id));
+        role_assign($roleid, $this->editingteacher->id, \context_module::instance($cm->id));
+        $this->setUser($this->editingteacher);
+
+        $this->expectException(\required_capability_exception::class);
+        $this->expectExceptionMessage('Manage activities');
+        $this->reload_users($this->course->id, $this->instanceid);
+    }
+
+    /**
      * A non-editing teacher cannot open the edit form, so cannot load its list either.
      *
      * @covers ::reload_users
@@ -180,6 +223,19 @@ final class mod_accredible_form_helper_test extends \advanced_testcase {
 
         $this->expectException(\require_login_exception::class);
         $this->reload_users($this->course->id, $this->instanceid);
+    }
+
+    /**
+     * Create a user enrolled in $course whose only extra capability is manageactivities.
+     *
+     * @return \stdClass
+     */
+    private function create_manageactivities_user(): \stdClass {
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('moodle/course:manageactivities', CAP_ALLOW, $roleid, \context_system::instance());
+        $user = $this->getDataGenerator()->create_and_enrol($this->course, 'student');
+        role_assign($roleid, $user->id, \context_course::instance($this->course->id));
+        return $user;
     }
 
     /**

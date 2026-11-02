@@ -87,8 +87,6 @@ class form_helper extends \external_api {
      * @throws \dml_missing_record_exception when the activity does not belong to the course.
      */
     public static function reload_users($courseid, $groupid, $instanceid = null) {
-        global $DB;
-
         $params = self::validate_parameters(
             self::reload_users_parameters(),
             ['courseid' => $courseid, 'groupid' => $groupid, 'instanceid' => $instanceid]
@@ -97,19 +95,20 @@ class form_helper extends \external_api {
 
         // Only the activity edit form needs this list, so require what that form requires.
         if ($params['instanceid']) {
-            $accredible = $DB->get_record(
+            // Passing the course id rejects an activity from another course.
+            $cm = get_coursemodule_from_instance(
                 'accredible',
-                ['id' => $params['instanceid'], 'course' => $params['courseid']],
-                'id',
+                $params['instanceid'],
+                $params['courseid'],
+                false,
                 MUST_EXIST
             );
-            $cm = get_coursemodule_from_instance('accredible', $accredible->id, $params['courseid'], false, MUST_EXIST);
             $context = \context_module::instance($cm->id);
             self::validate_context($context);
             require_capability('moodle/course:manageactivities', $context);
         } else {
             self::validate_context($coursecontext);
-            // Same pair as can_add_moduleinfo() and course_allowed_module() in course/modedit.php.
+            // The add form checks both: can_add_moduleinfo() in course/modlib.php and course_allowed_module() in course/lib.php.
             require_capability('moodle/course:manageactivities', $coursecontext);
             require_capability('mod/accredible:addinstance', $coursecontext);
         }
