@@ -76,6 +76,9 @@ The plugin supports Moodle 3.11 to 5.0 on PHP 7.4 to 8.3 (see the CI matrix in
 
 - User-facing text goes through `get_string()` with the key in `lang/en/accredible.php`. Flag
   hard-coded English in PHP, templates or JS (JS uses `core/str`).
+- Developer-facing text stays in plain English, as it does in Moodle core: `description` in
+  `db/services.php` and the external function parameter and return descriptions,
+  `debugging()` messages, code comments and docblocks. Don't ask for `get_string()` there.
 - JavaScript lives in `amd/src`. A change there needs the rebuilt files in `amd/build` in the
   same PR; don't review `amd/build` itself.
 
