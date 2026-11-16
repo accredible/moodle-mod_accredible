@@ -1,4 +1,8 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# Merge this file with the org-wide config in accredible/coderabbit
+# (security and NFR checks). Settings in this file win.
+inheritance: true
+
 language: 'en-US'
 
 knowledge_base:
